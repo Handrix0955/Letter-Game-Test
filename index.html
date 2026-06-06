@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Handrix给Irene的数独游戏: han luv ire</title>
+    <title>Handrix给Ire的字母数独游戏: han luv ire</title>
     <style>
         :root {
             --primary: #4A90E2;
@@ -24,10 +24,11 @@
             margin: 0; padding: 15px;
             display: flex; flex-direction: column; align-items: center;
             touch-action: manipulation;
+            /* 增加一点底部 padding，防止滑动到底部时太局促 */
+            padding-bottom: 40px; 
         }
 
         .header { text-align: center; margin-bottom: 15px; }
-        /* 缩小了一点字号，防止标题在小屏幕手机上折行 */
         .header h1 { font-size: 18px; color: var(--border); margin: 0 0 5px 0; }
         
         .top-controls {
@@ -39,18 +40,30 @@
         }
         button:active { filter: brightness(0.9); }
 
+        /* ======== 🚀 核心修复区：面板布局 ======== */
         .board {
-            display: grid; grid-template-columns: repeat(9, 1fr); gap: 1px;
-            background-color: var(--border); border: 2px solid var(--border);
-            width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 20px;
+            display: grid; 
+            grid-template-columns: repeat(9, 1fr); 
+            grid-template-rows: repeat(9, 1fr); /* 修复1：强制规定必须有均等的9行 */
+            gap: 1px;
+            background-color: var(--border); 
+            border: 2px solid var(--border);
+            width: 100%; 
+            max-width: 400px; 
+            aspect-ratio: 1/1; 
+            margin-bottom: 20px;
+            flex-shrink: 0; /* 修复2：禁止浏览器为了适应屏幕而挤压此面板 */
         }
 
         .cell {
             background-color: var(--cell-bg); display: flex; align-items: center; justify-content: center;
             font-size: 24px; font-weight: bold; cursor: pointer; position: relative;
             border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;
-            box-sizing: border-box; /* 确保边框不会撑开格子 */
+            box-sizing: border-box;
+            min-height: 0; /* 配合 flex-shrink 彻底解决内部元素挤压 */
         }
+        
+        /* 边框逻辑保持不变 */
         .cell:nth-child(3n) { border-right: 2px solid var(--border); }
         .cell:nth-child(9n) { border-right: none; }
         .cell:nth-child(n+19):nth-child(-n+27),
@@ -62,14 +75,13 @@
         .cell.same { background-color: var(--highlight-same); }
         .cell.selected { background-color: var(--selected); }
 
-        /* ======== 优化：四角笔记布局 (绝对定位防变形) ======== */
         .notes-grid {
-            position: absolute; /* 绝对定位，彻底解决撑破格子的问题 */
+            position: absolute; 
             top: 2px; left: 2px; right: 2px; bottom: 2px;
             display: grid; 
-            grid-template-columns: 1fr 1fr; /* 变成 2x2 网格 */
+            grid-template-columns: 1fr 1fr; 
             grid-template-rows: 1fr 1fr;
-            pointer-events: none; /* 让点击穿透，不影响选中格子 */
+            pointer-events: none; 
         }
         .note-item {
             display: flex; align-items: center; justify-content: center;
@@ -79,6 +91,7 @@
         .keyboard {
             display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
             width: 100%; max-width: 400px; margin-bottom: 15px;
+            flex-shrink: 0; /* 键盘也禁止被挤压 */
         }
         .key {
             background: white; border: 1px solid #ddd; border-radius: 8px;
@@ -108,13 +121,12 @@
             padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold;
             margin-top: 20px; cursor: pointer;
         }
-
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>Handrix给Irene的数独游戏: han luv ire</h1>
+        <h1>Handrix给Ire的字母数独游戏: han luv ire</h1>
     </div>
 
     <div class="top-controls">
@@ -142,7 +154,7 @@
         <div class="key action-btn" id="note-btn" onclick="toggleNoteMode()">📝笔记:关</div>
     </div>
     
-    <button onclick="openRules()" style="width:100%; max-width:400px; background:#17a2b8; color:white; border:none;">💡 游戏规则</button>
+    <button onclick="openRules()" style="width:100%; max-width:400px; background:#17a2b8; color:white; border:none; flex-shrink: 0;">💡 游戏规则</button>
 
     <!-- ======== 规则弹窗 ======== -->
     <div class="modal-overlay" id="rulesModal">
@@ -168,7 +180,7 @@
         </div>
     </div>
 
-    <!-- ======== 新增：检查答案提示弹窗 ======== -->
+    <!-- ======== 检查答案提示弹窗 ======== -->
     <div class="modal-overlay" id="messageModal">
         <div class="modal-content" style="text-align: center;">
             <h2 id="msgTitle">提示</h2>
@@ -309,7 +321,6 @@
                         cellDiv.classList.add('user');
                         cellDiv.innerText = userGrid[r][c];
                     } else if (notesGrid[r][c].length > 0) {
-                        // 强制生成 4 个格子，对应左上、右上、左下、右下
                         let noteHTML = `<div class="notes-grid">`;
                         for(let i=0; i<4; i++) {
                             let l = notesGrid[r][c][i] ? notesGrid[r][c][i] : '';
@@ -362,13 +373,11 @@
                 if (userGrid[r][c] !== '') userGrid[r][c] = '';
                 let idx = notesGrid[r][c].indexOf(l);
                 
-                // 如果当前没有这个笔记，且笔记数量小于4，才允许添加
                 if (idx === -1) {
                     if (notesGrid[r][c].length < 4) {
                         notesGrid[r][c].push(l);
                     }
                 } else {
-                    // 如果已经有这个笔记了，再次点击就是取消
                     notesGrid[r][c].splice(idx, 1);
                 }
             } else {
@@ -398,7 +407,6 @@
             }
         }
 
-        // ====== 消息弹窗逻辑 ======
         function showMessage(title, body, color) {
             document.getElementById('msgTitle').innerText = title;
             document.getElementById('msgTitle').style.color = color;
