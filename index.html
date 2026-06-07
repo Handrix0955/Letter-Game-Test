@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Handrix给Irene的字母数独游戏: han luv ire</title>
+    <title>Handrix给Irene的字母数独游戏 - han luv ire</title>
     <style>
+        /* ======== 浅色模式（默认）变量 ======== */
         :root {
-            --primary: #4A90E2;
             --bg: #F5F7FA;
             --cell-bg: #FFFFFF;
             --border: #2C3E50;
@@ -16,54 +16,93 @@
             --text-fixed: #000000;
             --text-user: #0056B3;
             --text-note: #666666;
+            --text-main: #333333;
+            --key-bg: #FFFFFF;
+            --key-border: #DDDDDD;
+            --key-action-bg: #EEEEEE;
+            --modal-bg: #FFFFFF;
+            --th-bg: #F4F4F4;
+            --undo-bg: #ffeeba;
+            --undo-border: #ffc107;
+            --undo-text: #856404;
+            --note-on-bg: #FFD700;
+            --note-on-border: #DAA520;
+        }
+
+        /* ======== 深色模式变量 ======== */
+        [data-theme="dark"] {
+            --bg: #121212;
+            --cell-bg: #1E1E1E;
+            --border: #555555;
+            --highlight-same: #4A452A;
+            --highlight-related: #2A3B4C;
+            --selected: #3A5A80;
+            --text-fixed: #E0E0E0;
+            --text-user: #66B2FF;
+            --text-note: #AAAAAA;
+            --text-main: #E0E0E0;
+            --key-bg: #2C2C2C;
+            --key-border: #444444;
+            --key-action-bg: #3A3A3A;
+            --modal-bg: #2A2A2A;
+            --th-bg: #333333;
+            --undo-bg: #4D3800;
+            --undo-border: #B38600;
+            --undo-text: #FFD54F;
+            --note-on-bg: #7A6300;
+            --note-on-border: #B38600;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
+            color: var(--text-main);
             margin: 0; padding: 15px;
             display: flex; flex-direction: column; align-items: center;
             touch-action: manipulation;
-            /* 增加一点底部 padding，防止滑动到底部时太局促 */
             padding-bottom: 40px; 
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        .header { text-align: center; margin-bottom: 15px; }
-        .header h1 { font-size: 18px; color: var(--border); margin: 0 0 5px 0; }
+        .header { text-align: center; margin-bottom: 12px; }
+        .header h1 { font-size: 18px; color: var(--text-main); margin: 0 0 5px 0; transition: color 0.3s; }
         
         .top-controls {
-            display: flex; justify-content: space-between; width: 100%; max-width: 400px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            width: 100%; max-width: 400px; margin-bottom: 10px;
         }
         select, button {
             padding: 8px 12px; font-size: 14px; font-weight: bold; border-radius: 6px;
-            border: 1px solid #ccc; background: white; cursor: pointer;
+            border: 1px solid var(--key-border); background: var(--key-bg); color: var(--text-main); cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
         }
         button:active { filter: brightness(0.9); }
 
-        /* ======== 🚀 核心修复区：面板布局 ======== */
+        .timer-display {
+            font-size: 16px; font-weight: bold; color: var(--text-main); font-variant-numeric: tabular-nums;
+            background: var(--key-action-bg); padding: 6px 12px; border-radius: 6px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
         .board {
             display: grid; 
             grid-template-columns: repeat(9, 1fr); 
-            grid-template-rows: repeat(9, 1fr); /* 修复1：强制规定必须有均等的9行 */
+            grid-template-rows: repeat(9, 1fr); 
             gap: 1px;
             background-color: var(--border); 
             border: 2px solid var(--border);
-            width: 100%; 
-            max-width: 400px; 
-            aspect-ratio: 1/1; 
-            margin-bottom: 20px;
-            flex-shrink: 0; /* 修复2：禁止浏览器为了适应屏幕而挤压此面板 */
+            width: 100%; max-width: 400px; aspect-ratio: 1/1; 
+            margin-bottom: 15px; flex-shrink: 0; 
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         .cell {
             background-color: var(--cell-bg); display: flex; align-items: center; justify-content: center;
             font-size: 24px; font-weight: bold; cursor: pointer; position: relative;
-            border-bottom: 1px solid #ccc; border-right: 1px solid #ccc;
-            box-sizing: border-box;
-            min-height: 0; /* 配合 flex-shrink 彻底解决内部元素挤压 */
+            border-bottom: 1px solid var(--key-border); border-right: 1px solid var(--key-border);
+            box-sizing: border-box; min-height: 0; 
+            transition: background-color 0.3s, color 0.3s;
         }
-        
-        /* 边框逻辑保持不变 */
         .cell:nth-child(3n) { border-right: 2px solid var(--border); }
         .cell:nth-child(9n) { border-right: none; }
         .cell:nth-child(n+19):nth-child(-n+27),
@@ -76,66 +115,67 @@
         .cell.selected { background-color: var(--selected); }
 
         .notes-grid {
-            position: absolute; 
-            top: 2px; left: 2px; right: 2px; bottom: 2px;
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            grid-template-rows: 1fr 1fr;
-            pointer-events: none; 
+            position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px;
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; pointer-events: none; 
         }
-        .note-item {
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 700; color: var(--text-note);
-        }
+        .note-item { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-note); }
 
         .keyboard {
             display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
-            width: 100%; max-width: 400px; margin-bottom: 15px;
-            flex-shrink: 0; /* 键盘也禁止被挤压 */
+            width: 100%; max-width: 400px; margin-bottom: 12px; flex-shrink: 0; 
         }
         .key {
-            background: white; border: 1px solid #ddd; border-radius: 8px;
+            background: var(--key-bg); border: 1px solid var(--key-border); border-radius: 8px; color: var(--text-main);
             font-size: 20px; font-weight: bold; height: 45px; display: flex;
             align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
-        .key.action-btn { font-size: 14px; background: #eee; }
-        .key.active-note { background: #FFD700; border-color: #DAA520; }
+        .key.action-btn { font-size: 14px; background: var(--key-action-bg); }
+        .key.active-note { background: var(--note-on-bg); border-color: var(--note-on-border); color: #333; }
+        .key.undo-btn { font-size: 15px; background: var(--undo-bg); border-color: var(--undo-border); color: var(--undo-text); }
 
-        /* ======== 弹窗公用样式 ======== */
+        .action-row {
+            display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 8px;
+        }
+        .action-row button { flex: 1; border: none; padding: 10px; font-size: 15px; }
+
+        /* ======== 弹窗样式 ======== */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); z-index: 1000;
-            justify-content: center; align-items: center;
+            background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center;
         }
         .modal-content {
-            background: white; width: 85%; max-width: 350px; border-radius: 12px;
-            padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            max-height: 80vh; overflow-y: auto;
+            background: var(--modal-bg); color: var(--text-main); width: 85%; max-width: 350px; border-radius: 12px;
+            padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto;
+            transition: background-color 0.3s, color 0.3s;
         }
-        .modal-content h2 { color: #4682B4; font-size: 20px; margin-top: 0; text-align: center;}
-        .modal-content h3 { font-size: 16px; margin: 15px 0 5px 0; color: #333; }
-        .modal-content ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5; color: #555; }
-        .modal-content li { margin-bottom: 6px; }
+        .modal-content h2 { color: #4A90E2; font-size: 20px; margin-top: 0; text-align: center;}
+        .modal-content h3 { font-size: 16px; margin: 15px 0 5px 0; color: var(--text-main); }
+        .modal-content ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5; }
         .close-btn {
-            display: block; width: 100%; background: #4682B4; color: white; border: none;
-            padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold;
-            margin-top: 20px; cursor: pointer;
+            display: block; width: 100%; background: #4A90E2; color: white !important; border: none;
+            padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer;
         }
+        
+        .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; font-size: 14px; }
+        .stats-table th { background: var(--th-bg); padding: 8px; border-bottom: 1px solid var(--key-border); }
+        .stats-table td { border-bottom: 1px solid var(--key-border); padding: 10px 8px; }
+
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>Handrix给Irene的字母数独游戏: han luv ire</h1>
+        <h1>Handrix给Irene的字母数独游戏 - han luv ire</h1>
     </div>
 
     <div class="top-controls">
-        <select id="diff-select">
+        <select id="diff-select" onchange="startNewGame()">
             <option value="35">🟢 简单</option>
             <option value="45" selected>🟡 中等</option>
             <option value="55">🔴 困难</option>
         </select>
-        <button onclick="checkWin()" style="background:#28a745; color:white; border:none;">检查答案</button>
+        <div class="timer-display" id="timer">⏱ 00:00</div>
         <button onclick="startNewGame()" style="background:#6f42c1; color:white; border:none;">新游戏</button>
     </div>
 
@@ -151,16 +191,25 @@
         <div class="key" onclick="inputLetter('i')">i</div>
         <div class="key" onclick="inputLetter('r')">r</div>
         <div class="key" onclick="inputLetter('e')">e</div>
-        <div class="key action-btn" id="note-btn" onclick="toggleNoteMode()">📝笔记:关</div>
+        <div class="key undo-btn" onclick="undo()">🔙 撤回</div>
     </div>
     
-    <button onclick="openRules()" style="width:100%; max-width:400px; background:#17a2b8; color:white; border:none; flex-shrink: 0;">💡 游戏规则</button>
+    <div class="action-row">
+        <button class="key action-btn" id="note-btn" onclick="toggleNoteMode()" style="border: 1px solid var(--key-border);">📝 笔记模式:关</button>
+        <button onclick="checkWin()" style="background:#28a745; color:white;">✅ 检查答案</button>
+    </div>
+    <div class="action-row">
+        <button onclick="openStats()" style="background:#ff9800; color:white;">🏆 个人战绩</button>
+        <button onclick="openRules()" style="background:#17a2b8; color:white;">💡 游戏规则</button>
+        <!-- 新增：深浅色切换按钮 -->
+        <button id="theme-btn" onclick="toggleTheme()" style="background:#343a40; color:white;">🌙 深色模式</button>
+    </div>
 
-    <!-- ======== 规则弹窗 ======== -->
+    <!-- 规则弹窗 -->
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">
             <h2>定制字母数独游戏规则</h2>
-            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 10px;">
+            <hr style="border: 0; border-top: 1px solid var(--key-border); margin-bottom: 10px;">
             <h3>🔥 主旨规则：</h3>
             <ul>
                 <li>首先 Handrix 非常 Luv Irene！么么</li>
@@ -169,23 +218,37 @@
             <h3>🧩 填字规则：</h3>
             <ul>
                 <li><b>9x9 棋盘</b>：填入 <b>h, a, n, l, u, v, i, r, e</b>。</li>
-                <li><b>每行、每列、每个 3x3 粗线宫格</b> 内，以上9个字母必须且只能出现一次。</li>
+                <li><b>每行、每列、每个 3x3 粗线宫格</b> 内，每个字母且只能出现一次。</li>
             </ul>
             <h3>💡 操作小技巧：</h3>
             <ul>
-                <li><b>选中高亮</b>：点击任一格子，会帮你自动高亮关联的行列和宫格，同时盘面相同字母也会变黄。</li>
-                <li><b>📝 笔记模式</b>：点击开启后，可以在格子内最多输入4个猜测字母；确认答案后，还会帮你自动清理相关的冲突笔记哦！</li>
+                <li><b>选中高亮</b>：点击格子会自动高亮关联区域和相同字母。</li>
+                <li><b>📝 笔记模式</b>：开启后单格最多填4个猜想；确认正确答案后，系统会自动清理同行同列的冲突笔记！</li>
+                <li><b>🔙 撤回功能</b>：填错不怕，支持撤回最近的 15 步操作。</li>
             </ul>
-            <button class="close-btn" onclick="closeRules()">知道啦宝宝！</button>
+            <button class="close-btn" onclick="closeModal('rulesModal')">知道啦宝宝！</button>
         </div>
     </div>
 
-    <!-- ======== 检查答案提示弹窗 ======== -->
+    <!-- 战绩弹窗 -->
+    <div class="modal-overlay" id="statsModal">
+        <div class="modal-content">
+            <h2>🏆 个人战绩看板</h2>
+            <hr style="border: 0; border-top: 1px solid var(--key-border);">
+            <table class="stats-table" id="statsTable">
+                <!-- JS 动态生成内容 -->
+            </table>
+            <p style="font-size: 12px; color: #888; text-align: center; margin-top: 15px;">* 数据安全储存在本手机，不与他人共享</p>
+            <button class="close-btn" onclick="closeModal('statsModal')">继续加油！</button>
+        </div>
+    </div>
+
+    <!-- 提示/彩蛋弹窗 -->
     <div class="modal-overlay" id="messageModal">
         <div class="modal-content" style="text-align: center;">
             <h2 id="msgTitle">提示</h2>
-            <p id="msgBody" style="font-size: 16px; color: #333; line-height: 1.5; margin: 20px 0; font-weight: 500;"></p>
-            <button class="close-btn" onclick="closeMessage()" style="background: #28a745;">知道啦！</button>
+            <p id="msgBody" style="font-size: 16px; line-height: 1.5; margin: 20px 0; font-weight: 500;"></p>
+            <button class="close-btn" id="msgCloseBtn" onclick="closeModal('messageModal')" style="background: #28a745;">知道啦！</button>
         </div>
     </div>
 
@@ -201,13 +264,84 @@
         let selectedCol = -1;
         let noteMode = false;
 
+        let historyStack = [];
+        const MAX_HISTORY = 15;
+
+        let timerInterval = null;
+        let timeElapsed = 0;
+        let gameActive = false;
+
+        let localStats = JSON.parse(localStorage.getItem('ireSudokuStats')) || {
+            '35': { best: Infinity, avg: 0, count: 0, name: '🟢 简单' },
+            '45': { best: Infinity, avg: 0, count: 0, name: '🟡 中等' },
+            '55': { best: Infinity, avg: 0, count: 0, name: '🔴 困难' }
+        };
+
         window.onload = startNewGame;
+
+        // ======== 深浅色模式切换逻辑 & 专属彩蛋 ========
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const themeBtn = document.getElementById('theme-btn');
+            
+            if (currentTheme === 'dark') {
+                body.removeAttribute('data-theme');
+                themeBtn.innerHTML = '🌙 深色模式';
+                themeBtn.style.background = '#343a40';
+                themeBtn.style.color = 'white';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeBtn.innerHTML = '☀️ 浅色模式';
+                themeBtn.style.background = '#f8f9fa';
+                themeBtn.style.color = '#333';
+                
+                // 触发甜甜的晚安彩蛋
+                showMessage(
+                    "🌙 晚安提醒", 
+                    "是不是大晚上了还在玩呀？\n别玩太晚哦，早点休息宝宝 😘", 
+                    "#9c27b0"
+                );
+            }
+        }
 
         function startNewGame() {
             let blanks = parseInt(document.getElementById('diff-select').value);
             generateSolution();
             createPuzzle(blanks);
             selectedRow = -1; selectedCol = -1;
+            historyStack = []; 
+            renderBoard();
+            
+            gameActive = true;
+            clearInterval(timerInterval);
+            timeElapsed = 0;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeElapsed++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            let m = Math.floor(timeElapsed / 60).toString().padStart(2, '0');
+            let s = (timeElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `⏱ ${m}:${s}`;
+        }
+
+        function saveState() {
+            if (historyStack.length >= MAX_HISTORY) historyStack.shift(); 
+            historyStack.push({
+                user: JSON.parse(JSON.stringify(userGrid)),
+                notes: JSON.parse(JSON.stringify(notesGrid))
+            });
+        }
+
+        function undo() {
+            if (historyStack.length === 0 || !gameActive) return; 
+            let lastState = historyStack.pop();
+            userGrid = lastState.user;
+            notesGrid = lastState.notes;
             renderBoard();
         }
 
@@ -215,7 +349,6 @@
             for (let i = 0; i < 9; i++) solution[i].fill(0);
             solveSudoku(solution);
         }
-
         function solveSudoku(grid) {
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
@@ -234,7 +367,6 @@
             }
             return true;
         }
-
         function isValid(grid, row, col, letter) {
             for (let i = 0; i < 9; i++) {
                 if (grid[row][i] === letter || grid[i][col] === letter) return false;
@@ -247,7 +379,6 @@
             }
             return true;
         }
-
         function countSolutions(grid, limit = 2) {
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
@@ -277,7 +408,6 @@
                     isFixed[r][c] = true;
                 }
             }
-            
             let positions = [];
             for (let i = 0; i < 81; i++) positions.push([Math.floor(i/9), i%9]);
             positions.sort(() => Math.random() - 0.5);
@@ -312,7 +442,7 @@
                 for (let c = 0; c < 9; c++) {
                     let cellDiv = document.createElement('div');
                     cellDiv.className = 'cell';
-                    cellDiv.onclick = () => selectCell(r, c);
+                    cellDiv.onclick = () => { if(gameActive) selectCell(r, c); };
 
                     if (isFixed[r][c]) {
                         cellDiv.classList.add('fixed');
@@ -357,26 +487,24 @@
             noteMode = !noteMode;
             let btn = document.getElementById('note-btn');
             if(noteMode) {
-                btn.innerText = "📝笔记:开";
+                btn.innerText = "📝 笔记模式:开";
                 btn.classList.add('active-note');
             } else {
-                btn.innerText = "📝笔记:关";
+                btn.innerText = "📝 笔记模式:关";
                 btn.classList.remove('active-note');
             }
         }
 
         function inputLetter(l) {
-            if (selectedRow === -1 || selectedCol === -1 || isFixed[selectedRow][selectedCol]) return;
-            
+            if (!gameActive || selectedRow === -1 || selectedCol === -1 || isFixed[selectedRow][selectedCol]) return;
+            saveState();
+
             let r = selectedRow, c = selectedCol;
             if (noteMode) {
                 if (userGrid[r][c] !== '') userGrid[r][c] = '';
                 let idx = notesGrid[r][c].indexOf(l);
-                
                 if (idx === -1) {
-                    if (notesGrid[r][c].length < 4) {
-                        notesGrid[r][c].push(l);
-                    }
+                    if (notesGrid[r][c].length < 4) notesGrid[r][c].push(l);
                 } else {
                     notesGrid[r][c].splice(idx, 1);
                 }
@@ -407,18 +535,16 @@
             }
         }
 
-        function showMessage(title, body, color) {
-            document.getElementById('msgTitle').innerText = title;
-            document.getElementById('msgTitle').style.color = color;
-            document.getElementById('msgBody').innerText = body;
-            document.getElementById('messageModal').style.display = 'flex';
-        }
-
-        function closeMessage() {
-            document.getElementById('messageModal').style.display = 'none';
+        function formatTime(sec) {
+            if (sec === Infinity) return "--:--";
+            let m = Math.floor(sec / 60).toString().padStart(2, '0');
+            let s = Math.round(sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
         }
 
         function checkWin() {
+            if(!gameActive) return;
+
             let hasEmpty = false, hasError = false;
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
@@ -433,17 +559,55 @@
             } else if (hasError) {
                 showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#dc3545");
             } else {
-                showMessage("过关", "🎉 太棒了Abbbbbbbb！恭喜你完成了 Ire 专属数独！🎉", "#28a745");
+                gameActive = false;
+                clearInterval(timerInterval);
+                
+                let diffKey = document.getElementById('diff-select').value;
+                let s = localStats[diffKey];
+                
+                s.count++;
+                s.avg = ((s.avg * (s.count - 1)) + timeElapsed) / s.count;
+                let isNewRecord = timeElapsed < s.best;
+                if (isNewRecord) s.best = timeElapsed;
+                
+                localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
+
+                let msg = `🎉 太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！🎉\n\n⏱ 本局用时: ${formatTime(timeElapsed)}`;
+                if(isNewRecord && s.count > 1) msg += "\n✨ 打破了该难度的最佳记录！✨";
+                
+                showMessage("过关", msg, "#28a745");
             }
         }
 
-        function openRules() {
-            document.getElementById('rulesModal').style.display = 'flex';
+        function showMessage(title, body, color) {
+            document.getElementById('msgTitle').innerText = title;
+            document.getElementById('msgTitle').style.color = color;
+            // 处理换行符
+            document.getElementById('msgBody').innerText = body;
+            
+            let closeBtn = document.getElementById('msgCloseBtn');
+            closeBtn.style.background = color; // 按钮颜色和标题颜色统一，更好看
+            
+            document.getElementById('messageModal').style.display = 'flex';
         }
 
-        function closeRules() {
-            document.getElementById('rulesModal').style.display = 'none';
+        function openStats() {
+            let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>完成局数</th></tr>`;
+            ['35', '45', '55'].forEach(k => {
+                let s = localStats[k];
+                html += `<tr>
+                    <td><b>${s.name}</b></td>
+                    <td style="color:#28a745; font-weight:bold;">${formatTime(s.best)}</td>
+                    <td>${s.count === 0 ? '--:--' : formatTime(s.avg)}</td>
+                    <td>${s.count}</td>
+                </tr>`;
+            });
+            document.getElementById('statsTable').innerHTML = html;
+            document.getElementById('statsModal').style.display = 'flex';
         }
+
+        function openRules() { document.getElementById('rulesModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     </script>
 </body>
 </html>
