@@ -85,14 +85,9 @@
         }
 
         .board {
-            display: grid; 
-            grid-template-columns: repeat(9, 1fr); 
-            grid-template-rows: repeat(9, 1fr); 
-            gap: 1px;
-            background-color: var(--border); 
-            border: 2px solid var(--border);
-            width: 100%; max-width: 400px; aspect-ratio: 1/1; 
-            margin-bottom: 15px; flex-shrink: 0; 
+            display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr); 
+            gap: 1px; background-color: var(--border); border: 2px solid var(--border);
+            width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 15px; flex-shrink: 0; 
             transition: background-color 0.3s, border-color 0.3s;
         }
 
@@ -100,8 +95,7 @@
             background-color: var(--cell-bg); display: flex; align-items: center; justify-content: center;
             font-size: 24px; font-weight: bold; cursor: pointer; position: relative;
             border-bottom: 1px solid var(--key-border); border-right: 1px solid var(--key-border);
-            box-sizing: border-box; min-height: 0; 
-            transition: background-color 0.3s, color 0.3s;
+            box-sizing: border-box; min-height: 0; transition: background-color 0.3s, color 0.3s;
         }
         .cell:nth-child(3n) { border-right: 2px solid var(--border); }
         .cell:nth-child(9n) { border-right: none; }
@@ -134,12 +128,9 @@
         .key.active-note { background: var(--note-on-bg); border-color: var(--note-on-border); color: #333; }
         .key.undo-btn { font-size: 15px; background: var(--undo-bg); border-color: var(--undo-border); color: var(--undo-text); }
 
-        .action-row {
-            display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 8px;
-        }
+        .action-row { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 8px; }
         .action-row button { flex: 1; border: none; padding: 10px; font-size: 15px; }
 
-        /* ======== 弹窗样式 ======== */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center;
@@ -170,6 +161,7 @@
     </div>
 
     <div class="top-controls">
+        <!-- 💡 在这里修改 value 的值，就可以调整相应难度的挖空数量 -->
         <select id="diff-select" onchange="startNewGame()">
             <option value="35">🟢 简单</option>
             <option value="45" selected>🟡 中等</option>
@@ -201,7 +193,6 @@
     <div class="action-row">
         <button onclick="openStats()" style="background:#ff9800; color:white;">🏆 个人战绩</button>
         <button onclick="openRules()" style="background:#17a2b8; color:white;">💡 游戏规则</button>
-        <!-- 新增：深浅色切换按钮 -->
         <button id="theme-btn" onclick="toggleTheme()" style="background:#343a40; color:white;">🌙 深色模式</button>
     </div>
 
@@ -224,7 +215,7 @@
             <ul>
                 <li><b>选中高亮</b>：点击格子会自动高亮关联区域和相同字母。</li>
                 <li><b>📝 笔记模式</b>：开启后单格最多填4个猜想；确认正确答案后，系统会自动清理同行同列的冲突笔记！</li>
-                <li><b>🔙 撤回功能</b>：填错不怕，支持撤回最近的 15 步操作。</li>
+                <li><b>🔙 撤回功能</b>：宝宝填错不怕，支持撤回最近的 15 步操作。</li>
             </ul>
             <button class="close-btn" onclick="closeModal('rulesModal')">知道啦宝宝！</button>
         </div>
@@ -235,15 +226,13 @@
         <div class="modal-content">
             <h2>🏆 个人战绩看板</h2>
             <hr style="border: 0; border-top: 1px solid var(--key-border);">
-            <table class="stats-table" id="statsTable">
-                <!-- JS 动态生成内容 -->
-            </table>
+            <table class="stats-table" id="statsTable"></table>
             <p style="font-size: 12px; color: #888; text-align: center; margin-top: 15px;">* 数据安全储存在本手机，不与他人共享</p>
             <button class="close-btn" onclick="closeModal('statsModal')">继续加油！</button>
         </div>
     </div>
 
-    <!-- 提示/彩蛋弹窗 -->
+    <!-- 提示弹窗 -->
     <div class="modal-overlay" id="messageModal">
         <div class="modal-content" style="text-align: center;">
             <h2 id="msgTitle">提示</h2>
@@ -260,67 +249,58 @@
         let notesGrid = Array(9).fill().map(() => Array(9).fill().map(()=>[]));
         let isFixed = Array(9).fill().map(() => Array(9).fill(false));
         
-        let selectedRow = -1;
-        let selectedCol = -1;
-        let noteMode = false;
+        let selectedRow = -1; let selectedCol = -1; let noteMode = false;
+        let historyStack = []; const MAX_HISTORY = 15;
+        let timerInterval = null; let timeElapsed = 0; let gameActive = false;
 
-        let historyStack = [];
-        const MAX_HISTORY = 15;
-
-        let timerInterval = null;
-        let timeElapsed = 0;
-        let gameActive = false;
-
-        let localStats = JSON.parse(localStorage.getItem('ireSudokuStats')) || {
-            '35': { best: Infinity, avg: 0, count: 0, name: '🟢 简单' },
-            '45': { best: Infinity, avg: 0, count: 0, name: '🟡 中等' },
-            '55': { best: Infinity, avg: 0, count: 0, name: '🔴 困难' }
+        // ======== 🚀 数据安全急救与读取 ========
+        let defaultStats = {
+            '35': { best: null, avg: 0, count: 0, name: '🟢 简单' },
+            '45': { best: null, avg: 0, count: 0, name: '🟡 中等' },
+            '55': { best: null, avg: 0, count: 0, name: '🔴 困难' }
         };
+        let localStats = JSON.parse(localStorage.getItem('ireSudokuStats')) || defaultStats;
+
+        // 【数据无损恢复脚本】寻找并修复变成 00:00 的异常数据
+        ['35', '45', '55'].forEach(k => {
+            if (!localStats[k]) localStats[k] = defaultStats[k];
+            let s = localStats[k];
+            // 发现由于 Infinity 被强转导致的 null 或 0
+            if (s.best === null || s.best === 0) {
+                if (s.count > 0) {
+                    s.best = s.avg; // 🎉 完美恢复：把平均时间补偿回最佳记录中
+                } else {
+                    s.best = null;
+                }
+            }
+        });
+        localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
 
         window.onload = startNewGame;
 
-        // ======== 深浅色模式切换逻辑 & 专属彩蛋 ========
         function toggleTheme() {
             const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
             const themeBtn = document.getElementById('theme-btn');
-            
-            if (currentTheme === 'dark') {
+            if (body.getAttribute('data-theme') === 'dark') {
                 body.removeAttribute('data-theme');
                 themeBtn.innerHTML = '🌙 深色模式';
-                themeBtn.style.background = '#343a40';
-                themeBtn.style.color = 'white';
+                themeBtn.style.background = '#343a40'; themeBtn.style.color = 'white';
             } else {
                 body.setAttribute('data-theme', 'dark');
                 themeBtn.innerHTML = '☀️ 浅色模式';
-                themeBtn.style.background = '#f8f9fa';
-                themeBtn.style.color = '#333';
-                
-                // 触发甜甜的晚安彩蛋
-                showMessage(
-                    "🌙 晚安提醒", 
-                    "是不是大晚上了还在玩呀？\n别玩太晚哦，早点休息宝宝 😘", 
-                    "#9c27b0"
-                );
+                themeBtn.style.background = '#f8f9fa'; themeBtn.style.color = '#333';
+                showMessage("🌙 晚安提醒", "是不是大晚上了还在玩呀？\n别玩太晚哦，早点休息宝宝 😘", "#9c27b0");
             }
         }
 
         function startNewGame() {
             let blanks = parseInt(document.getElementById('diff-select').value);
-            generateSolution();
-            createPuzzle(blanks);
-            selectedRow = -1; selectedCol = -1;
-            historyStack = []; 
+            generateSolution(); createPuzzle(blanks);
+            selectedRow = -1; selectedCol = -1; historyStack = []; 
             renderBoard();
-            
-            gameActive = true;
-            clearInterval(timerInterval);
-            timeElapsed = 0;
+            gameActive = true; clearInterval(timerInterval); timeElapsed = 0;
             updateTimerDisplay();
-            timerInterval = setInterval(() => {
-                timeElapsed++;
-                updateTimerDisplay();
-            }, 1000);
+            timerInterval = setInterval(() => { timeElapsed++; updateTimerDisplay(); }, 1000);
         }
 
         function updateTimerDisplay() {
@@ -331,17 +311,13 @@
 
         function saveState() {
             if (historyStack.length >= MAX_HISTORY) historyStack.shift(); 
-            historyStack.push({
-                user: JSON.parse(JSON.stringify(userGrid)),
-                notes: JSON.parse(JSON.stringify(notesGrid))
-            });
+            historyStack.push({ user: JSON.parse(JSON.stringify(userGrid)), notes: JSON.parse(JSON.stringify(notesGrid)) });
         }
 
         function undo() {
             if (historyStack.length === 0 || !gameActive) return; 
             let lastState = historyStack.pop();
-            userGrid = lastState.user;
-            notesGrid = lastState.notes;
+            userGrid = lastState.user; notesGrid = lastState.notes;
             renderBoard();
         }
 
@@ -368,15 +344,9 @@
             return true;
         }
         function isValid(grid, row, col, letter) {
-            for (let i = 0; i < 9; i++) {
-                if (grid[row][i] === letter || grid[i][col] === letter) return false;
-            }
+            for (let i = 0; i < 9; i++) if (grid[row][i] === letter || grid[i][col] === letter) return false;
             let sr = Math.floor(row / 3) * 3, sc = Math.floor(col / 3) * 3;
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    if (grid[sr + i][sc + j] === letter) return false;
-                }
-            }
+            for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (grid[sr + i][sc + j] === letter) return false;
             return true;
         }
         function countSolutions(grid, limit = 2) {
@@ -386,9 +356,7 @@
                         let count = 0;
                         for (let letter of LETTERS) {
                             if (isValid(grid, r, c, letter)) {
-                                grid[r][c] = letter;
-                                count += countSolutions(grid, limit);
-                                grid[r][c] = 0;
+                                grid[r][c] = letter; count += countSolutions(grid, limit); grid[r][c] = 0;
                                 if (count >= limit) return count;
                             }
                         }
@@ -402,42 +370,26 @@
         function createPuzzle(blanks) {
             for(let r=0; r<9; r++) {
                 for(let c=0; c<9; c++) {
-                    board[r][c] = solution[r][c];
-                    userGrid[r][c] = '';
-                    notesGrid[r][c] = [];
-                    isFixed[r][c] = true;
+                    board[r][c] = solution[r][c]; userGrid[r][c] = ''; notesGrid[r][c] = []; isFixed[r][c] = true;
                 }
             }
             let positions = [];
             for (let i = 0; i < 81; i++) positions.push([Math.floor(i/9), i%9]);
             positions.sort(() => Math.random() - 0.5);
-
             let removed = 0;
             for (let pos of positions) {
                 if (removed >= blanks) break;
-                let r = pos[0], c = pos[1];
-                let backup = board[r][c];
-                board[r][c] = 0;
-                
-                if (countSolutions(board) !== 1) {
-                    board[r][c] = backup;
-                } else {
-                    isFixed[r][c] = false;
-                    removed++;
-                }
+                let r = pos[0], c = pos[1]; let backup = board[r][c]; board[r][c] = 0;
+                if (countSolutions(board) !== 1) board[r][c] = backup; else { isFixed[r][c] = false; removed++; }
             }
         }
 
         function renderBoard() {
-            const boardDiv = document.getElementById('board');
-            boardDiv.innerHTML = '';
-            
+            const boardDiv = document.getElementById('board'); boardDiv.innerHTML = '';
             let currentVal = '';
             if(selectedRow !== -1 && selectedCol !== -1) {
-                if(isFixed[selectedRow][selectedCol]) currentVal = board[selectedRow][selectedCol];
-                else currentVal = userGrid[selectedRow][selectedCol];
+                currentVal = isFixed[selectedRow][selectedCol] ? board[selectedRow][selectedCol] : userGrid[selectedRow][selectedCol];
             }
-
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
                     let cellDiv = document.createElement('div');
@@ -445,87 +397,53 @@
                     cellDiv.onclick = () => { if(gameActive) selectCell(r, c); };
 
                     if (isFixed[r][c]) {
-                        cellDiv.classList.add('fixed');
-                        cellDiv.innerText = board[r][c];
+                        cellDiv.classList.add('fixed'); cellDiv.innerText = board[r][c];
                     } else if (userGrid[r][c] !== '') {
-                        cellDiv.classList.add('user');
-                        cellDiv.innerText = userGrid[r][c];
+                        cellDiv.classList.add('user'); cellDiv.innerText = userGrid[r][c];
                     } else if (notesGrid[r][c].length > 0) {
                         let noteHTML = `<div class="notes-grid">`;
-                        for(let i=0; i<4; i++) {
-                            let l = notesGrid[r][c][i] ? notesGrid[r][c][i] : '';
-                            noteHTML += `<div class="note-item">${l}</div>`;
-                        }
-                        noteHTML += `</div>`;
-                        cellDiv.innerHTML = noteHTML;
+                        for(let i=0; i<4; i++) noteHTML += `<div class="note-item">${notesGrid[r][c][i] || ''}</div>`;
+                        noteHTML += `</div>`; cellDiv.innerHTML = noteHTML;
                     }
 
-                    if (r === selectedRow && c === selectedCol) {
-                        cellDiv.classList.add('selected');
-                    } else if (selectedRow !== -1) {
-                        let inBox = Math.floor(r/3) === Math.floor(selectedRow/3) && Math.floor(c/3) === Math.floor(selectedCol/3);
-                        if (r === selectedRow || c === selectedCol || inBox) {
-                            cellDiv.classList.add('related');
-                        }
+                    if (r === selectedRow && c === selectedCol) cellDiv.classList.add('selected');
+                    else if (selectedRow !== -1 && (r === selectedRow || c === selectedCol || (Math.floor(r/3) === Math.floor(selectedRow/3) && Math.floor(c/3) === Math.floor(selectedCol/3)))) {
+                        cellDiv.classList.add('related');
                     }
 
-                    if (currentVal !== '' && cellDiv.innerText === currentVal && cellDiv.children.length === 0) {
-                        cellDiv.classList.add('same');
-                    }
-
+                    if (currentVal !== '' && cellDiv.innerText === currentVal && cellDiv.children.length === 0) cellDiv.classList.add('same');
                     boardDiv.appendChild(cellDiv);
                 }
             }
         }
 
-        function selectCell(r, c) {
-            selectedRow = r; selectedCol = c;
-            renderBoard();
-        }
+        function selectCell(r, c) { selectedRow = r; selectedCol = c; renderBoard(); }
 
         function toggleNoteMode() {
-            noteMode = !noteMode;
-            let btn = document.getElementById('note-btn');
-            if(noteMode) {
-                btn.innerText = "📝 笔记模式:开";
-                btn.classList.add('active-note');
-            } else {
-                btn.innerText = "📝 笔记模式:关";
-                btn.classList.remove('active-note');
-            }
+            noteMode = !noteMode; let btn = document.getElementById('note-btn');
+            if(noteMode) { btn.innerText = "📝 笔记模式:开"; btn.classList.add('active-note'); } 
+            else { btn.innerText = "📝 笔记模式:关"; btn.classList.remove('active-note'); }
         }
 
         function inputLetter(l) {
             if (!gameActive || selectedRow === -1 || selectedCol === -1 || isFixed[selectedRow][selectedCol]) return;
             saveState();
-
             let r = selectedRow, c = selectedCol;
             if (noteMode) {
                 if (userGrid[r][c] !== '') userGrid[r][c] = '';
                 let idx = notesGrid[r][c].indexOf(l);
-                if (idx === -1) {
-                    if (notesGrid[r][c].length < 4) notesGrid[r][c].push(l);
-                } else {
-                    notesGrid[r][c].splice(idx, 1);
-                }
+                if (idx === -1) { if (notesGrid[r][c].length < 4) notesGrid[r][c].push(l); } 
+                else notesGrid[r][c].splice(idx, 1);
             } else {
-                userGrid[r][c] = l;
-                autoCleanNotes(r, c, l);
+                userGrid[r][c] = l; autoCleanNotes(r, c, l);
             }
             renderBoard();
         }
 
         function autoCleanNotes(row, col, letter) {
-            for (let i = 0; i < 9; i++) {
-                removeNote(row, i, letter);
-                removeNote(i, col, letter);
-            }
+            for (let i = 0; i < 9; i++) { removeNote(row, i, letter); removeNote(i, col, letter); }
             let sr = Math.floor(row / 3) * 3, sc = Math.floor(col / 3) * 3;
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    removeNote(sr + i, sc + j, letter);
-                }
-            }
+            for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) removeNote(sr + i, sc + j, letter);
         }
 
         function removeNote(r, c, letter) {
@@ -535,8 +453,9 @@
             }
         }
 
+        // 修复：处理 null 状态的时间显示
         function formatTime(sec) {
-            if (sec === Infinity) return "--:--";
+            if (sec === null || sec === Infinity) return "--:--";
             let m = Math.floor(sec / 60).toString().padStart(2, '0');
             let s = Math.round(sec % 60).toString().padStart(2, '0');
             return `${m}:${s}`;
@@ -544,7 +463,6 @@
 
         function checkWin() {
             if(!gameActive) return;
-
             let hasEmpty = false, hasError = false;
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
@@ -554,20 +472,17 @@
                 }
             }
             
-            if (hasEmpty) {
-                showMessage("提示", "还有空格或者只有笔记未确认答案哦，请abb宝儿先填完！", "#f0ad4e");
-            } else if (hasError) {
-                showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#dc3545");
-            } else {
-                gameActive = false;
-                clearInterval(timerInterval);
-                
+            if (hasEmpty) showMessage("提示", "还有空格或者只有笔记未确认答案哦，请abb宝儿先填完！", "#f0ad4e");
+            else if (hasError) showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#dc3545");
+            else {
+                gameActive = false; clearInterval(timerInterval);
                 let diffKey = document.getElementById('diff-select').value;
                 let s = localStats[diffKey];
                 
                 s.count++;
                 s.avg = ((s.avg * (s.count - 1)) + timeElapsed) / s.count;
-                let isNewRecord = timeElapsed < s.best;
+                // 修复逻辑：如果是 null，必然是新记录
+                let isNewRecord = (s.best === null) || (timeElapsed < s.best);
                 if (isNewRecord) s.best = timeElapsed;
                 
                 localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
@@ -582,12 +497,9 @@
         function showMessage(title, body, color) {
             document.getElementById('msgTitle').innerText = title;
             document.getElementById('msgTitle').style.color = color;
-            // 处理换行符
             document.getElementById('msgBody').innerText = body;
-            
             let closeBtn = document.getElementById('msgCloseBtn');
-            closeBtn.style.background = color; // 按钮颜色和标题颜色统一，更好看
-            
+            closeBtn.style.background = color;
             document.getElementById('messageModal').style.display = 'flex';
         }
 
