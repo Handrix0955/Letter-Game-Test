@@ -7,88 +7,73 @@
     <style>
         /* ======== 浅色模式（默认）变量 ======== */
         :root {
-            --bg: #F5F7FA;
-            --cell-bg: #FFFFFF;
-            --border: #2C3E50;
-            --highlight-same: #FFF3CD;
-            --highlight-related: #E8F0FE;
-            --selected: #C6D8FF;
-            --text-fixed: #000000;
-            --text-user: #0056B3;
-            --text-note: #666666;
-            --text-main: #333333;
-            --key-bg: #FFFFFF;
-            --key-border: #DDDDDD;
-            --key-action-bg: #EEEEEE;
-            --modal-bg: #FFFFFF;
-            --th-bg: #F4F4F4;
-            --undo-bg: #ffeeba;
-            --undo-border: #ffc107;
-            --undo-text: #856404;
-            --note-on-bg: #FFD700;
-            --note-on-border: #DAA520;
+            --bg: #F5F7FA; --cell-bg: #FFFFFF; --border: #2C3E50;
+            --highlight-same: #FFF3CD; --highlight-related: #E8F0FE; --selected: #C6D8FF;
+            --text-fixed: #000000; --text-user: #0056B3; --text-note: #666666; --text-main: #333333;
+            --key-bg: #FFFFFF; --key-border: #DDDDDD; --key-action-bg: #EEEEEE; --modal-bg: #FFFFFF;
+            --th-bg: #F4F4F4; --undo-bg: #ffeeba; --undo-border: #ffc107; --undo-text: #856404;
+            --note-on-bg: #FFD700; --note-on-border: #DAA520;
+            --hint-han: rgba(168, 230, 207, 0.6); --hint-luv: rgba(255, 179, 186, 0.6); --hint-ire: rgba(186, 225, 255, 0.6);
+            --glow-han: #A8E6CF; --glow-luv: #FFB3BA; --glow-ire: #BAE1FF;
         }
 
         /* ======== 深色模式变量 ======== */
         [data-theme="dark"] {
-            --bg: #121212;
-            --cell-bg: #1E1E1E;
-            --border: #555555;
-            --highlight-same: #4A452A;
-            --highlight-related: #2A3B4C;
-            --selected: #3A5A80;
-            --text-fixed: #E0E0E0;
-            --text-user: #66B2FF;
-            --text-note: #AAAAAA;
-            --text-main: #E0E0E0;
-            --key-bg: #2C2C2C;
-            --key-border: #444444;
-            --key-action-bg: #3A3A3A;
-            --modal-bg: #2A2A2A;
-            --th-bg: #333333;
-            --undo-bg: #4D3800;
-            --undo-border: #B38600;
-            --undo-text: #FFD54F;
-            --note-on-bg: #7A6300;
-            --note-on-border: #B38600;
+            --bg: #121212; --cell-bg: #1E1E1E; --border: #555555;
+            --highlight-same: #4A452A; --highlight-related: #2A3B4C; --selected: #3A5A80;
+            --text-fixed: #E0E0E0; --text-user: #66B2FF; --text-note: #AAAAAA; --text-main: #E0E0E0;
+            --key-bg: #2C2C2C; --key-border: #444444; --key-action-bg: #3A3A3A; --modal-bg: #2A2A2A;
+            --th-bg: #333333; --undo-bg: #4D3800; --undo-border: #B38600; --undo-text: #FFD54F;
+            --note-on-bg: #7A6300; --note-on-border: #B38600;
+            --hint-han: rgba(46, 117, 85, 0.6); --hint-luv: rgba(138, 43, 88, 0.6); --hint-ire: rgba(43, 91, 132, 0.6);
+            --glow-han: #2E7555; --glow-luv: #8A2B58; --glow-ire: #2B5B84;
         }
+
+        /* ======== 🐉 活动限定主题 ======== */
+        body.theme-event { --bg: #E8F5E9; --border: #2E7D32; }
+        [data-theme="dark"] body.theme-event { --bg: #0d1a11; --border: #4CAF50; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0; padding: 15px;
-            display: flex; flex-direction: column; align-items: center;
-            touch-action: manipulation;
-            padding-bottom: 40px; 
-            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--bg); color: var(--text-main); margin: 0; padding: 15px;
+            display: flex; flex-direction: column; align-items: center; touch-action: manipulation;
+            padding-bottom: 40px; transition: background-color 0.4s, color 0.4s; overflow-x: hidden;
+        }
+
+        #particles {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: -1; overflow: hidden; display: none;
+        }
+        body.theme-event #particles { display: block; }
+        .particle { position: absolute; top: -50px; font-size: 24px; opacity: 0; animation: fall linear infinite; }
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
 
         .header { text-align: center; margin-bottom: 12px; }
         .header h1 { font-size: 18px; color: var(--text-main); margin: 0 0 5px 0; transition: color 0.3s; }
         
-        .top-controls {
-            display: flex; justify-content: space-between; align-items: center;
-            width: 100%; max-width: 400px; margin-bottom: 10px;
-        }
+        .top-controls { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 400px; margin-bottom: 10px; }
         select, button {
             padding: 8px 12px; font-size: 14px; font-weight: bold; border-radius: 6px;
-            border: 1px solid var(--key-border); background: var(--key-bg); color: var(--text-main); cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
+            border: 1px solid var(--key-border); background: var(--key-bg); color: var(--text-main); cursor: pointer; transition: 0.3s;
         }
+        select#diff-select { max-width: 140px; }
         button:active { filter: brightness(0.9); }
 
         .timer-display {
             font-size: 16px; font-weight: bold; color: var(--text-main); font-variant-numeric: tabular-nums;
-            background: var(--key-action-bg); padding: 6px 12px; border-radius: 6px;
-            transition: background-color 0.3s, color 0.3s;
+            background: var(--key-action-bg); padding: 6px 12px; border-radius: 6px; transition: 0.3s;
         }
 
         .board {
             display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr); 
             gap: 1px; background-color: var(--border); border: 2px solid var(--border);
             width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 15px; flex-shrink: 0; 
-            transition: background-color 0.3s, border-color 0.3s;
+            transition: background-color 0.4s, border-color 0.4s;
         }
 
         .cell {
@@ -99,14 +84,26 @@
         }
         .cell:nth-child(3n) { border-right: 2px solid var(--border); }
         .cell:nth-child(9n) { border-right: none; }
-        .cell:nth-child(n+19):nth-child(-n+27),
-        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--border); }
+        .cell:nth-child(n+19):nth-child(-n+27), .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--border); }
         
         .cell.fixed { color: var(--text-fixed); }
         .cell.user { color: var(--text-user); }
+        
+        .cell.hint-han { background-color: var(--hint-han); animation: pulseHan 2s infinite alternate; }
+        .cell.hint-luv { background-color: var(--hint-luv); animation: pulseLuv 2s infinite alternate; }
+        .cell.hint-ire { background-color: var(--hint-ire); animation: pulseIre 2s infinite alternate; }
+        @keyframes pulseHan { from { box-shadow: inset 0 0 5px var(--glow-han); } to { box-shadow: inset 0 0 20px var(--glow-han); } }
+        @keyframes pulseLuv { from { box-shadow: inset 0 0 5px var(--glow-luv); } to { box-shadow: inset 0 0 20px var(--glow-luv); } }
+        @keyframes pulseIre { from { box-shadow: inset 0 0 5px var(--glow-ire); } to { box-shadow: inset 0 0 20px var(--glow-ire); } }
+
         .cell.related { background-color: var(--highlight-related); }
         .cell.same { background-color: var(--highlight-same); }
         .cell.selected { background-color: var(--selected); }
+
+        .hint-watermark {
+            position: absolute; top: 2px; right: 2px; font-size: 9px; 
+            color: var(--text-note); opacity: 0.8; font-weight: normal; pointer-events: none;
+        }
 
         .notes-grid {
             position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px;
@@ -115,14 +112,11 @@
         .note-item { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-note); }
 
         .keyboard {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
-            width: 100%; max-width: 400px; margin-bottom: 12px; flex-shrink: 0; 
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px; flex-shrink: 0; 
         }
         .key {
             background: var(--key-bg); border: 1px solid var(--key-border); border-radius: 8px; color: var(--text-main);
-            font-size: 20px; font-weight: bold; height: 45px; display: flex;
-            align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            font-size: 20px; font-weight: bold; height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.3s;
         }
         .key.action-btn { font-size: 14px; background: var(--key-action-bg); }
         .key.active-note { background: var(--note-on-bg); border-color: var(--note-on-border); color: #333; }
@@ -137,8 +131,7 @@
         }
         .modal-content {
             background: var(--modal-bg); color: var(--text-main); width: 85%; max-width: 350px; border-radius: 12px;
-            padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto;
-            transition: background-color 0.3s, color 0.3s;
+            padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; transition: 0.3s;
         }
         .modal-content h2 { color: #4A90E2; font-size: 20px; margin-top: 0; text-align: center;}
         .modal-content h3 { font-size: 16px; margin: 15px 0 5px 0; color: var(--text-main); }
@@ -147,7 +140,6 @@
             display: block; width: 100%; background: #4A90E2; color: white !important; border: none;
             padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer;
         }
-        
         .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; font-size: 14px; }
         .stats-table th { background: var(--th-bg); padding: 8px; border-bottom: 1px solid var(--key-border); }
         .stats-table td { border-bottom: 1px solid var(--key-border); padding: 10px 8px; }
@@ -156,16 +148,18 @@
 </head>
 <body>
 
+    <div id="particles"></div>
+
     <div class="header">
-        <h1>Handrix给Irene的字母数独游戏 - han luv ire</h1>
+        <h1 id="main-title">Handrix给Irene的字母数独游戏 - han luv ire</h1>
     </div>
 
     <div class="top-controls">
-        <!-- 💡 在这里修改 value 的值，就可以调整相应难度的挖空数量 -->
         <select id="diff-select" onchange="startNewGame()">
             <option value="35">🟢 简单</option>
             <option value="45" selected>🟡 中等</option>
             <option value="55">🔴 困难</option>
+            <option value="event" id="event-option">🎉 活动模式(困难)</option>
         </select>
         <div class="timer-display" id="timer">⏱ 00:00</div>
         <button onclick="startNewGame()" style="background:#6f42c1; color:white; border:none;">新游戏</button>
@@ -186,25 +180,34 @@
         <div class="key undo-btn" onclick="undo()">🔙 撤回</div>
     </div>
     
+    <!-- 替换原有的操作行，加入提示按钮 -->
     <div class="action-row">
-        <button class="key action-btn" id="note-btn" onclick="toggleNoteMode()" style="border: 1px solid var(--key-border);">📝 笔记模式:关</button>
-        <button onclick="checkWin()" style="background:#28a745; color:white;">✅ 检查答案</button>
+        <button class="key action-btn" id="note-btn" onclick="toggleNoteMode()" style="border: 1px solid var(--key-border);">📝 笔记:关</button>
+        <button id="hint-btn" onclick="useHint()" style="background:#007bff; color:white;">💡 提示(3)</button>
+        <button onclick="checkWin()" style="background:#28a745; color:white;">✅ 检查</button>
     </div>
+
     <div class="action-row">
-        <button onclick="openStats()" style="background:#ff9800; color:white;">🏆 个人战绩</button>
-        <button onclick="openRules()" style="background:#17a2b8; color:white;">💡 游戏规则</button>
+        <button onclick="openStats()" style="background:#ff9800; color:white;">🏆 战绩</button>
+        <button onclick="openRules()" style="background:#17a2b8; color:white;">💡 规则</button>
         <button id="theme-btn" onclick="toggleTheme()" style="background:#343a40; color:white;">🌙 深色模式</button>
     </div>
 
     <!-- 规则弹窗 -->
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">
-            <h2>定制字母数独游戏规则</h2>
+            <h2 id="rule-title">定制字母数独游戏规则</h2>
             <hr style="border: 0; border-top: 1px solid var(--key-border); margin-bottom: 10px;">
             <h3>🔥 主旨规则：</h3>
             <ul>
                 <li>首先 Handrix 非常 Luv Irene！么么</li>
                 <li>其次 这下绝对不会有广告啦</li>
+            </ul>
+            <h3 id="rule-event-title" style="display:none; color: #E91E63;">🐉 端午特别活动规则：</h3>
+            <ul id="rule-event-body" style="display:none; color: #E91E63; font-weight: bold;">
+                <li>端午限定模式基于“困难难度”。</li>
+                <li>棋盘中会出现三组带颜色的发光格子，它们是相连的组合！</li>
+                <li>分别是连在一起的 han、luv、ire，这能大幅降低推理难度，6月19日下线哦！</li>
             </ul>
             <h3>🧩 填字规则：</h3>
             <ul>
@@ -213,8 +216,9 @@
             </ul>
             <h3>💡 操作小技巧：</h3>
             <ul>
-                <li><b>选中高亮</b>：点击格子会自动高亮关联区域和相同字母。</li>
-                <li><b>📝 笔记模式</b>：开启后单格最多填4个猜想；确认正确答案后，系统会自动清理同行同列的冲突笔记！</li>
+                <li><b>🤩 选中高亮</b>：点击格子会自动高亮关联区域和相同字母。</li>
+                <li><b>📝 笔记模式</b>：开启后单格最多填4个猜想；确认正确答案后，系统会自动清理冲突笔记！</li>
+                <li><b>💡 提示求助</b>：太难了？不怕不怕～每局游戏提供 3 次直接揭晓答案的提示机会哦！</li>
                 <li><b>🔙 撤回功能</b>：宝宝填错不怕，支持撤回最近的 15 步操作。</li>
             </ul>
             <button class="close-btn" onclick="closeModal('rulesModal')">知道啦宝宝！</button>
@@ -232,7 +236,6 @@
         </div>
     </div>
 
-    <!-- 提示弹窗 -->
     <div class="modal-overlay" id="messageModal">
         <div class="modal-content" style="text-align: center;">
             <h2 id="msgTitle">提示</h2>
@@ -252,54 +255,127 @@
         let selectedRow = -1; let selectedCol = -1; let noteMode = false;
         let historyStack = []; const MAX_HISTORY = 15;
         let timerInterval = null; let timeElapsed = 0; let gameActive = false;
+        let eventHints = {}; 
+        
+        // ======== 提示系统变量 ========
+        let hintsLeft = 3;
 
-        // ======== 🚀 数据安全急救与读取 ========
         let defaultStats = {
             '35': { best: null, avg: 0, count: 0, name: '🟢 简单' },
             '45': { best: null, avg: 0, count: 0, name: '🟡 中等' },
-            '55': { best: null, avg: 0, count: 0, name: '🔴 困难' }
+            '55': { best: null, avg: 0, count: 0, name: '🔴 困难' },
+            'event': { best: null, avg: 0, count: 0, name: '🎉 活动困难模式' }
         };
         let localStats = JSON.parse(localStorage.getItem('ireSudokuStats')) || defaultStats;
-
-        // 【数据无损恢复脚本】寻找并修复变成 00:00 的异常数据
-        ['35', '45', '55'].forEach(k => {
-            if (!localStats[k]) localStats[k] = defaultStats[k];
+        if (!localStats['event']) localStats['event'] = defaultStats['event'];
+        localStats['event'].name = '🎉 活动困难模式';
+        
+        ['35', '45', '55', 'event'].forEach(k => {
             let s = localStats[k];
-            // 发现由于 Infinity 被强转导致的 null 或 0
-            if (s.best === null || s.best === 0) {
-                if (s.count > 0) {
-                    s.best = s.avg; // 🎉 完美恢复：把平均时间补偿回最佳记录中
-                } else {
-                    s.best = null;
-                }
-            }
+            if (s.best === null || s.best === 0) s.best = s.count > 0 ? s.avg : null;
         });
         localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
 
-        window.onload = startNewGame;
+        function initParticles() {
+            const container = document.getElementById('particles'); container.innerHTML = '';
+            const emojis = ['🍃', '🎋', '🐉', '✨'];
+            for (let i = 0; i < 20; i++) {
+                let p = document.createElement('div'); p.className = 'particle';
+                p.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                p.style.animationDelay = (Math.random() * 5) + 's';
+                container.appendChild(p);
+            }
+        }
+
+        function checkEventExpiry() {
+            let now = new Date(); let expireDate = new Date('2026-06-20T00:00:00+08:00'); 
+            if (now > expireDate) {
+                let eventOpt = document.getElementById('event-option');
+                if (eventOpt) eventOpt.style.display = 'none';
+                if (document.getElementById('diff-select').value === 'event') document.getElementById('diff-select').value = '45';
+            }
+        }
+
+        window.onload = () => { initParticles(); checkEventExpiry(); startNewGame(); };
 
         function toggleTheme() {
-            const body = document.body;
-            const themeBtn = document.getElementById('theme-btn');
+            const body = document.body; const themeBtn = document.getElementById('theme-btn');
             if (body.getAttribute('data-theme') === 'dark') {
                 body.removeAttribute('data-theme');
-                themeBtn.innerHTML = '🌙 深色模式';
-                themeBtn.style.background = '#343a40'; themeBtn.style.color = 'white';
+                themeBtn.innerHTML = '🌙 深色模式'; themeBtn.style.background = '#343a40'; themeBtn.style.color = 'white';
             } else {
                 body.setAttribute('data-theme', 'dark');
-                themeBtn.innerHTML = '☀️ 浅色模式';
-                themeBtn.style.background = '#f8f9fa'; themeBtn.style.color = '#333';
+                themeBtn.innerHTML = '☀️ 浅色模式'; themeBtn.style.background = '#f8f9fa'; themeBtn.style.color = '#333';
                 showMessage("🌙 晚安提醒", "是不是大晚上了还在玩呀？\n别玩太晚哦，早点休息宝宝 😘", "#9c27b0");
             }
         }
 
+        function findConnectedTromino(grid, charSet) {
+            let shapes = [
+                [[0,0], [0,1], [0,2]], [[0,0], [1,0], [2,0]], 
+                [[0,0], [0,1], [1,0]], [[0,0], [0,1], [-1,0]], 
+                [[0,0], [1,0], [1,1]], [[0,0], [1,0], [1,-1]]
+            ];
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    for (let shape of shapes) {
+                        let cells = [], chars = [], valid = true;
+                        for (let pt of shape) {
+                            let nr = r + pt[0], nc = c + pt[1];
+                            if (nr < 0 || nr >= 9 || nc < 0 || nc >= 9) { valid = false; break; }
+                            cells.push({r: nr, c: nc}); chars.push(grid[nr][nc]);
+                        }
+                        if (valid) {
+                            if (chars.slice().sort().join('') === charSet.slice().sort().join('')) return cells;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        function generateEventSolution() {
+            for(let i=0; i<100; i++) {
+                generateSolution();
+                let han = findConnectedTromino(solution, ['h','a','n']);
+                let luv = findConnectedTromino(solution, ['l','u','v']);
+                let ire = findConnectedTromino(solution, ['i','r','e']);
+                if(han && luv && ire) return {han, luv, ire};
+            }
+            return null; 
+        }
+
         function startNewGame() {
-            let blanks = parseInt(document.getElementById('diff-select').value);
-            generateSolution(); createPuzzle(blanks);
+            let diffKey = document.getElementById('diff-select').value;
+            let blanks = diffKey === 'event' ? 55 : parseInt(diffKey);
+            eventHints = {}; let forcedBlanks = [];
+
+            // 重置提示次数
+            hintsLeft = 3;
+            document.getElementById('hint-btn').innerText = `💡 提示(3)`;
+
+            if (diffKey === 'event') {
+                document.body.classList.add('theme-event');
+                document.getElementById('main-title').innerText = "🐉 端午特别活动：han luv ire 🎋";
+                let shapes = generateEventSolution();
+                if (shapes) {
+                    shapes.han.forEach(p => { forcedBlanks.push(p); eventHints[`${p.r}-${p.c}`] = 'han'; });
+                    shapes.luv.forEach(p => { forcedBlanks.push(p); eventHints[`${p.r}-${p.c}`] = 'luv'; });
+                    shapes.ire.forEach(p => { forcedBlanks.push(p); eventHints[`${p.r}-${p.c}`] = 'ire'; });
+                } else generateSolution(); 
+            } else {
+                document.body.classList.remove('theme-event');
+                document.getElementById('main-title').innerText = "Handrix给Irene的字母数独游戏 - han luv ire";
+                generateSolution();
+            }
+
+            createPuzzle(blanks, forcedBlanks);
+            
             selectedRow = -1; selectedCol = -1; historyStack = []; 
             renderBoard();
-            gameActive = true; clearInterval(timerInterval); timeElapsed = 0;
-            updateTimerDisplay();
+            gameActive = true; clearInterval(timerInterval); timeElapsed = 0; updateTimerDisplay();
             timerInterval = setInterval(() => { timeElapsed++; updateTimerDisplay(); }, 1000);
         }
 
@@ -332,9 +408,7 @@
                         let shuffled = [...LETTERS].sort(() => Math.random() - 0.5);
                         for (let letter of shuffled) {
                             if (isValid(grid, r, c, letter)) {
-                                grid[r][c] = letter;
-                                if (solveSudoku(grid)) return true;
-                                grid[r][c] = 0;
+                                grid[r][c] = letter; if (solveSudoku(grid)) return true; grid[r][c] = 0;
                             }
                         }
                         return false;
@@ -367,20 +441,27 @@
             return 1;
         }
 
-        function createPuzzle(blanks) {
+        function createPuzzle(blanks, forcedBlanks = []) {
             for(let r=0; r<9; r++) {
                 for(let c=0; c<9; c++) {
                     board[r][c] = solution[r][c]; userGrid[r][c] = ''; notesGrid[r][c] = []; isFixed[r][c] = true;
                 }
             }
+            let removed = 0;
+            for(let p of forcedBlanks) {
+                if(board[p.r][p.c] !== 0) { board[p.r][p.c] = 0; isFixed[p.r][p.c] = false; removed++; }
+            }
             let positions = [];
             for (let i = 0; i < 81; i++) positions.push([Math.floor(i/9), i%9]);
             positions.sort(() => Math.random() - 0.5);
-            let removed = 0;
+            
             for (let pos of positions) {
                 if (removed >= blanks) break;
-                let r = pos[0], c = pos[1]; let backup = board[r][c]; board[r][c] = 0;
-                if (countSolutions(board) !== 1) board[r][c] = backup; else { isFixed[r][c] = false; removed++; }
+                let r = pos[0], c = pos[1]; let backup = board[r][c]; 
+                if(backup !== 0) {
+                    board[r][c] = 0;
+                    if (countSolutions(board) !== 1) board[r][c] = backup; else { isFixed[r][c] = false; removed++; }
+                }
             }
         }
 
@@ -396,6 +477,9 @@
                     cellDiv.className = 'cell';
                     cellDiv.onclick = () => { if(gameActive) selectCell(r, c); };
 
+                    let hintGroup = eventHints[`${r}-${c}`];
+                    if (hintGroup) cellDiv.classList.add(`hint-${hintGroup}`);
+
                     if (isFixed[r][c]) {
                         cellDiv.classList.add('fixed'); cellDiv.innerText = board[r][c];
                     } else if (userGrid[r][c] !== '') {
@@ -405,6 +489,8 @@
                         for(let i=0; i<4; i++) noteHTML += `<div class="note-item">${notesGrid[r][c][i] || ''}</div>`;
                         noteHTML += `</div>`; cellDiv.innerHTML = noteHTML;
                     }
+
+                    if (hintGroup && cellDiv.innerText === '') cellDiv.innerHTML += `<div class="hint-watermark">${hintGroup}</div>`;
 
                     if (r === selectedRow && c === selectedCol) cellDiv.classList.add('selected');
                     else if (selectedRow !== -1 && (r === selectedRow || c === selectedCol || (Math.floor(r/3) === Math.floor(selectedRow/3) && Math.floor(c/3) === Math.floor(selectedCol/3)))) {
@@ -421,8 +507,40 @@
 
         function toggleNoteMode() {
             noteMode = !noteMode; let btn = document.getElementById('note-btn');
-            if(noteMode) { btn.innerText = "📝 笔记模式:开"; btn.classList.add('active-note'); } 
-            else { btn.innerText = "📝 笔记模式:关"; btn.classList.remove('active-note'); }
+            if(noteMode) { btn.innerText = "📝 笔记:开"; btn.classList.add('active-note'); } 
+            else { btn.innerText = "📝 笔记:关"; btn.classList.remove('active-note'); }
+        }
+
+        // ======== 💡 提示功能核心逻辑 ========
+        function useHint() {
+            if (!gameActive) return;
+            if (hintsLeft <= 0) {
+                showMessage("提示", "3次提示机会已经用完啦宝宝～靠你自己咯！", "#f0ad4e");
+                return;
+            }
+            if (selectedRow === -1 || selectedCol === -1) {
+                showMessage("提示", "请先在盘面上点击选中一个你想要提示的空白格子哦！", "#007bff");
+                return;
+            }
+            if (isFixed[selectedRow][selectedCol]) {
+                showMessage("提示", "这个格子已经是固定的题目啦，不需要提示～", "#f0ad4e");
+                return;
+            }
+            
+            let correctChar = solution[selectedRow][selectedCol];
+            if (userGrid[selectedRow][selectedCol] === correctChar) {
+                showMessage("提示", "这个格子你已经凭实力填对啦，不需要浪费提示次数！", "#28a745");
+                return;
+            }
+
+            // 执行提示
+            saveState(); // 提示也是可以撤回的
+            userGrid[selectedRow][selectedCol] = correctChar;
+            autoCleanNotes(selectedRow, selectedCol, correctChar);
+            
+            hintsLeft--;
+            document.getElementById('hint-btn').innerText = `💡 提示(${hintsLeft})`;
+            renderBoard();
         }
 
         function inputLetter(l) {
@@ -453,7 +571,6 @@
             }
         }
 
-        // 修复：处理 null 状态的时间显示
         function formatTime(sec) {
             if (sec === null || sec === Infinity) return "--:--";
             let m = Math.floor(sec / 60).toString().padStart(2, '0');
@@ -479,9 +596,7 @@
                 let diffKey = document.getElementById('diff-select').value;
                 let s = localStats[diffKey];
                 
-                s.count++;
-                s.avg = ((s.avg * (s.count - 1)) + timeElapsed) / s.count;
-                // 修复逻辑：如果是 null，必然是新记录
+                s.count++; s.avg = ((s.avg * (s.count - 1)) + timeElapsed) / s.count;
                 let isNewRecord = (s.best === null) || (timeElapsed < s.best);
                 if (isNewRecord) s.best = timeElapsed;
                 
@@ -504,9 +619,10 @@
         }
 
         function openStats() {
-            let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>完成局数</th></tr>`;
-            ['35', '45', '55'].forEach(k => {
+            let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>通关局数</th></tr>`;
+            ['35', '45', '55', 'event'].forEach(k => {
                 let s = localStats[k];
+                if (k === 'event' && document.getElementById('event-option').style.display === 'none' && s.count === 0) return;
                 html += `<tr>
                     <td><b>${s.name}</b></td>
                     <td style="color:#28a745; font-weight:bold;">${formatTime(s.best)}</td>
@@ -518,7 +634,12 @@
             document.getElementById('statsModal').style.display = 'flex';
         }
 
-        function openRules() { document.getElementById('rulesModal').style.display = 'flex'; }
+        function openRules() {
+            let isEvent = document.getElementById('diff-select').value === 'event';
+            document.getElementById('rule-event-title').style.display = isEvent ? 'block' : 'none';
+            document.getElementById('rule-event-body').style.display = isEvent ? 'block' : 'none';
+            document.getElementById('rulesModal').style.display = 'flex';
+        }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     </script>
 </body>
