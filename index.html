@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
     <title>Handrix给Irene的字母数独游戏：han luv ire</title>
     <style>
-        /* ======== 极简玻璃拟态主题变量 ======== */
+        /* ======== 极简玻璃拟态主题 ======== */
         :root {
             --bg-color: #f6f8fb; --glass-bg: rgba(255, 255, 255, 0.6); --glass-border: rgba(255, 255, 255, 0.8);
             --cell-bg: rgba(255, 255, 255, 0.9); --grid-line: #cbd5e1; --grid-line-thick: #475569;
@@ -33,9 +33,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color); color: var(--text-main);
-            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
-            touch-action: manipulation; padding-bottom: 40px; overflow-x: hidden;
+            background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; 
+            display: flex; flex-direction: column; align-items: center; touch-action: manipulation; padding-bottom: 40px; overflow-x: hidden;
             background: linear-gradient(-45deg, var(--gradient-1), var(--gradient-2), var(--bg-color));
             background-size: 400% 400%; animation: auroraBG 15s ease infinite; transition: 0.5s;
         }
@@ -199,7 +198,6 @@
         </button>
     </div>
 
-    <!-- ======== 规则弹窗 ======== -->
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">
             <h2><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 定制字母数独规则</h2>
@@ -271,6 +269,13 @@
                 gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
                 osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+                gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.2, now + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
             } else if (type === 'win') { 
                 const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51];
                 freqs.forEach((freq, i) => {
@@ -285,7 +290,7 @@
         document.body.addEventListener('touchstart', initAudio, {once:true});
         document.body.addEventListener('click', initAudio, {once:true});
 
-        // ======== 🏆 数据安全急救与无损合并逻辑 ========
+        // ======== 🏆 最强数据急救与加载逻辑 ========
         let defaultStats = {
             '35': { best: null, avg: 0, count: 0, name: '简单模式' },
             '45': { best: null, avg: 0, count: 0, name: '中等模式' },
@@ -293,41 +298,31 @@
             'event': { best: null, avg: 0, count: 0, name: '活动困难模式' }
         };
 
-        let localStatsV2 = JSON.parse(localStorage.getItem('ireSudokuStatsV2'));
-        let localStatsV1 = JSON.parse(localStorage.getItem('ireSudokuStats')); 
+        // 直接且唯一地读取你最原生的那份档案！绝不再造新抽屉！
+        let localStats = JSON.parse(localStorage.getItem('ireSudokuStats'));
 
-        let isRecoveryTriggered = false;
+        if (!localStats) {
+            localStats = JSON.parse(JSON.stringify(defaultStats));
+        } else {
+            // 洗干净名字里的 Emoji
+            if (!localStats['event']) localStats['event'] = defaultStats['event'];
+            localStats['35'].name = '简单模式';
+            localStats['45'].name = '中等模式';
+            localStats['55'].name = '困难模式';
+            localStats['event'].name = '活动困难模式';
 
-        if (!localStatsV2) localStatsV2 = JSON.parse(JSON.stringify(defaultStats));
-
-        // 强行把 V1 的心血继承到 V2
-        if (localStatsV1) {
-            ['35', '45', '55'].forEach(k => {
-                // 如果 V1 有记录，且 V2 是空的，或者是 V1 的次数比 V2 多（极度防丢策略）
-                if (localStatsV1[k] && localStatsV1[k].count > 0 && localStatsV1[k].count >= localStatsV2[k].count) {
-                    localStatsV2[k].count = localStatsV1[k].count;
-                    localStatsV2[k].avg = localStatsV1[k].avg;
-                    localStatsV2[k].best = localStatsV1[k].best;
-                    isRecoveryTriggered = true; // 触发雷达
+            // 完美修复 Infinity 和 null
+            ['35', '45', '55', 'event'].forEach(k => {
+                let s = localStats[k];
+                if (s.best === null || s.best === 0 || s.best === Infinity) {
+                    s.best = s.count > 0 ? s.avg : null;
                 }
             });
         }
+        // 把干净安全的数据存回原来的档案
+        localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
 
-        // 修复所有 null 或 0 或 Infinity 的异常最佳记录
-        ['35', '45', '55', 'event'].forEach(k => {
-            if (!localStatsV2[k]) localStatsV2[k] = defaultStats[k];
-            let s = localStatsV2[k];
-            if (s.best === null || s.best === 0 || s.best === Infinity) {
-                s.best = s.count > 0 ? s.avg : null;
-            }
-        });
-
-        localStatsV2['event'].name = '活动困难模式';
-        localStorage.setItem('ireSudokuStatsV2', JSON.stringify(localStatsV2));
-        let localStats = localStatsV2;
-
-
-        // ======== 🎨 Canvas 发热优化 (无Emoji纯数学竹叶绘制) ========
+        // ======== 🎨 Canvas 发热优化 (竹叶飘落纯数学公式) ========
         const fxCanvas = document.getElementById('canvas-fx'); const fxCtx = fxCanvas.getContext('2d');
         const confCanvas = document.getElementById('canvas-confetti'); const confCtx = confCanvas.getContext('2d');
         let fxParticles = []; let confParticles = []; let reqFx, reqConf;
@@ -363,7 +358,7 @@
                     fxCtx.rotate(p.angle);
                     fxCtx.fillStyle = `rgba(46, 125, 50, ${p.opacity})`; 
                     
-                    // 画一片纯数学公式竹叶
+                    // 纯数学公式画竹叶 (零发热)
                     fxCtx.beginPath();
                     fxCtx.moveTo(0, 0);
                     fxCtx.quadraticCurveTo(p.size/2, -p.size/3, p.size, 0);
@@ -427,17 +422,7 @@
             }
         }
 
-        window.onload = () => { 
-            checkEventExpiry(); 
-            startNewGame(); 
-            
-            // 如果急救雷达生效了，弹出提示让玩家安心
-            if (isRecoveryTriggered) {
-                setTimeout(() => {
-                    showMessage("雷达提示", "✅ 滴滴！成功从底层芯片为你找回了之前的辛苦战绩！快去战绩板看看吧！", "#10b981");
-                }, 800);
-            }
-        };
+        window.onload = () => { checkEventExpiry(); startNewGame(); };
 
         function toggleTheme() {
             playSound('bubble');
@@ -482,7 +467,7 @@
         }
 
         function startNewGame() {
-            playSound('bubble');
+            playSound('click');
             let diffKey = document.getElementById('diff-select').value;
             let blanks = diffKey === 'event' ? 55 : parseInt(diffKey);
             eventHints = {}; let forcedBlanks = [];
@@ -627,7 +612,7 @@
         }
 
         function toggleNoteMode() {
-            playSound('bubble');
+            playSound('click');
             noteMode = !noteMode; let btn = document.getElementById('note-btn');
             if(noteMode) { btn.classList.add('active-note'); } 
             else { btn.classList.remove('active-note'); }
@@ -685,6 +670,7 @@
 
         function checkWin() {
             if(!gameActive) return;
+            playSound('click');
             let hasEmpty = false, hasError = false;
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
@@ -705,7 +691,7 @@
                 let isNewRecord = (s.best === null) || (timeElapsed < s.best);
                 if (isNewRecord) s.best = timeElapsed;
                 
-                localStorage.setItem('ireSudokuStatsV2', JSON.stringify(localStats));
+                localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
 
                 let msg = `太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！\n\n本局用时: ${formatTime(timeElapsed)}`;
                 if(isNewRecord && s.count > 1) msg += "\n打破了该难度的最佳记录！";
@@ -725,7 +711,7 @@
         }
 
         function openStats() {
-            playSound('bubble');
+            playSound('click');
             let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>通关局数</th></tr>`;
             ['35', '45', '55', 'event'].forEach(k => {
                 let s = localStats[k];
@@ -742,7 +728,7 @@
         }
 
         function openRules() {
-            playSound('bubble');
+            playSound('click');
             let isEvent = document.getElementById('diff-select').value === 'event';
             document.getElementById('rule-event-title').style.display = isEvent ? 'block' : 'none';
             document.getElementById('rule-event-body').style.display = isEvent ? 'block' : 'none';
