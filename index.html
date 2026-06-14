@@ -3,179 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Handrix给Irene的字母数独游戏 - han luv ire</title>
+    <title>Handrix给Irene的字母数独游戏：han luv ire</title>
     <style>
-        /* ======== 高级质感变量 ======== */
+        /* ======== 极简玻璃拟态主题变量 ======== */
         :root {
-            --bg: #F0F3F8; --cell-bg: #FFFFFF; --border: #D1D9E6;
-            --highlight-same: #FFF4CE; --highlight-related: #E4ECFA; --selected: #C9D9F8;
-            --text-fixed: #2D3748; --text-user: #3182CE; --text-note: #A0AEC0; --text-main: #2D3748;
-            --key-bg: #FFFFFF; --key-border: #E2E8F0; --key-action-bg: #EDF2F7; --modal-bg: #FFFFFF;
-            --th-bg: #F7FAFC; --undo-bg: #FEFCBF; --undo-border: #F6E05E; --undo-text: #B7791F;
-            --note-on-bg: #F6E05E; --note-on-border: #D69E2E;
-            --hint-han: rgba(168, 230, 207, 0.4); --hint-luv: rgba(255, 179, 186, 0.4); --hint-ire: rgba(186, 225, 255, 0.4);
-            --shadow-light: #FFFFFF; --shadow-dark: #D1D9E6;
+            --bg-color: #f6f8fb; --glass-bg: rgba(255, 255, 255, 0.6); --glass-border: rgba(255, 255, 255, 0.8);
+            --cell-bg: rgba(255, 255, 255, 0.9); --grid-line: #cbd5e1; --grid-line-thick: #475569;
+            --text-fixed: #0f172a; --text-user: #2563eb; --text-note: #64748b; --text-main: #334155;
+            --btn-bg: rgba(255, 255, 255, 0.8); --btn-border: rgba(255, 255, 255, 0.6);
+            --highlight-same: rgba(253, 230, 138, 0.6); --highlight-related: rgba(219, 234, 254, 0.5); --selected: rgba(147, 197, 253, 0.8);
+            --gradient-1: #e0c3fc; --gradient-2: #8ec5fc; --shadow: rgba(0, 0, 0, 0.05);
+            --hint-han: rgba(167, 243, 208, 0.5); --hint-luv: rgba(254, 202, 202, 0.5); --hint-ire: rgba(191, 219, 254, 0.5);
+            --event-text: #059669;
         }
 
-        /* ======== 深色模式 ======== */
         [data-theme="dark"] {
-            --bg: #1A202C; --cell-bg: #2D3748; --border: #4A5568;
-            --highlight-same: #4A452A; --highlight-related: #2A4365; --selected: #2C5282;
-            --text-fixed: #F7FAFC; --text-user: #63B3ED; --text-note: #718096; --text-main: #E2E8F0;
-            --key-bg: #2D3748; --key-border: #4A5568; --key-action-bg: #4A5568; --modal-bg: #2D3748;
-            --th-bg: #1A202C; --undo-bg: #744210; --undo-border: #975A16; --undo-text: #F6E05E;
-            --note-on-bg: #975A16; --note-on-border: #B7791F;
-            --hint-han: rgba(46, 117, 85, 0.4); --hint-luv: rgba(138, 43, 88, 0.4); --hint-ire: rgba(43, 91, 132, 0.4);
-            --shadow-light: #2D3748; --shadow-dark: #0f131a;
+            --bg-color: #0f172a; --glass-bg: rgba(30, 41, 59, 0.6); --glass-border: rgba(255, 255, 255, 0.1);
+            --cell-bg: rgba(30, 41, 59, 0.85); --grid-line: #334155; --grid-line-thick: #94a3b8;
+            --text-fixed: #f8fafc; --text-user: #60a5fa; --text-note: #94a3b8; --text-main: #e2e8f0;
+            --btn-bg: rgba(30, 41, 59, 0.8); --btn-border: rgba(255, 255, 255, 0.1);
+            --highlight-same: rgba(202, 138, 4, 0.4); --highlight-related: rgba(30, 58, 138, 0.4); --selected: rgba(37, 99, 235, 0.6);
+            --gradient-1: #0f2027; --gradient-2: #203a43; --shadow: rgba(0, 0, 0, 0.3);
+            --hint-han: rgba(5, 150, 105, 0.4); --hint-luv: rgba(190, 18, 60, 0.4); --hint-ire: rgba(29, 78, 216, 0.4);
+            --event-text: #34d399;
         }
 
-        /* ======== 🐉 活动限定主题 ======== */
-        body.theme-event { --bg: #E8F5E9; --shadow-dark: #C8E6C9; --border: #A5D6A7; }
-        [data-theme="dark"] body.theme-event { --bg: #0F1C12; --shadow-dark: #070d08; --border: #2E7D32; }
+        body.theme-event { --gradient-1: #d4fc79; --gradient-2: #96e6a1; }
+        [data-theme="dark"] body.theme-event { --gradient-1: #06170e; --gradient-2: #164027; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg); color: var(--text-main); margin: 0; padding: 15px;
-            display: flex; flex-direction: column; align-items: center; touch-action: manipulation;
-            padding-bottom: 40px; transition: background-color 0.4s, color 0.4s; overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color); color: var(--text-main);
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
+            touch-action: manipulation; padding-bottom: 40px; overflow-x: hidden;
+            background: linear-gradient(-45deg, var(--gradient-1), var(--gradient-2), var(--bg-color));
+            background-size: 400% 400%; animation: auroraBG 15s ease infinite; transition: 0.5s;
         }
 
-        #canvas-bg, #canvas-fx { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
-        #canvas-bg { z-index: -1; }
-        #canvas-fx { z-index: 9999; } /* 庆典烟花层在最上方 */
+        @keyframes auroraBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        #canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
+        #canvas-fx { z-index: -1; }
+        #canvas-confetti { z-index: 9999; }
 
         .header { text-align: center; margin-bottom: 12px; z-index: 10; }
-        .header h1 { font-size: 18px; color: var(--text-main); margin: 0 0 5px 0; transition: 0.3s; }
+        .header h1 { font-size: 18px; color: var(--text-main); margin: 0 0 5px 0; letter-spacing: 0.5px; transition: 0.3s; }
         
-        .top-controls {
-            display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 400px; margin-bottom: 10px; z-index: 10;
+        .top-controls { 
+            display: flex; justify-content: space-between; align-items: center; gap: 8px;
+            width: 100%; max-width: 400px; margin-bottom: 15px; z-index: 10; 
         }
+        select, button, .timer-display {
+            box-sizing: border-box; padding: 8px 0; font-size: 14px; font-weight: bold; border-radius: 10px;
+            border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-main); 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); outline: none; cursor: pointer; transition: 0.2s;
+        }
+        select#diff-select, #new-game-btn { flex: 1; max-width: 110px; text-align: center; }
+        .timer-display { flex: 0 0 95px; width: 95px; cursor: default; display: flex; justify-content: center; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
         
-        select, button {
-            padding: 8px 12px; font-size: 14px; font-weight: bold; border-radius: 8px;
-            border: 1px solid var(--key-border); background: var(--key-bg); color: var(--text-main); cursor: pointer; transition: 0.2s;
-            box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light); 
-        }
-        select#diff-select { max-width: 140px; }
-        button:active { 
-            transform: scale(0.95); 
-            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); 
-        }
-
-        .timer-display {
-            font-size: 16px; font-weight: bold; color: var(--text-main); font-variant-numeric: tabular-nums;
-            background: var(--key-action-bg); padding: 6px 12px; border-radius: 8px; transition: 0.3s;
-            box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
-        }
-
         .board {
-            display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr); 
-            gap: 1px; background-color: var(--border); border: 2px solid var(--border);
-            width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 15px; flex-shrink: 0; 
-            border-radius: 6px; overflow: hidden;
-            box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
-            transition: background-color 0.4s, border-color 0.4s; z-index: 10;
+            display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr);
+            width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 20px; flex-shrink: 0;
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 2px solid var(--grid-line-thick); border-radius: 8px; overflow: hidden; box-shadow: 0 8px 32px var(--shadow); z-index: 10;
         }
 
         .cell {
             background-color: var(--cell-bg); display: flex; align-items: center; justify-content: center;
-            font-size: 24px; font-weight: bold; cursor: pointer; position: relative;
-            border-bottom: 1px solid var(--key-border); border-right: 1px solid var(--key-border);
-            box-sizing: border-box; min-height: 0; transition: background-color 0.2s, color 0.2s;
+            font-size: 24px; font-weight: bold; cursor: pointer; position: relative; 
+            border-right: 1px solid var(--grid-line); border-bottom: 1px solid var(--grid-line);
+            box-sizing: border-box; min-height: 0; transition: background-color 0.2s;
         }
-        .cell:nth-child(3n) { border-right: 2px solid var(--border); }
+        
+        .cell:nth-child(3n) { border-right: 2px solid var(--grid-line-thick); }
         .cell:nth-child(9n) { border-right: none; }
-        .cell:nth-child(n+19):nth-child(-n+27), .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--border); }
+        .cell:nth-child(n+19):nth-child(-n+27), .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--grid-line-thick); }
+        .cell:nth-child(n+73):nth-child(-n+81) { border-bottom: none; }
         
-        .cell.fixed { color: var(--text-fixed); }
+        .cell.fixed { color: var(--text-fixed); font-weight: 800;}
         .cell.user { color: var(--text-user); }
+        .cell.hint-han { background-color: var(--hint-han); } .cell.hint-luv { background-color: var(--hint-luv); } .cell.hint-ire { background-color: var(--hint-ire); }
+        .cell.related { background-color: var(--highlight-related); } .cell.same { background-color: var(--highlight-same); }
+        .cell.selected { background-color: var(--selected); box-shadow: inset 0 0 0 2px var(--text-user); z-index: 2; }
+
+        @keyframes shine { 0% { background-color: rgba(255,255,255,1); } 100% { background-color: transparent; } }
+        .cell.just-placed::after { content: ''; position: absolute; inset: 0; animation: shine 0.4s ease-out; pointer-events: none; }
+
+        .hint-watermark { position: absolute; top: 1px; right: 3px; font-size: 11px; color: var(--text-note); opacity: 0.9; font-weight: 700; }
+        .notes-grid { position: absolute; inset: 1px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; pointer-events: none; }
+        .note-item { display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: var(--text-note); }
+
+        .keyboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px; z-index: 10; }
+        .key, .action-btn {
+            background: var(--btn-bg); border: 1px solid var(--btn-border); border-radius: 10px; color: var(--text-main);
+            font-size: 20px; font-weight: bold; height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 4px 6px var(--shadow);
+            transition: 0.15s; cursor: pointer; user-select: none; gap: 4px;
+        }
+        .key:active, .action-btn:active { transform: scale(0.92); background: var(--highlight-related); }
+        .key.undo-btn { color: #d97706; background: rgba(253, 230, 138, 0.4); font-size: 13px; flex-direction: row; }
         
-        .cell.hint-han { background-color: var(--hint-han); }
-        .cell.hint-luv { background-color: var(--hint-luv); }
-        .cell.hint-ire { background-color: var(--hint-ire); }
+        .action-btn.active-note { background: #f59e0b !important; color: #ffffff !important; border: 1px solid #d97706 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important; }
+        .action-btn.active-note .icon { stroke: #ffffff; }
 
-        .cell.related { background-color: var(--highlight-related); }
-        .cell.same { background-color: var(--highlight-same); }
-        .cell.selected { background-color: var(--selected); }
+        .action-row { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 10px; z-index: 10; }
+        .action-row .action-btn { flex: 1; font-size: 13px; height: auto; padding: 10px 0; flex-direction: row; gap: 6px; }
 
-        @keyframes shineEffect {
-            0% { background-color: rgba(255, 255, 255, 0.9); }
-            100% { background-color: transparent; }
-        }
-        .cell.just-placed::after {
-            content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
-            animation: shineEffect 0.4s ease-out; pointer-events: none;
-        }
-
-        .hint-watermark {
-            position: absolute; top: 2px; right: 2px; font-size: 9px; 
-            color: var(--text-note); opacity: 0.8; font-weight: normal; pointer-events: none;
-        }
-
-        .notes-grid {
-            position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px;
-            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; pointer-events: none; 
-        }
-        .note-item { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-note); }
-
-        .keyboard {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 12px; flex-shrink: 0; z-index: 10;
-        }
-        .key {
-            background: var(--key-bg); border: none; border-radius: 10px; color: var(--text-main);
-            font-size: 20px; font-weight: bold; height: 48px; display: flex; align-items: center; justify-content: center; 
-            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); 
-            transition: 0.1s; cursor: pointer; user-select: none;
-        }
-        .key:active { transform: scale(0.92); box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light); }
-        .key.action-btn { font-size: 14px; background: var(--key-action-bg); }
-        .key.active-note { background: var(--note-on-bg); border: 1px solid var(--note-on-border); color: #333; }
-        .key.undo-btn { font-size: 15px; background: var(--undo-bg); color: var(--undo-text); }
-
-        .action-row { display: flex; gap: 10px; width: 100%; max-width: 400px; margin-bottom: 10px; z-index: 10; }
-        .action-row button { flex: 1; border: none; padding: 12px; font-size: 15px; }
+        .icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+        .inline-icon { width: 16px; height: 16px; margin-right: 4px; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
         .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: center;
+            display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px); z-index: 10000; justify-content: center; align-items: center;
         }
         .modal-content {
-            background: var(--modal-bg); color: var(--text-main); width: 85%; max-width: 350px; border-radius: 16px;
-            padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; transition: 0.3s;
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); color: var(--text-main); width: 85%; max-width: 350px; border-radius: 20px;
+            padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); max-height: 80vh; overflow-y: auto;
         }
-        .modal-content h2 { color: #4A90E2; font-size: 20px; margin-top: 0; text-align: center;}
-        .modal-content h3 { font-size: 16px; margin: 15px 0 5px 0; color: var(--text-main); }
+        .modal-content h2 { font-size: 18px; margin-top: 0; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;}
+        .modal-content h3 { font-size: 15px; margin: 15px 0 5px 0; opacity: 0.9; display: flex; align-items: center; }
         .modal-content ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6; }
         .close-btn {
-            display: block; width: 100%; background: #4A90E2; color: white !important; border: none;
-            padding: 12px; border-radius: 10px; font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer;
-            box-shadow: 0 4px 6px rgba(74, 144, 226, 0.3);
+            width: 100%; background: #3b82f6; color: white !important; border: none; padding: 12px; border-radius: 12px; 
+            font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.2s;
         }
+        .close-btn:active { transform: scale(0.95); }
         .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; font-size: 14px; }
-        .stats-table th { background: var(--th-bg); padding: 10px 8px; border-bottom: 1px solid var(--key-border); border-radius: 6px 6px 0 0;}
-        .stats-table td { border-bottom: 1px solid var(--key-border); padding: 12px 8px; }
-
+        .stats-table th { background: var(--th-bg); padding: 10px 8px; border-bottom: 1px solid var(--glass-border); border-radius: 8px 8px 0 0;}
+        .stats-table td { border-bottom: 1px solid var(--glass-border); padding: 12px 8px; }
+        
+        .theme-event-text { color: var(--event-text); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- Canvas 渲染层 -->
-    <canvas id="canvas-bg"></canvas>
     <canvas id="canvas-fx"></canvas>
+    <canvas id="canvas-confetti"></canvas>
 
     <div class="header">
-        <h1 id="main-title">Handrix给Irene的字母数独游戏 - han luv ire</h1>
+        <h1 id="main-title">Handrix给Irene的字母数独游戏：han luv ire</h1>
     </div>
 
     <div class="top-controls">
         <select id="diff-select" onchange="startNewGame()">
-            <option value="35">🟢 简单</option>
-            <option value="45" selected>🟡 中等</option>
-            <option value="55">🔴 困难</option>
-            <option value="event" id="event-option">🎉 活动模式(困难)</option>
+            <option value="35">&#9679; 简单模式</option>
+            <option value="45" selected>&#9679; 中等模式</option>
+            <option value="55">&#9679; 困难模式</option>
+            <option value="event" id="event-option">&#10022; 活动困难模式</option>
         </select>
-        <div class="timer-display" id="timer">⏱ 00:00</div>
-        <button onclick="startNewGame()" style="background:#6f42c1; color:white; border:none; box-shadow: 0 4px 6px rgba(111, 66, 193, 0.3);">新游戏</button>
+        <div class="timer-display" id="timer">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 00:00
+        </div>
+        <button id="new-game-btn" onclick="startNewGame()" style="background:#8b5cf6; color:white; border:none; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);">新游戏</button>
     </div>
 
     <div class="board" id="board"></div>
@@ -190,208 +170,242 @@
         <div class="key" onclick="inputLetter('i')">i</div>
         <div class="key" onclick="inputLetter('r')">r</div>
         <div class="key" onclick="inputLetter('e')">e</div>
-        <div class="key undo-btn" onclick="undo()">🔙 撤回</div>
+        <div class="key undo-btn" onclick="undo()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg> 撤回
+        </div>
     </div>
     
     <div class="action-row">
-        <button class="key action-btn" id="note-btn" onclick="toggleNoteMode()">📝 笔记:关</button>
-        <button id="hint-btn" onclick="useHint()" style="background:#007bff; color:white; box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);">💡 提示(3)</button>
-        <button onclick="checkWin()" style="background:#28a745; color:white; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);">✅ 检查</button>
+        <button class="action-btn" id="note-btn" onclick="toggleNoteMode()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> 笔记
+        </button>
+        <button class="action-btn" id="hint-btn" onclick="useHint()" style="color: #0ea5e9;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> <span id="hint-text">提示(3)</span>
+        </button>
+        <button class="action-btn" onclick="checkWin()" style="color: #10b981;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 检查
+        </button>
     </div>
 
     <div class="action-row">
-        <button onclick="openStats()" style="background:#ff9800; color:white; box-shadow: 0 4px 6px rgba(255, 152, 0, 0.3);">🏆 战绩</button>
-        <button onclick="openRules()" style="background:#17a2b8; color:white; box-shadow: 0 4px 6px rgba(23, 162, 184, 0.3);">💡 规则</button>
-        <button id="theme-btn" onclick="toggleTheme()" style="background:#343a40; color:white; box-shadow: 0 4px 6px rgba(52, 58, 64, 0.3);">🌙 深色模式</button>
+        <button class="action-btn" onclick="openStats()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 战绩
+        </button>
+        <button class="action-btn" onclick="openRules()">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 规则
+        </button>
+        <button class="action-btn" id="theme-btn" onclick="toggleTheme()">
+            <svg class="icon" id="theme-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> 护眼
+        </button>
     </div>
 
-    <!-- ======== 规则弹窗 (文案已更新) ======== -->
+    <!-- ======== 规则弹窗 ======== -->
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">
-            <h2 id="rule-title">定制字母数独游戏规则</h2>
-            <hr style="border: 0; border-top: 1px solid var(--key-border); margin-bottom: 10px;">
-            <h3>🔥 主旨规则：</h3>
+            <h2><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 定制字母数独规则</h2>
+            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin-bottom: 10px;">
+            
+            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> 主旨规则：</h3>
             <ul>
                 <li>首先 Handrix 非常 Luv Irene！么么</li>
                 <li>其次 这下绝对不会有广告啦</li>
             </ul>
-            <h3 id="rule-event-title" style="display:none; color: #E91E63;">🐉 端午特别活动规则：</h3>
-            <ul id="rule-event-body" style="display:none; color: #E91E63; font-weight: bold;">
-                <li>端午限定模式基于“困难难度”。</li>
+            
+            <h3 id="rule-event-title" style="display:none;" class="theme-event-text"><svg class="inline-icon" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg> 端午特别活动规则：</h3>
+            <ul id="rule-event-body" style="display:none;" class="theme-event-text">
+                <li>活动模式基于“困难难度”。</li>
                 <li>棋盘中会出现三组带颜色的水彩质感格子，它们是相连的组合！</li>
                 <li>分别是连在一起的 han、luv、ire，这能大幅降低推理难度，6月19日下线哦！</li>
             </ul>
-            <h3>🧩 填字规则：</h3>
+            
+            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.954.954 0 0 0-.288.877l.13 1.011c.088.684-.061 1.405-.434 2.02-.374.615-.992 1.04-1.745 1.196l-.995.207a.953.953 0 0 0-.743.518l-.48 1.002c-.328.685-.899 1.204-1.608 1.464a2.585 2.585 0 0 1-2.198-.108l-.872-.51a.95.95 0 0 0-1.04 0l-.872.51a2.584 2.584 0 0 1-2.198.108 2.584 2.584 0 0 1-1.608-1.464l-.48-1.002a.954.954 0 0 0-.743-.518l-.995-.207a2.586 2.586 0 0 1-1.745-1.196 2.586 2.586 0 0 1-.434-2.02l.13-1.011a.954.954 0 0 0-.288-.877l-1.611-1.611a2.41 2.41 0 0 1 0-3.408l1.568-1.568a.954.954 0 0 0 .289-.878l-.13-1.011a2.586 2.586 0 0 1 .434-2.02 2.586 2.586 0 0 1 1.745-1.196l.995-.207a.953.953 0 0 0 .743-.518l.48-1.002a2.584 2.584 0 0 1 1.608-1.464 2.584 2.584 0 0 1 2.198.108l.872.51a.95.95 0 0 0 1.04 0l.872-.51a2.584 2.584 0 0 1 2.198-.108 2.584 2.584 0 0 1 1.608 1.464l.48 1.002a.954.954 0 0 0 .743.518l.995.207c.753.156 1.371.58 1.745 1.196.373.615.522 1.336.434 2.02l-.13 1.011Z"/></svg> 填字规则：</h3>
             <ul>
                 <li><b>9x9 棋盘</b>：填入 <b>h, a, n, l, u, v, i, r, e</b>。</li>
-                <li><b>每行、每列、每个 3x3 粗线宫格</b> 内，每个字母且只能出现一次。</li>
+                <li><b>每个 3x3 宫格</b> 内，每个字母且只能出现一次。</li>
             </ul>
-            <h3>💡 操作小技巧：</h3>
+            
+            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg> 操作小技巧：</h3>
             <ul>
-                <li><b>选中高亮</b>：点击格子会自动高亮关联区域和相同字母。</li>
-                <li><b>📝 笔记模式</b>：开启后单格最多填4个猜想；确认正确答案后，系统会自动清理冲突笔记！</li>
-                <li><b>💡 提示求助</b>：太难了？不怕不怕～每局游戏提供 3 次直接揭晓答案的提示机会哦！</li>
-                <li><b>🔙 撤回功能</b>：宝宝填错不怕，支持撤回最近的 15 步操作。</li>
+                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg> 选中高亮</b>：点击格子会自动高亮关联区域和相同字母。</li>
+                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> 笔记模式</b>：单格最多填4个猜想；确认答案后，系统会自动清理冲突笔记！</li>
+                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> 提示求助</b>：不怕不怕～每局提供 3 次揭晓答案的机会哦！</li>
+                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg> 撤回功能</b>：宝宝填错不怕，支持撤回最近的 15 步操作。</li>
             </ul>
-            <button class="close-btn" onclick="closeModal('rulesModal')">知道啦宝宝！</button>
+            <button class="close-btn" onclick="playSound('click'); closeModal('rulesModal')">知道啦宝宝！</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="statsModal">
         <div class="modal-content">
-            <h2>🏆 个人战绩看板</h2>
-            <hr style="border: 0; border-top: 1px solid var(--key-border);">
+            <h2><svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 个人战绩看板</h2>
             <table class="stats-table" id="statsTable"></table>
-            <p style="font-size: 12px; color: #888; text-align: center; margin-top: 15px;">* 数据安全储存在本手机，不与他人共享</p>
-            <button class="close-btn" onclick="closeModal('statsModal')">继续加油！</button>
+            <p style="font-size: 11px; color: var(--text-note); text-align: center; margin-top: 15px;">* 数据安全储存在本手机芯片内，绝对隐私</p>
+            <button class="close-btn" onclick="playSound('click'); closeModal('statsModal')">继续加油！</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="messageModal">
         <div class="modal-content" style="text-align: center;">
             <h2 id="msgTitle">提示</h2>
-            <p id="msgBody" style="font-size: 16px; line-height: 1.5; margin: 20px 0; font-weight: 500;"></p>
-            <button class="close-btn" id="msgCloseBtn" onclick="closeModal('messageModal')" style="background: #28a745;">知道啦！</button>
+            <p id="msgBody" style="font-size: 15px; line-height: 1.5; margin: 20px 0; font-weight: 500;"></p>
+            <button class="close-btn" id="msgCloseBtn" onclick="playSound('click'); closeModal('messageModal')">知道啦！</button>
         </div>
     </div>
 
     <script>
-        // ======== 🎵 原生音效引擎 (改良为泡泡声 Bloop) ========
+        // ======== 🎵 原生音效引擎 ========
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
-
-        function initAudio() {
-            if (!audioCtx) audioCtx = new AudioContext();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
+        function initAudio() { if (!audioCtx) { audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); } }
 
         function playSound(type) {
-            initAudio();
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
+            initAudio(); if (!audioCtx) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
             
-            // 只有填入字母和过关才有声音，彻底消除吵闹和“放屁”声
-            if (type === 'bubble') {
-                // 清脆可爱的泡泡破裂声 (Bloop)
-                osc.type = 'sine'; // 纯净的波形
+            if (type === 'bubble') { 
+                osc.type = 'sine';
                 osc.frequency.setValueAtTime(300, now);
-                osc.frequency.exponentialRampToValueAtTime(900, now + 0.08); // 频率快速上扬产生“波”的感觉
-                
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08); // 声音极快消失
-                
+                osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+                gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
                 osc.start(now); osc.stop(now + 0.1);
-            } else if (type === 'win') {
-                // 庆祝水晶音 (C5 E5 G5 C6 E6)
+            } else if (type === 'win') { 
                 const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51];
                 freqs.forEach((freq, i) => {
-                    const o = audioCtx.createOscillator();
-                    const g = audioCtx.createGain();
-                    o.connect(g); g.connect(audioCtx.destination);
-                    o.type = 'sine';
-                    o.frequency.value = freq;
-                    g.gain.setValueAtTime(0, now + i*0.08);
-                    g.gain.linearRampToValueAtTime(0.3, now + i*0.08 + 0.02);
+                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                    o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.value = freq;
+                    g.gain.setValueAtTime(0, now + i*0.08); g.gain.linearRampToValueAtTime(0.2, now + i*0.08 + 0.02);
                     g.gain.exponentialRampToValueAtTime(0.01, now + i*0.08 + 0.6);
                     o.start(now + i*0.08); o.stop(now + i*0.08 + 0.7);
                 });
             }
         }
-
-        // 监听全局第一次触控激活音频引擎
         document.body.addEventListener('touchstart', initAudio, {once:true});
         document.body.addEventListener('click', initAudio, {once:true});
 
-        // ======== 🎨 Canvas 引擎 (升级为全屏双向烟花庆典) ========
-        const bgCanvas = document.getElementById('canvas-bg');
-        const bgCtx = bgCanvas.getContext('2d');
-        const fxCanvas = document.getElementById('canvas-fx');
-        const fxCtx = fxCanvas.getContext('2d');
-        let bgParticles = []; let fxParticles = [];
-        let reqBg, reqFx;
+        // ======== 🏆 数据安全急救与无损合并逻辑 ========
+        let defaultStats = {
+            '35': { best: null, avg: 0, count: 0, name: '简单模式' },
+            '45': { best: null, avg: 0, count: 0, name: '中等模式' },
+            '55': { best: null, avg: 0, count: 0, name: '困难模式' },
+            'event': { best: null, avg: 0, count: 0, name: '活动困难模式' }
+        };
+
+        let localStatsV2 = JSON.parse(localStorage.getItem('ireSudokuStatsV2'));
+        let localStatsV1 = JSON.parse(localStorage.getItem('ireSudokuStats')); 
+
+        let isRecoveryTriggered = false;
+
+        if (!localStatsV2) localStatsV2 = JSON.parse(JSON.stringify(defaultStats));
+
+        // 强行把 V1 的心血继承到 V2
+        if (localStatsV1) {
+            ['35', '45', '55'].forEach(k => {
+                // 如果 V1 有记录，且 V2 是空的，或者是 V1 的次数比 V2 多（极度防丢策略）
+                if (localStatsV1[k] && localStatsV1[k].count > 0 && localStatsV1[k].count >= localStatsV2[k].count) {
+                    localStatsV2[k].count = localStatsV1[k].count;
+                    localStatsV2[k].avg = localStatsV1[k].avg;
+                    localStatsV2[k].best = localStatsV1[k].best;
+                    isRecoveryTriggered = true; // 触发雷达
+                }
+            });
+        }
+
+        // 修复所有 null 或 0 或 Infinity 的异常最佳记录
+        ['35', '45', '55', 'event'].forEach(k => {
+            if (!localStatsV2[k]) localStatsV2[k] = defaultStats[k];
+            let s = localStatsV2[k];
+            if (s.best === null || s.best === 0 || s.best === Infinity) {
+                s.best = s.count > 0 ? s.avg : null;
+            }
+        });
+
+        localStatsV2['event'].name = '活动困难模式';
+        localStorage.setItem('ireSudokuStatsV2', JSON.stringify(localStatsV2));
+        let localStats = localStatsV2;
+
+
+        // ======== 🎨 Canvas 发热优化 (无Emoji纯数学竹叶绘制) ========
+        const fxCanvas = document.getElementById('canvas-fx'); const fxCtx = fxCanvas.getContext('2d');
+        const confCanvas = document.getElementById('canvas-confetti'); const confCtx = confCanvas.getContext('2d');
+        let fxParticles = []; let confParticles = []; let reqFx, reqConf;
 
         function resizeCanvas() {
-            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
             fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight;
+            confCanvas.width = window.innerWidth; confCanvas.height = window.innerHeight;
         }
         window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
         function startEventBg() {
-            bgParticles = [];
-            const emojis = ['🍃', '🎋', '✨'];
-            for(let i=0; i<15; i++) {
-                bgParticles.push({
-                    x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height - bgCanvas.height,
-                    speed: Math.random() * 1 + 0.5, char: emojis[Math.floor(Math.random()*emojis.length)],
-                    angle: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 2
+            fxParticles = [];
+            for(let i=0; i<20; i++) {
+                fxParticles.push({
+                    x: Math.random() * fxCanvas.width, 
+                    y: Math.random() * fxCanvas.height - fxCanvas.height,
+                    speed: Math.random() * 1.5 + 0.5, 
+                    size: Math.random() * 15 + 10,
+                    angle: Math.random() * Math.PI * 2, 
+                    rotSpeed: (Math.random() - 0.5) * 0.05,
+                    opacity: Math.random() * 0.4 + 0.2
                 });
             }
-            if(reqBg) cancelAnimationFrame(reqBg);
+            if(reqFx) cancelAnimationFrame(reqFx);
             function render() {
-                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-                bgCtx.font = "20px Arial"; bgCtx.globalAlpha = 0.4;
-                bgParticles.forEach(p => {
+                fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+                fxParticles.forEach(p => {
                     p.y += p.speed; p.angle += p.rotSpeed;
-                    if(p.y > bgCanvas.height + 20) { p.y = -20; p.x = Math.random() * bgCanvas.width; }
-                    bgCtx.save(); bgCtx.translate(p.x, p.y); bgCtx.rotate(p.angle * Math.PI/180);
-                    bgCtx.fillText(p.char, -10, 10); bgCtx.restore();
+                    if(p.y > fxCanvas.height + 20) { p.y = -20; p.x = Math.random() * fxCanvas.width; }
+                    
+                    fxCtx.save(); 
+                    fxCtx.translate(p.x, p.y); 
+                    fxCtx.rotate(p.angle);
+                    fxCtx.fillStyle = `rgba(46, 125, 50, ${p.opacity})`; 
+                    
+                    // 画一片纯数学公式竹叶
+                    fxCtx.beginPath();
+                    fxCtx.moveTo(0, 0);
+                    fxCtx.quadraticCurveTo(p.size/2, -p.size/3, p.size, 0);
+                    fxCtx.quadraticCurveTo(p.size/2, p.size/3, 0, 0);
+                    fxCtx.fill();
+                    fxCtx.restore();
                 });
-                reqBg = requestAnimationFrame(render);
+                reqFx = requestAnimationFrame(render);
             }
             render();
         }
 
-        function stopEventBg() {
-            if(reqBg) cancelAnimationFrame(reqBg);
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-        }
+        function stopEventBg() { if(reqFx) cancelAnimationFrame(reqFx); fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height); }
 
         function triggerConfetti() {
-            playSound('win');
-            fxParticles = [];
-            // 从左下角和右下角同时喷发彩色烟花纸屑
+            playSound('win'); confParticles = [];
             for(let i=0; i<120; i++) {
                 let isLeft = Math.random() < 0.5;
-                fxParticles.push({
-                    x: isLeft ? 0 : fxCanvas.width, 
-                    y: fxCanvas.height,
-                    vx: (Math.random() * 15 + 5) * (isLeft ? 1 : -1), // 往中间喷
-                    vy: -(Math.random() * 18 + 10), // 向上喷发的高度
-                    color: `hsl(${Math.random()*360}, 90%, 60%)`, 
-                    size: Math.random() * 8 + 6,
-                    rot: Math.random() * 360,
-                    rotSpeed: (Math.random() - 0.5) * 15
+                confParticles.push({
+                    x: isLeft ? 0 : confCanvas.width, y: confCanvas.height,
+                    vx: (Math.random() * 12 + 4) * (isLeft ? 1 : -1), vy: -(Math.random() * 18 + 10),
+                    color: `hsl(${Math.random()*360}, 90%, 65%)`, size: Math.random() * 8 + 6,
+                    rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 15
                 });
             }
-            if(reqFx) cancelAnimationFrame(reqFx);
-            function renderFx() {
-                fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+            if(reqConf) cancelAnimationFrame(reqConf);
+            function renderConf() {
+                confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
                 let active = false;
-                fxParticles.forEach(p => {
-                    p.x += p.vx; p.y += p.vy; p.vy += 0.4; // 重力加速度
-                    p.rot += p.rotSpeed;
-                    if(p.y < fxCanvas.height + 20) {
-                        active = true;
-                        fxCtx.save();
-                        fxCtx.translate(p.x, p.y);
-                        fxCtx.rotate(p.rot * Math.PI / 180);
-                        fxCtx.fillStyle = p.color; 
-                        fxCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
-                        fxCtx.restore();
+                confParticles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy; p.vy += 0.4; p.rot += p.rotSpeed;
+                    if(p.y < confCanvas.height + 20) {
+                        active = true; confCtx.save(); confCtx.translate(p.x, p.y); confCtx.rotate(p.rot * Math.PI / 180);
+                        confCtx.fillStyle = p.color; confCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size); confCtx.restore();
                     }
                 });
-                if(active) reqFx = requestAnimationFrame(renderFx);
+                if(active) reqConf = requestAnimationFrame(renderConf);
             }
-            renderFx();
+            renderConf();
         }
 
-        // ======== 游戏逻辑 ========
+        // ======== 游戏核心逻辑 ========
         const LETTERS = ['h', 'a', 'n', 'l', 'u', 'v', 'i', 'r', 'e'];
         let board = Array(9).fill().map(() => Array(9).fill(0));
         let solution = Array(9).fill().map(() => Array(9).fill(0));
@@ -404,22 +418,6 @@
         let timerInterval = null; let timeElapsed = 0; let gameActive = false;
         let eventHints = {}; let hintsLeft = 3;
 
-        let defaultStats = {
-            '35': { best: null, avg: 0, count: 0, name: '🟢 简单' },
-            '45': { best: null, avg: 0, count: 0, name: '🟡 中等' },
-            '55': { best: null, avg: 0, count: 0, name: '🔴 困难' },
-            'event': { best: null, avg: 0, count: 0, name: '🎉 活动困难模式' }
-        };
-        let localStats = JSON.parse(localStorage.getItem('ireSudokuStats')) || defaultStats;
-        if (!localStats['event']) localStats['event'] = defaultStats['event'];
-        localStats['event'].name = '🎉 活动困难模式';
-        
-        ['35', '45', '55', 'event'].forEach(k => {
-            let s = localStats[k];
-            if (s.best === null || s.best === 0) s.best = s.count > 0 ? s.avg : null;
-        });
-        localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
-
         function checkEventExpiry() {
             let now = new Date(); let expireDate = new Date('2026-06-20T00:00:00+08:00'); 
             if (now > expireDate) {
@@ -429,26 +427,33 @@
             }
         }
 
-        window.onload = () => { checkEventExpiry(); startNewGame(); };
+        window.onload = () => { 
+            checkEventExpiry(); 
+            startNewGame(); 
+            
+            // 如果急救雷达生效了，弹出提示让玩家安心
+            if (isRecoveryTriggered) {
+                setTimeout(() => {
+                    showMessage("雷达提示", "✅ 滴滴！成功从底层芯片为你找回了之前的辛苦战绩！快去战绩板看看吧！", "#10b981");
+                }, 800);
+            }
+        };
 
         function toggleTheme() {
-            const body = document.body; const themeBtn = document.getElementById('theme-btn');
+            playSound('bubble');
+            const body = document.body; const themeIcon = document.getElementById('theme-icon');
             if (body.getAttribute('data-theme') === 'dark') {
                 body.removeAttribute('data-theme');
-                themeBtn.innerHTML = '🌙 深色模式'; themeBtn.style.background = '#343a40'; themeBtn.style.color = 'white';
+                themeIcon.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'; 
             } else {
                 body.setAttribute('data-theme', 'dark');
-                themeBtn.innerHTML = '☀️ 浅色模式'; themeBtn.style.background = '#f8f9fa'; themeBtn.style.color = '#333';
-                showMessage("🌙 晚安提醒", "是不是大晚上了还在玩呀？\n别玩太晚哦，早点休息宝宝 😘", "#9c27b0");
+                themeIcon.innerHTML = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'; 
+                showMessage("晚安提醒", "是不是大晚上了还在玩呀？\n别玩太晚哦，早点休息宝宝 😘", "#8b5cf6");
             }
         }
 
         function findConnectedTromino(grid, charSet) {
-            let shapes = [
-                [[0,0], [0,1], [0,2]], [[0,0], [1,0], [2,0]], 
-                [[0,0], [0,1], [1,0]], [[0,0], [0,1], [-1,0]], 
-                [[0,0], [1,0], [1,1]], [[0,0], [1,0], [1,-1]]
-            ];
+            let shapes = [ [[0,0], [0,1], [0,2]], [[0,0], [1,0], [2,0]], [[0,0], [0,1], [1,0]], [[0,0], [0,1], [-1,0]], [[0,0], [1,0], [1,1]], [[0,0], [1,0], [1,-1]] ];
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
                     for (let shape of shapes) {
@@ -458,9 +463,7 @@
                             if (nr < 0 || nr >= 9 || nc < 0 || nc >= 9) { valid = false; break; }
                             cells.push({r: nr, c: nc}); chars.push(grid[nr][nc]);
                         }
-                        if (valid) {
-                            if (chars.slice().sort().join('') === charSet.slice().sort().join('')) return cells;
-                        }
+                        if (valid && chars.slice().sort().join('') === charSet.slice().sort().join('')) return cells;
                     }
                 }
             }
@@ -479,14 +482,15 @@
         }
 
         function startNewGame() {
+            playSound('bubble');
             let diffKey = document.getElementById('diff-select').value;
             let blanks = diffKey === 'event' ? 55 : parseInt(diffKey);
             eventHints = {}; let forcedBlanks = [];
-            hintsLeft = 3; document.getElementById('hint-btn').innerText = `💡 提示(3)`;
+            hintsLeft = 3; document.getElementById('hint-text').innerText = `提示(3)`;
 
             if (diffKey === 'event') {
                 document.body.classList.add('theme-event');
-                document.getElementById('main-title').innerText = "🐉 端午特别活动：han luv ire 🎋";
+                document.getElementById('main-title').innerText = "端午特别活动：han luv ire";
                 startEventBg();
                 let shapes = generateEventSolution();
                 if (shapes) {
@@ -496,7 +500,7 @@
                 } else generateSolution(); 
             } else {
                 document.body.classList.remove('theme-event');
-                document.getElementById('main-title').innerText = "Handrix给Irene的字母数独游戏 - han luv ire";
+                document.getElementById('main-title').innerText = "Handrix给Irene的字母数独游戏：han luv ire";
                 stopEventBg();
                 generateSolution();
             }
@@ -511,7 +515,7 @@
         function updateTimerDisplay() {
             let m = Math.floor(timeElapsed / 60).toString().padStart(2, '0');
             let s = (timeElapsed % 60).toString().padStart(2, '0');
-            document.getElementById('timer').innerText = `⏱ ${m}:${s}`;
+            document.getElementById('timer').innerHTML = `<svg class="icon" style="vertical-align: text-bottom; width: 16px; height: 16px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${m}:${s}`;
         }
 
         function saveState() {
@@ -521,24 +525,20 @@
 
         function undo() {
             if (historyStack.length === 0 || !gameActive) return; 
+            playSound('bubble');
             let lastState = historyStack.pop();
             userGrid = lastState.user; notesGrid = lastState.notes;
             renderBoard();
         }
 
-        function generateSolution() {
-            for (let i = 0; i < 9; i++) solution[i].fill(0);
-            solveSudoku(solution);
-        }
+        function generateSolution() { for (let i = 0; i < 9; i++) solution[i].fill(0); solveSudoku(solution); }
         function solveSudoku(grid) {
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
                     if (grid[r][c] === 0) {
                         let shuffled = [...LETTERS].sort(() => Math.random() - 0.5);
                         for (let letter of shuffled) {
-                            if (isValid(grid, r, c, letter)) {
-                                grid[r][c] = letter; if (solveSudoku(grid)) return true; grid[r][c] = 0;
-                            }
+                            if (isValid(grid, r, c, letter)) { grid[r][c] = letter; if (solveSudoku(grid)) return true; grid[r][c] = 0; }
                         }
                         return false;
                     }
@@ -558,10 +558,7 @@
                     if (grid[r][c] === 0) {
                         let count = 0;
                         for (let letter of LETTERS) {
-                            if (isValid(grid, r, c, letter)) {
-                                grid[r][c] = letter; count += countSolutions(grid, limit); grid[r][c] = 0;
-                                if (count >= limit) return count;
-                            }
+                            if (isValid(grid, r, c, letter)) { grid[r][c] = letter; count += countSolutions(grid, limit); grid[r][c] = 0; if (count >= limit) return count; }
                         }
                         return count;
                     }
@@ -572,14 +569,10 @@
 
         function createPuzzle(blanks, forcedBlanks = []) {
             for(let r=0; r<9; r++) {
-                for(let c=0; c<9; c++) {
-                    board[r][c] = solution[r][c]; userGrid[r][c] = ''; notesGrid[r][c] = []; isFixed[r][c] = true;
-                }
+                for(let c=0; c<9; c++) { board[r][c] = solution[r][c]; userGrid[r][c] = ''; notesGrid[r][c] = []; isFixed[r][c] = true; }
             }
             let removed = 0;
-            for(let p of forcedBlanks) {
-                if(board[p.r][p.c] !== 0) { board[p.r][p.c] = 0; isFixed[p.r][p.c] = false; removed++; }
-            }
+            for(let p of forcedBlanks) { if(board[p.r][p.c] !== 0) { board[p.r][p.c] = 0; isFixed[p.r][p.c] = false; removed++; } }
             let positions = [];
             for (let i = 0; i < 81; i++) positions.push([Math.floor(i/9), i%9]);
             positions.sort(() => Math.random() - 0.5);
@@ -587,24 +580,19 @@
             for (let pos of positions) {
                 if (removed >= blanks) break;
                 let r = pos[0], c = pos[1]; let backup = board[r][c]; 
-                if(backup !== 0) {
-                    board[r][c] = 0;
-                    if (countSolutions(board) !== 1) board[r][c] = backup; else { isFixed[r][c] = false; removed++; }
-                }
+                if(backup !== 0) { board[r][c] = 0; if (countSolutions(board) !== 1) board[r][c] = backup; else { isFixed[r][c] = false; removed++; } }
             }
         }
 
         function renderBoard() {
             const boardDiv = document.getElementById('board'); boardDiv.innerHTML = '';
             let currentVal = '';
-            if(selectedRow !== -1 && selectedCol !== -1) {
-                currentVal = isFixed[selectedRow][selectedCol] ? board[selectedRow][selectedCol] : userGrid[selectedRow][selectedCol];
-            }
+            if(selectedRow !== -1 && selectedCol !== -1) currentVal = isFixed[selectedRow][selectedCol] ? board[selectedRow][selectedCol] : userGrid[selectedRow][selectedCol];
+
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
                     let cellDiv = document.createElement('div');
-                    cellDiv.className = 'cell';
-                    cellDiv.id = `cell-${r}-${c}`;
+                    cellDiv.className = 'cell'; cellDiv.id = `cell-${r}-${c}`;
                     cellDiv.onclick = () => { if(gameActive) selectCell(r, c); };
 
                     let hintGroup = eventHints[`${r}-${c}`];
@@ -616,7 +604,7 @@
                         cellDiv.classList.add('user'); cellDiv.innerText = userGrid[r][c];
                     } else if (notesGrid[r][c].length > 0) {
                         let noteHTML = `<div class="notes-grid">`;
-                        for(let i=0; i<4; i++) noteHTML += `<div class="note-item">${notesGrid[r][c][i] || ''}</div>`;
+                        for(let k=0; k<4; k++) noteHTML += `<div class="note-item">${notesGrid[r][c][k] || ''}</div>`;
                         noteHTML += `</div>`; cellDiv.innerHTML = noteHTML;
                     }
 
@@ -634,44 +622,35 @@
         }
 
         function selectCell(r, c) { 
+            playSound('bubble');
             selectedRow = r; selectedCol = c; renderBoard(); 
         }
 
         function toggleNoteMode() {
+            playSound('bubble');
             noteMode = !noteMode; let btn = document.getElementById('note-btn');
-            if(noteMode) { btn.innerText = "📝 笔记:开"; btn.classList.add('active-note'); } 
-            else { btn.innerText = "📝 笔记:关"; btn.classList.remove('active-note'); }
+            if(noteMode) { btn.classList.add('active-note'); } 
+            else { btn.classList.remove('active-note'); }
         }
 
         function useHint() {
             if (!gameActive) return;
-            if (hintsLeft <= 0) { showMessage("提示", "3次提示机会已经用完啦宝宝～靠你自己咯！", "#f0ad4e"); return; }
-            if (selectedRow === -1 || selectedCol === -1) { showMessage("提示", "请先在盘面上点击选中一个你想要提示的空白格子哦！", "#007bff"); return; }
-            if (isFixed[selectedRow][selectedCol]) { showMessage("提示", "这个格子已经是固定的题目啦，不需要提示！", "#f0ad4e"); return; }
-            
+            if (hintsLeft <= 0) { showMessage("提示", "3次提示机会已经用完啦宝宝～靠你自己咯！", "#f59e0b"); return; }
+            if (selectedRow === -1 || selectedCol === -1) { showMessage("提示", "请先点击选中一个你想要提示的空白格子哦！", "#3b82f6"); return; }
+            if (isFixed[selectedRow][selectedCol]) { showMessage("提示", "这个已经是题目啦，不需要提示！", "#f59e0b"); return; }
             let correctChar = solution[selectedRow][selectedCol];
-            if (userGrid[selectedRow][selectedCol] === correctChar) {
-                showMessage("提示", "这个格子你已经凭实力填对啦，不需要浪费提示次数！", "#28a745"); return;
-            }
+            if (userGrid[selectedRow][selectedCol] === correctChar) { showMessage("提示", "你已经凭实力填对啦，不需要浪费提示！", "#10b981"); return; }
 
-            playSound('bubble'); // 使用提示也有泡泡声
-            saveState();
-            userGrid[selectedRow][selectedCol] = correctChar;
-            autoCleanNotes(selectedRow, selectedCol, correctChar);
-            hintsLeft--; document.getElementById('hint-btn').innerText = `💡 提示(${hintsLeft})`;
-            renderBoard();
+            playSound('bubble');
+            saveState(); userGrid[selectedRow][selectedCol] = correctChar; autoCleanNotes(selectedRow, selectedCol, correctChar);
+            hintsLeft--; document.getElementById('hint-text').innerText = `提示(${hintsLeft})`; renderBoard();
             setTimeout(() => { document.getElementById(`cell-${selectedRow}-${selectedCol}`).classList.add('just-placed'); }, 50);
         }
 
         function inputLetter(l) {
-            if (!gameActive || selectedRow === -1 || selectedCol === -1 || isFixed[selectedRow][selectedCol]) {
-                return; // 不允许填入时，完全静音
-            }
-            
-            playSound('bubble'); // 只有成功填入字母时，才发出干净可爱的泡泡声
-            
-            saveState();
-            let r = selectedRow, c = selectedCol;
+            if (!gameActive || selectedRow === -1 || selectedCol === -1 || isFixed[selectedRow][selectedCol]) return;
+            playSound('bubble');
+            saveState(); let r = selectedRow, c = selectedCol;
             if (noteMode) {
                 if (userGrid[r][c] !== '') userGrid[r][c] = '';
                 let idx = notesGrid[r][c].indexOf(l);
@@ -681,7 +660,6 @@
                 userGrid[r][c] = l; autoCleanNotes(r, c, l);
             }
             renderBoard();
-            
             if(!noteMode) setTimeout(() => { document.getElementById(`cell-${r}-${c}`).classList.add('just-placed'); }, 50);
         }
 
@@ -707,7 +685,6 @@
 
         function checkWin() {
             if(!gameActive) return;
-            
             let hasEmpty = false, hasError = false;
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
@@ -717,11 +694,9 @@
                 }
             }
             
-            if (hasEmpty) {
-                showMessage("提示", "还有空格或者只有笔记未确认答案哦，请abb宝儿先填完！", "#f0ad4e");
-            } else if (hasError) {
-                showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#dc3545");
-            } else {
+            if (hasEmpty) showMessage("提示", "还有空格或者笔记未确认哦，请abb宝儿先填完！", "#f59e0b");
+            else if (hasError) showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#ef4444");
+            else {
                 gameActive = false; clearInterval(timerInterval);
                 let diffKey = document.getElementById('diff-select').value;
                 let s = localStats[diffKey];
@@ -730,13 +705,13 @@
                 let isNewRecord = (s.best === null) || (timeElapsed < s.best);
                 if (isNewRecord) s.best = timeElapsed;
                 
-                localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
+                localStorage.setItem('ireSudokuStatsV2', JSON.stringify(localStats));
 
-                let msg = `🎉 太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！🎉\n\n⏱ 本局用时: ${formatTime(timeElapsed)}`;
-                if(isNewRecord && s.count > 1) msg += "\n✨ 打破了该难度的最佳记录！✨";
+                let msg = `太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！\n\n本局用时: ${formatTime(timeElapsed)}`;
+                if(isNewRecord && s.count > 1) msg += "\n打破了该难度的最佳记录！";
                 
-                triggerConfetti(); // 触发全屏两侧喷发烟花纸屑
-                showMessage("过关", msg, "#28a745");
+                triggerConfetti(); 
+                showMessage("过关", msg, "#10b981");
             }
         }
 
@@ -750,13 +725,14 @@
         }
 
         function openStats() {
+            playSound('bubble');
             let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>通关局数</th></tr>`;
             ['35', '45', '55', 'event'].forEach(k => {
                 let s = localStats[k];
                 if (k === 'event' && document.getElementById('event-option').style.display === 'none' && s.count === 0) return;
                 html += `<tr>
                     <td><b>${s.name}</b></td>
-                    <td style="color:#28a745; font-weight:bold;">${formatTime(s.best)}</td>
+                    <td style="color:#10b981; font-weight:bold;">${formatTime(s.best)}</td>
                     <td>${s.count === 0 ? '--:--' : formatTime(s.avg)}</td>
                     <td>${s.count}</td>
                 </tr>`;
@@ -766,6 +742,7 @@
         }
 
         function openRules() {
+            playSound('bubble');
             let isEvent = document.getElementById('diff-select').value === 'event';
             document.getElementById('rule-event-title').style.display = isEvent ? 'block' : 'none';
             document.getElementById('rule-event-body').style.display = isEvent ? 'block' : 'none';
