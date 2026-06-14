@@ -7,23 +7,35 @@
     <style>
         /* ======== 极简玻璃拟态主题变量 ======== */
         :root {
-            --bg-color: #f6f8fb; --glass-bg: rgba(255, 255, 255, 0.6); --glass-border: rgba(255, 255, 255, 0.8);
-            --cell-bg: rgba(255, 255, 255, 0.9); --grid-line: #cbd5e1; --grid-line-thick: #475569;
+            --bg-color: #f6f8fb;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --cell-bg: rgba(255, 255, 255, 0.9);
+            --grid-line: #cbd5e1; --grid-line-thick: #475569;
             --text-fixed: #0f172a; --text-user: #2563eb; --text-note: #64748b; --text-main: #334155;
             --btn-bg: rgba(255, 255, 255, 0.8); --btn-border: rgba(255, 255, 255, 0.6);
-            --highlight-same: rgba(253, 230, 138, 0.6); --highlight-related: rgba(219, 234, 254, 0.5); --selected: rgba(147, 197, 253, 0.8);
-            --gradient-1: #e0c3fc; --gradient-2: #8ec5fc; --shadow: rgba(0, 0, 0, 0.05);
+            --highlight-same: rgba(253, 230, 138, 0.6);
+            --highlight-related: rgba(219, 234, 254, 0.5);
+            --selected: rgba(147, 197, 253, 0.8);
+            --gradient-1: #e0c3fc; --gradient-2: #8ec5fc; 
+            --shadow: rgba(0, 0, 0, 0.05);
             --hint-han: rgba(167, 243, 208, 0.5); --hint-luv: rgba(254, 202, 202, 0.5); --hint-ire: rgba(191, 219, 254, 0.5);
             --event-text: #059669;
         }
 
         [data-theme="dark"] {
-            --bg-color: #0f172a; --glass-bg: rgba(30, 41, 59, 0.6); --glass-border: rgba(255, 255, 255, 0.1);
-            --cell-bg: rgba(30, 41, 59, 0.85); --grid-line: #334155; --grid-line-thick: #94a3b8;
+            --bg-color: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --cell-bg: rgba(30, 41, 59, 0.85);
+            --grid-line: #334155; --grid-line-thick: #94a3b8;
             --text-fixed: #f8fafc; --text-user: #60a5fa; --text-note: #94a3b8; --text-main: #e2e8f0;
             --btn-bg: rgba(30, 41, 59, 0.8); --btn-border: rgba(255, 255, 255, 0.1);
-            --highlight-same: rgba(202, 138, 4, 0.4); --highlight-related: rgba(30, 58, 138, 0.4); --selected: rgba(37, 99, 235, 0.6);
-            --gradient-1: #0f2027; --gradient-2: #203a43; --shadow: rgba(0, 0, 0, 0.3);
+            --highlight-same: rgba(202, 138, 4, 0.4);
+            --highlight-related: rgba(30, 58, 138, 0.4);
+            --selected: rgba(37, 99, 235, 0.6);
+            --gradient-1: #0f2027; --gradient-2: #203a43; 
+            --shadow: rgba(0, 0, 0, 0.3);
             --hint-han: rgba(5, 150, 105, 0.4); --hint-luv: rgba(190, 18, 60, 0.4); --hint-ire: rgba(29, 78, 216, 0.4);
             --event-text: #34d399;
         }
@@ -33,17 +45,17 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; 
-            display: flex; flex-direction: column; align-items: center; touch-action: manipulation; padding-bottom: 40px; overflow-x: hidden;
+            background-color: var(--bg-color); color: var(--text-main);
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
+            touch-action: manipulation; padding-bottom: 40px; overflow-x: hidden;
             background: linear-gradient(-45deg, var(--gradient-1), var(--gradient-2), var(--bg-color));
             background-size: 400% 400%; animation: auroraBG 15s ease infinite; transition: 0.5s;
         }
 
         @keyframes auroraBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        #canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
-        #canvas-fx { z-index: -1; }
-        #canvas-confetti { z-index: 9999; }
+        #canvas-fx { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: -1; }
+        #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; }
 
         .header { text-align: center; margin-bottom: 12px; z-index: 10; }
         .header h1 { font-size: 18px; color: var(--text-main); margin: 0 0 5px 0; letter-spacing: 0.5px; transition: 0.3s; }
@@ -52,19 +64,27 @@
             display: flex; justify-content: space-between; align-items: center; gap: 8px;
             width: 100%; max-width: 400px; margin-bottom: 15px; z-index: 10; 
         }
+        
         select, button, .timer-display {
             box-sizing: border-box; padding: 8px 0; font-size: 14px; font-weight: bold; border-radius: 10px;
             border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-main); 
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); outline: none; cursor: pointer; transition: 0.2s;
         }
+        
         select#diff-select, #new-game-btn { flex: 1; max-width: 110px; text-align: center; }
-        .timer-display { flex: 0 0 95px; width: 95px; cursor: default; display: flex; justify-content: center; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
+        
+        .timer-display {
+            flex: 0 0 95px; width: 95px; cursor: default;
+            display: flex; justify-content: center; align-items: center; gap: 4px;
+            font-variant-numeric: tabular-nums; 
+        }
         
         .board {
             display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr);
             width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 20px; flex-shrink: 0;
             background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 2px solid var(--grid-line-thick); border-radius: 8px; overflow: hidden; box-shadow: 0 8px 32px var(--shadow); z-index: 10;
+            border: 2px solid var(--grid-line-thick); border-radius: 8px; overflow: hidden;
+            box-shadow: 0 8px 32px var(--shadow); z-index: 10;
         }
 
         .cell {
@@ -81,18 +101,25 @@
         
         .cell.fixed { color: var(--text-fixed); font-weight: 800;}
         .cell.user { color: var(--text-user); }
-        .cell.hint-han { background-color: var(--hint-han); } .cell.hint-luv { background-color: var(--hint-luv); } .cell.hint-ire { background-color: var(--hint-ire); }
-        .cell.related { background-color: var(--highlight-related); } .cell.same { background-color: var(--highlight-same); }
+        
+        .cell.hint-han { background-color: var(--hint-han); }
+        .cell.hint-luv { background-color: var(--hint-luv); }
+        .cell.hint-ire { background-color: var(--hint-ire); }
+
+        .cell.related { background-color: var(--highlight-related); }
+        .cell.same { background-color: var(--highlight-same); }
         .cell.selected { background-color: var(--selected); box-shadow: inset 0 0 0 2px var(--text-user); z-index: 2; }
 
         @keyframes shine { 0% { background-color: rgba(255,255,255,1); } 100% { background-color: transparent; } }
         .cell.just-placed::after { content: ''; position: absolute; inset: 0; animation: shine 0.4s ease-out; pointer-events: none; }
 
-        .hint-watermark { position: absolute; top: 1px; right: 3px; font-size: 11px; color: var(--text-note); opacity: 0.9; font-weight: bold; }
+        .hint-watermark { position: absolute; top: 1px; right: 3px; font-size: 11px; color: var(--text-note); opacity: 0.9; font-weight: 700; }
         .notes-grid { position: absolute; inset: 1px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; pointer-events: none; }
         .note-item { display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: var(--text-note); }
 
-        .keyboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px; z-index: 10; }
+        .keyboard {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px; z-index: 10;
+        }
         .key, .action-btn {
             background: var(--btn-bg); border: 1px solid var(--btn-border); border-radius: 10px; color: var(--text-main);
             font-size: 20px; font-weight: bold; height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
@@ -102,7 +129,10 @@
         .key:active, .action-btn:active { transform: scale(0.92); background: var(--highlight-related); }
         .key.undo-btn { color: #d97706; background: rgba(253, 230, 138, 0.4); font-size: 13px; flex-direction: row; }
         
-        .action-btn.active-note { background: #f59e0b !important; color: #ffffff !important; border: 1px solid #d97706 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important; }
+        .action-btn.active-note { 
+            background: #f59e0b !important; color: #ffffff !important; border: 1px solid #d97706 !important; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+        }
         .action-btn.active-note .icon { stroke: #ffffff; }
 
         .action-row { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 10px; z-index: 10; }
@@ -198,7 +228,6 @@
         </button>
     </div>
 
-    <!-- ======== 规则弹窗 ======== -->
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">
             <h2><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 定制字母数独规则</h2>
@@ -284,7 +313,7 @@
         document.body.addEventListener('touchstart', initAudio, {once:true});
         document.body.addEventListener('click', initAudio, {once:true});
 
-        // ======== 🎨 极致修复：数据无损合并逻辑 ========
+        // ======== 🏆 数据安全急救与无损合并逻辑 ========
         let defaultStats = {
             '35': { best: null, avg: 0, count: 0, name: '简单模式' },
             '45': { best: null, avg: 0, count: 0, name: '中等模式' },
@@ -292,53 +321,37 @@
             'event': { best: null, avg: 0, count: 0, name: '活动困难模式' }
         };
 
-        // 【自动将 V1 时代的心血合入 V2】
         let localStatsV2 = JSON.parse(localStorage.getItem('ireSudokuStatsV2'));
-        let localStatsV1 = JSON.parse(localStorage.getItem('ireSudokuStats')); // 老抽屉
+        let localStatsV1 = JSON.parse(localStorage.getItem('ireSudokuStats')); 
 
-        if (!localStatsV2) {
-            // 如果没建新档，看老档在不在
-            if (localStatsV1) {
-                localStatsV2 = localStatsV1;
-                // 数据结构对齐
-                if (!localStatsV2['event']) localStatsV2['event'] = defaultStats['event'];
-                localStatsV2['event'].name = '活动困难模式';
-                ['35', '45', '55'].forEach(k => {
-                    if (localStatsV2[k]) {
-                        localStatsV2[k].name = defaultStats[k].name;
-                        // 修正 null/Infinity 问题
-                        if (localStatsV2[k].best === null || localStatsV2[k].best === 0 || localStatsV2[k].best === Infinity) {
-                            localStatsV2[k].best = localStatsV2[k].count > 0 ? localStatsV2[k].avg : null;
-                        }
-                    } else {
-                        localStatsV2[k] = defaultStats[k];
-                    }
-                });
-            } else {
-                localStatsV2 = defaultStats;
-            }
-        } else {
-            // 已有 V2 数据，检查是否有 V1 漏网之鱼需要合入（防丢极致处理）
-            if (localStatsV1) {
-                ['35', '45', '55'].forEach(k => {
-                    let oldS = localStatsV1[k]; let newS = localStatsV2[k];
-                    if (oldS && oldS.count > 0 && newS.count === 0) {
-                        // V2 没玩过，但 V1 玩过，继承过来
-                        newS.count = oldS.count; newS.avg = oldS.avg; newS.best = oldS.best;
-                        if (newS.best === null || newS.best === 0 || newS.best === Infinity) newS.best = newS.avg;
-                    }
-                });
-            }
-            if (!localStatsV2['event']) localStatsV2['event'] = defaultStats['event'];
-            localStatsV2['event'].name = '活动困难模式';
+        if (!localStatsV2) localStatsV2 = JSON.parse(JSON.stringify(defaultStats));
+
+        // 强行把 V1 的心血继承到 V2
+        if (localStatsV1) {
+            ['35', '45', '55'].forEach(k => {
+                if (localStatsV1[k] && localStatsV1[k].count > 0 && localStatsV2[k].count === 0) {
+                    localStatsV2[k].count = localStatsV1[k].count;
+                    localStatsV2[k].avg = localStatsV1[k].avg;
+                    localStatsV2[k].best = localStatsV1[k].best;
+                }
+            });
         }
 
-        // 保存修复后的 V2 数据
+        // 修复所有 null 或 0 的异常最佳记录
+        ['35', '45', '55', 'event'].forEach(k => {
+            if (!localStatsV2[k]) localStatsV2[k] = defaultStats[k];
+            let s = localStatsV2[k];
+            if (s.best === null || s.best === 0 || s.best === Infinity) {
+                s.best = s.count > 0 ? s.avg : null;
+            }
+        });
+
+        localStatsV2['event'].name = '活动困难模式';
         localStorage.setItem('ireSudokuStatsV2', JSON.stringify(localStatsV2));
         let localStats = localStatsV2;
 
 
-        // ======== 🎨 Canvas 引擎 (端午表情包极低功耗恢复) ========
+        // ======== 🎨 Canvas 发热优化 (端午元素回归，0发热) ========
         const fxCanvas = document.getElementById('canvas-fx'); const fxCtx = fxCanvas.getContext('2d');
         const confCanvas = document.getElementById('canvas-confetti'); const confCtx = confCanvas.getContext('2d');
         let fxParticles = []; let confParticles = []; let reqFx, reqConf;
@@ -363,7 +376,7 @@
             if(reqFx) cancelAnimationFrame(reqFx);
             function render() {
                 fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-                fxCtx.font = "24px Arial"; fxCtx.globalAlpha = 0.5; // 半透明不抢戏
+                fxCtx.font = "24px Arial"; fxCtx.globalAlpha = 0.6;
                 fxParticles.forEach(p => {
                     p.y += p.speed; p.angle += p.rotSpeed;
                     if(p.y > fxCanvas.height + 20) { p.y = -20; p.x = Math.random() * fxCanvas.width; }
