@@ -15,7 +15,7 @@
             --gradient-1: #e0c3fc; --gradient-2: #8ec5fc; --shadow: rgba(0, 0, 0, 0.05);
             --hint-han: rgba(167, 243, 208, 0.5); --hint-luv: rgba(254, 202, 202, 0.5); --hint-ire: rgba(191, 219, 254, 0.5);
             --event-text: #059669; 
-            --stat-best-color: #059669; /* 浅色模式下的深翠绿，提高对比度 */
+            --stat-best-color: #059669; /* 浅色模式高对比度绿 */
         }
 
         [data-theme="dark"] {
@@ -27,7 +27,7 @@
             --gradient-1: #0f2027; --gradient-2: #203a43; --shadow: rgba(0, 0, 0, 0.3);
             --hint-han: rgba(5, 150, 105, 0.4); --hint-luv: rgba(190, 18, 60, 0.4); --hint-ire: rgba(29, 78, 216, 0.4);
             --event-text: #34d399;
-            --stat-best-color: #34d399; /* 深色模式下的亮荧光绿，极其醒目 */
+            --stat-best-color: #34d399; /* 深色模式高对比度绿 */
         }
 
         body.theme-event { --gradient-1: #d4fc79; --gradient-2: #96e6a1; }
@@ -45,7 +45,7 @@
 
         #canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
         #canvas-fx { z-index: -1; }
-        #canvas-confetti { z-index: 9999; }
+        #canvas-confetti { z-index: 9999; } /* 庆典烟花层在最上方 */
 
         .header { text-align: center; margin-bottom: 12px; z-index: 10; }
         .header h1 { font-size: 18px; color: var(--text-main); margin: 0 0 5px 0; letter-spacing: 0.5px; transition: 0.3s; }
@@ -219,7 +219,7 @@
                 <li>分别是连在一起的 han、luv、ire，这能大幅降低推理难度，6月19日下线哦！</li>
             </ul>
             
-            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.954.954 0 0 0-.288.877l.13 1.011c.088.684-.061 1.405-.434 2.02-.374.615-.992 1.04-1.745 1.196l-.995.207a.953.953 0 0 0-.743.518l-.48 1.002c-.328.685-.899 1.204-1.608 1.464a2.585 2.585 0 0 1-2.198-.108l-.872-.51a.95.95 0 0 0-1.04 0l-.872.51a2.584 2.584 0 0 1-2.198-.108 2.584 2.584 0 0 1-1.608-1.464l-.48-1.002a.954.954 0 0 0-.743-.518l-.995-.207a2.586 2.586 0 0 1-1.745-1.196 2.586 2.586 0 0 1-.434-2.02l.13-1.011a.954.954 0 0 0-.288-.877l-1.611-1.611a2.41 2.41 0 0 1 0-3.408l1.568-1.568a.954.954 0 0 0 .289-.878l-.13-1.011a2.586 2.586 0 0 1 .434-2.02 2.586 2.586 0 0 1 1.745-1.196l.995-.207a.953.953 0 0 0 .743-.518l.48-1.002a2.584 2.584 0 0 1 1.608-1.464 2.584 2.584 0 0 1 2.198.108l.872.51a.95.95 0 0 0 1.04 0l.872-.51a2.584 2.584 0 0 1 2.198-.108 2.584 2.584 0 0 1 1.608 1.464l.48 1.002a.954.954 0 0 0 .743.518l.995.207c.753.156 1.371.58 1.745 1.196.373.615.522 1.336.434 2.02l-.13 1.011Z"/></svg> 填字规则：</h3>
+            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.954.954 0 0 0-.288.877l.13 1.011c.088.684-.061 1.405-.434 2.02-.374.615-.992 1.04-1.745 1.196l-.995.207a.953.953 0 0 0-.743.518l-.48 1.002c-.328.685-.899 1.204-1.608 1.464a2.585 2.585 0 0 1-2.198-.108l-.872-.51a.95.95 0 0 0-1.04 0l-.872.51a2.584 2.584 0 0 1-2.198.108 2.584 2.584 0 0 1-1.608-1.464l-.48-1.002a.954.954 0 0 0-.743-.518l-.995-.207a2.586 2.586 0 0 1-1.745-1.196 2.586 2.586 0 0 1-.434-2.02l.13-1.011a.954.954 0 0 0-.288-.877l-1.611-1.611a2.41 2.41 0 0 1 0-3.408l1.568-1.568a.954.954 0 0 0 .289-.878l-.13-1.011a2.586 2.586 0 0 1 .434-2.02 2.586 2.586 0 0 1 1.745-1.196l.995-.207a.953.953 0 0 0 .743-.518l.48-1.002a2.584 2.584 0 0 1 1.608-1.464 2.584 2.584 0 0 1 2.198.108l.872.51a.95.95 0 0 0 1.04 0l.872-.51a2.584 2.584 0 0 1 2.198-.108 2.584 2.584 0 0 1 1.608 1.464l.48 1.002a.954.954 0 0 0 .743.518l.995.207c.753.156 1.371.58 1.745 1.196.373.615.522 1.336.434 2.02l-.13 1.011Z"/></svg> 填字规则：</h3>
             <ul>
                 <li><b>9x9 棋盘</b>：填入 <b>h, a, n, l, u, v, i, r, e</b>。</li>
                 <li><b>每个 3x3 宫格</b> 内，每个字母且只能出现一次。</li>
@@ -286,7 +286,7 @@
         document.body.addEventListener('touchstart', initAudio, {once:true});
         document.body.addEventListener('click', initAudio, {once:true});
 
-        // ======== 🏆 数据安全急救与无损合并逻辑 ========
+        // ======== 🏆 数据急救：只读最老的档案 ========
         let defaultStats = {
             '35': { best: null, avg: 0, count: 0, name: '简单模式' },
             '45': { best: null, avg: 0, count: 0, name: '中等模式' },
@@ -294,38 +294,30 @@
             'event': { best: null, avg: 0, count: 0, name: '活动困难模式' }
         };
 
-        let localStatsV2 = JSON.parse(localStorage.getItem('ireSudokuStatsV2'));
-        let localStatsV1 = JSON.parse(localStorage.getItem('ireSudokuStats')); 
+        // 直接读取你旧代码用的钥匙！绝不再造新抽屉！
+        let localStats = JSON.parse(localStorage.getItem('ireSudokuStats'));
 
-        let isRecoveryTriggered = false;
+        if (!localStats) {
+            localStats = JSON.parse(JSON.stringify(defaultStats));
+        } else {
+            // 洗干净名字里的 Emoji
+            if (!localStats['event']) localStats['event'] = defaultStats['event'];
+            localStats['35'].name = '简单模式';
+            localStats['45'].name = '中等模式';
+            localStats['55'].name = '困难模式';
+            localStats['event'].name = '活动困难模式';
 
-        if (!localStatsV2) localStatsV2 = JSON.parse(JSON.stringify(defaultStats));
-
-        if (localStatsV1) {
-            ['35', '45', '55'].forEach(k => {
-                if (localStatsV1[k] && localStatsV1[k].count > 0 && localStatsV1[k].count >= localStatsV2[k].count) {
-                    localStatsV2[k].count = localStatsV1[k].count;
-                    localStatsV2[k].avg = localStatsV1[k].avg;
-                    localStatsV2[k].best = localStatsV1[k].best;
-                    isRecoveryTriggered = true; 
+            // 完美修复 Infinity 和 null
+            ['35', '45', '55', 'event'].forEach(k => {
+                let s = localStats[k];
+                if (s.best === null || s.best === 0 || s.best === Infinity) {
+                    s.best = s.count > 0 ? s.avg : null;
                 }
             });
         }
+        localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
 
-        ['35', '45', '55', 'event'].forEach(k => {
-            if (!localStatsV2[k]) localStatsV2[k] = defaultStats[k];
-            let s = localStatsV2[k];
-            if (s.best === null || s.best === 0 || s.best === Infinity) {
-                s.best = s.count > 0 ? s.avg : null;
-            }
-        });
-
-        localStatsV2['event'].name = '活动困难模式';
-        localStorage.setItem('ireSudokuStatsV2', JSON.stringify(localStatsV2));
-        let localStats = localStatsV2;
-
-
-        // ======== 🎨 Canvas 发热优化 (无Emoji纯数学竹叶绘制) ========
+        // ======== 🎨 Canvas 发热优化 (竹叶飘落纯数学公式) ========
         const fxCanvas = document.getElementById('canvas-fx'); const fxCtx = fxCanvas.getContext('2d');
         const confCanvas = document.getElementById('canvas-confetti'); const confCtx = confCanvas.getContext('2d');
         let fxParticles = []; let confParticles = []; let reqFx, reqConf;
@@ -361,6 +353,7 @@
                     fxCtx.rotate(p.angle);
                     fxCtx.fillStyle = `rgba(46, 125, 50, ${p.opacity})`; 
                     
+                    // 纯数学公式画竹叶 (零发热)
                     fxCtx.beginPath();
                     fxCtx.moveTo(0, 0);
                     fxCtx.quadraticCurveTo(p.size/2, -p.size/3, p.size, 0);
@@ -424,16 +417,7 @@
             }
         }
 
-        window.onload = () => { 
-            checkEventExpiry(); 
-            startNewGame(); 
-            
-            if (isRecoveryTriggered) {
-                setTimeout(() => {
-                    showMessage("雷达提示", "✅ 滴滴！成功从底层芯片为你找回了之前的辛苦战绩！快去战绩板看看吧！", "#10b981");
-                }, 800);
-            }
-        };
+        window.onload = () => { checkEventExpiry(); startNewGame(); };
 
         function toggleTheme() {
             const body = document.body; const themeIcon = document.getElementById('theme-icon');
@@ -484,7 +468,7 @@
 
             if (diffKey === 'event') {
                 document.body.classList.add('theme-event');
-                document.getElementById('main-title').innerText = "端午特别活动：han luv ire";
+                document.getElementById('main-title').innerText = "端午节特别活动";
                 startEventBg();
                 let shapes = generateEventSolution();
                 if (shapes) {
@@ -685,8 +669,8 @@
                 }
             }
             
-            if (hasEmpty) { showMessage("提示", "还有空格或者笔记未确认哦，请abb宝儿先填完！", "#f59e0b"); }
-            else if (hasError) { showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#ef4444"); }
+            if (hasEmpty) showMessage("提示", "还有空格或者笔记未确认哦，请abb宝儿先填完！", "#f59e0b");
+            else if (hasError) showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#ef4444");
             else {
                 gameActive = false; clearInterval(timerInterval);
                 let diffKey = document.getElementById('diff-select').value;
@@ -696,7 +680,7 @@
                 let isNewRecord = (s.best === null) || (timeElapsed < s.best);
                 if (isNewRecord) s.best = timeElapsed;
                 
-                localStorage.setItem('ireSudokuStatsV2', JSON.stringify(localStats));
+                localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
 
                 let msg = `太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！\n\n本局用时: ${formatTime(timeElapsed)}`;
                 if(isNewRecord && s.count > 1) msg += "\n打破了该难度的最佳记录！";
