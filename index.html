@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
     <title>Handrix给Irene的字母数独游戏：han luv ire</title>
     <style>
-        /* ======== 极简玻璃拟态主题 ======== */
+        /* ======== 极简玻璃拟态主题变量 ======== */
         :root {
             --bg-color: #f6f8fb; --glass-bg: rgba(255, 255, 255, 0.6); --glass-border: rgba(255, 255, 255, 0.8);
             --cell-bg: rgba(255, 255, 255, 0.9); --grid-line: #cbd5e1; --grid-line-thick: #475569;
@@ -69,7 +69,7 @@
 
         .cell {
             background-color: var(--cell-bg); display: flex; align-items: center; justify-content: center;
-            font-size: 24px; font-weight: bold; cursor: pointer; position: relative; /* 恢复主字号视觉平衡 */
+            font-size: 24px; font-weight: bold; cursor: pointer; position: relative; 
             border-right: 1px solid var(--grid-line); border-bottom: 1px solid var(--grid-line);
             box-sizing: border-box; min-height: 0; transition: background-color 0.2s;
         }
@@ -88,7 +88,6 @@
         @keyframes shine { 0% { background-color: rgba(255,255,255,1); } 100% { background-color: transparent; } }
         .cell.just-placed::after { content: ''; position: absolute; inset: 0; animation: shine 0.4s ease-out; pointer-events: none; }
 
-        /* ======== 笔记与提示字号精准控制 ======== */
         .hint-watermark { position: absolute; top: 1px; right: 3px; font-size: 11px; color: var(--text-note); opacity: 0.9; font-weight: bold; }
         .notes-grid { position: absolute; inset: 1px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; pointer-events: none; }
         .note-item { display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: var(--text-note); }
@@ -109,7 +108,6 @@
         .action-row { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 10px; z-index: 10; }
         .action-row .action-btn { flex: 1; font-size: 13px; height: auto; padding: 10px 0; flex-direction: row; gap: 6px; }
 
-        /* ======== SVG 修复区 (强制 fill:none 避免黑墨迹) ======== */
         .icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
         .inline-icon { width: 16px; height: 16px; margin-right: 4px; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -200,7 +198,7 @@
         </button>
     </div>
 
-    <!-- ======== 规则弹窗 (纯净线条图标修复版) ======== -->
+    <!-- ======== 规则弹窗 ======== -->
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">
             <h2><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 定制字母数独规则</h2>
@@ -286,7 +284,61 @@
         document.body.addEventListener('touchstart', initAudio, {once:true});
         document.body.addEventListener('click', initAudio, {once:true});
 
-        // ======== 🎨 Canvas 发热优化 (极其轻量的端午绘图) ========
+        // ======== 🎨 极致修复：数据无损合并逻辑 ========
+        let defaultStats = {
+            '35': { best: null, avg: 0, count: 0, name: '简单模式' },
+            '45': { best: null, avg: 0, count: 0, name: '中等模式' },
+            '55': { best: null, avg: 0, count: 0, name: '困难模式' },
+            'event': { best: null, avg: 0, count: 0, name: '活动困难模式' }
+        };
+
+        // 【自动将 V1 时代的心血合入 V2】
+        let localStatsV2 = JSON.parse(localStorage.getItem('ireSudokuStatsV2'));
+        let localStatsV1 = JSON.parse(localStorage.getItem('ireSudokuStats')); // 老抽屉
+
+        if (!localStatsV2) {
+            // 如果没建新档，看老档在不在
+            if (localStatsV1) {
+                localStatsV2 = localStatsV1;
+                // 数据结构对齐
+                if (!localStatsV2['event']) localStatsV2['event'] = defaultStats['event'];
+                localStatsV2['event'].name = '活动困难模式';
+                ['35', '45', '55'].forEach(k => {
+                    if (localStatsV2[k]) {
+                        localStatsV2[k].name = defaultStats[k].name;
+                        // 修正 null/Infinity 问题
+                        if (localStatsV2[k].best === null || localStatsV2[k].best === 0 || localStatsV2[k].best === Infinity) {
+                            localStatsV2[k].best = localStatsV2[k].count > 0 ? localStatsV2[k].avg : null;
+                        }
+                    } else {
+                        localStatsV2[k] = defaultStats[k];
+                    }
+                });
+            } else {
+                localStatsV2 = defaultStats;
+            }
+        } else {
+            // 已有 V2 数据，检查是否有 V1 漏网之鱼需要合入（防丢极致处理）
+            if (localStatsV1) {
+                ['35', '45', '55'].forEach(k => {
+                    let oldS = localStatsV1[k]; let newS = localStatsV2[k];
+                    if (oldS && oldS.count > 0 && newS.count === 0) {
+                        // V2 没玩过，但 V1 玩过，继承过来
+                        newS.count = oldS.count; newS.avg = oldS.avg; newS.best = oldS.best;
+                        if (newS.best === null || newS.best === 0 || newS.best === Infinity) newS.best = newS.avg;
+                    }
+                });
+            }
+            if (!localStatsV2['event']) localStatsV2['event'] = defaultStats['event'];
+            localStatsV2['event'].name = '活动困难模式';
+        }
+
+        // 保存修复后的 V2 数据
+        localStorage.setItem('ireSudokuStatsV2', JSON.stringify(localStatsV2));
+        let localStats = localStatsV2;
+
+
+        // ======== 🎨 Canvas 引擎 (端午表情包极低功耗恢复) ========
         const fxCanvas = document.getElementById('canvas-fx'); const fxCtx = fxCanvas.getContext('2d');
         const confCanvas = document.getElementById('canvas-confetti'); const confCtx = confCanvas.getContext('2d');
         let fxParticles = []; let confParticles = []; let reqFx, reqConf;
@@ -299,7 +351,7 @@
 
         function startEventBg() {
             fxParticles = [];
-            // 用 Canvas 绘制 12 个端午 Emoji，绝对零发热
+            // 用 Canvas 绘制端午 Emoji，绝对零发热
             const emojis = ['🐉', '🛶', '🎋', '🍃'];
             for(let i=0; i<12; i++) {
                 fxParticles.push({
@@ -311,7 +363,7 @@
             if(reqFx) cancelAnimationFrame(reqFx);
             function render() {
                 fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-                fxCtx.font = "24px Arial"; fxCtx.globalAlpha = 0.6; // 透明度适中，不抢戏
+                fxCtx.font = "24px Arial"; fxCtx.globalAlpha = 0.5; // 半透明不抢戏
                 fxParticles.forEach(p => {
                     p.y += p.speed; p.angle += p.rotSpeed;
                     if(p.y > fxCanvas.height + 20) { p.y = -20; p.x = Math.random() * fxCanvas.width; }
@@ -364,22 +416,6 @@
         let historyStack = []; const MAX_HISTORY = 15;
         let timerInterval = null; let timeElapsed = 0; let gameActive = false;
         let eventHints = {}; let hintsLeft = 3;
-
-        let defaultStats = {
-            '35': { best: null, avg: 0, count: 0, name: '简单模式' },
-            '45': { best: null, avg: 0, count: 0, name: '中等模式' },
-            '55': { best: null, avg: 0, count: 0, name: '困难模式' },
-            'event': { best: null, avg: 0, count: 0, name: '活动困难模式' }
-        };
-        let localStats = JSON.parse(localStorage.getItem('ireSudokuStatsV2')) || defaultStats;
-        if (!localStats['event']) localStats['event'] = defaultStats['event'];
-        localStats['event'].name = '活动困难模式'; 
-        
-        ['35', '45', '55', 'event'].forEach(k => {
-            let s = localStats[k];
-            if (s.best === null || s.best === 0) s.best = s.count > 0 ? s.avg : null;
-        });
-        localStorage.setItem('ireSudokuStatsV2', JSON.stringify(localStats));
 
         function checkEventExpiry() {
             let now = new Date(); let expireDate = new Date('2026-06-20T00:00:00+08:00'); 
@@ -441,7 +477,7 @@
 
             if (diffKey === 'event') {
                 document.body.classList.add('theme-event');
-                document.getElementById('main-title').innerText = "端午特别活动 - han luv ire";
+                document.getElementById('main-title').innerText = "端午特别活动：han luv ire";
                 startEventBg();
                 let shapes = generateEventSolution();
                 if (shapes) {
