@@ -412,7 +412,7 @@
             let now = new Date(); let expireDate = new Date('2026-06-20T00:00:00+08:00'); 
             if (now > expireDate) {
                 let eventOpt = document.getElementById('event-option');
-                if (eventOpt) eventOpt.style.display = 'none';
+                if (eventOpt) eventOpt.remove(); // 🚀 核心修复：直接把节点切除，防止 iOS 原生滚轮强制读取隐藏项
                 if (document.getElementById('diff-select').value === 'event') document.getElementById('diff-select').value = '45';
             }
         }
