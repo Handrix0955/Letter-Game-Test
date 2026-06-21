@@ -700,10 +700,11 @@
         }
 
         function openStats() {
+            playSound('bubble');
             let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>通关局数</th></tr>`;
             ['35', '45', '55', 'event'].forEach(k => {
                 let s = localStats[k];
-                if (k === 'event' && document.getElementById('event-option').style.display === 'none' && s.count === 0) return;
+                if (k === 'event' && (!document.getElementById('event-option') || document.getElementById('event-option').style.display === 'none') && s.count === 0) return;
                 html += `<tr>
                     <td><b>${s.name}</b></td>
                     <td style="color: var(--stat-best-color); font-weight:bold;">${formatTime(s.best)}</td>
