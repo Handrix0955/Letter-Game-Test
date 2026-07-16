@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Handrix给Irene的字母数独游戏：han luv ire</title>
+    <title>Handrix给Irene的字母数独游戏: han luv ire</title>
     <style>
         /* ======== 极简玻璃拟态主题变量 ======== */
         :root {
@@ -12,10 +12,9 @@
             --text-fixed: #0f172a; --text-user: #2563eb; --text-note: #64748b; --text-main: #334155;
             --btn-bg: rgba(255, 255, 255, 0.8); --btn-border: rgba(255, 255, 255, 0.6);
             --highlight-same: rgba(253, 230, 138, 0.6); --highlight-related: rgba(219, 234, 254, 0.5); --selected: rgba(147, 197, 253, 0.8);
-            --gradient-1: #e0c3fc; --gradient-2: #8ec5fc; --shadow: rgba(0, 0, 0, 0.05);
+            --shadow: rgba(0, 0, 0, 0.05);
             --hint-han: rgba(167, 243, 208, 0.5); --hint-luv: rgba(254, 202, 202, 0.5); --hint-ire: rgba(191, 219, 254, 0.5);
-            --event-text: #059669; 
-            --stat-best-color: #059669; /* 浅色模式高对比度绿 */
+            --event-text: #059669; --stat-best-color: #059669; 
         }
 
         [data-theme="dark"] {
@@ -24,14 +23,26 @@
             --text-fixed: #f8fafc; --text-user: #60a5fa; --text-note: #94a3b8; --text-main: #e2e8f0;
             --btn-bg: rgba(30, 41, 59, 0.8); --btn-border: rgba(255, 255, 255, 0.1);
             --highlight-same: rgba(202, 138, 4, 0.4); --highlight-related: rgba(30, 58, 138, 0.4); --selected: rgba(37, 99, 235, 0.6);
-            --gradient-1: #0f2027; --gradient-2: #203a43; --shadow: rgba(0, 0, 0, 0.3);
+            --shadow: rgba(0, 0, 0, 0.3);
             --hint-han: rgba(5, 150, 105, 0.4); --hint-luv: rgba(190, 18, 60, 0.4); --hint-ire: rgba(29, 78, 216, 0.4);
-            --event-text: #34d399;
-            --stat-best-color: #34d399; /* 深色模式高对比度绿 */
+            --event-text: #34d399; --stat-best-color: #34d399; 
         }
 
         body.theme-event { --gradient-1: #d4fc79; --gradient-2: #96e6a1; }
         [data-theme="dark"] body.theme-event { --gradient-1: #06170e; --gradient-2: #164027; }
+
+        /* ======== 🎨 皮肤系统 ======== */
+        body[data-skin="default"] { --gradient-1: #e0c3fc; --gradient-2: #8ec5fc; --bg-color: #f6f8fb; }
+        body[data-skin="purple"] { --gradient-1: #e2c0ff; --gradient-2: #c49aeb; --bg-color: #fdfaff; }
+        [data-theme="dark"] body[data-skin="default"] { --gradient-1: #0f2027; --gradient-2: #203a43; --bg-color: #0f172a; }
+        [data-theme="dark"] body[data-skin="purple"] { --gradient-1: #2a0845; --gradient-2: #1a0b2e; --bg-color: #0f0514; }
+
+        .skin-opt {
+            border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 6px var(--shadow); transition: 0.2s; margin-bottom: 12px; width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px;
+        }
+        .skin-opt:active { transform: scale(0.95); }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -45,7 +56,7 @@
 
         #canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
         #canvas-fx { z-index: -1; }
-        #canvas-confetti { z-index: 9999; } /* 庆典烟花层在最上方 */
+        #canvas-confetti { z-index: 9999; }
 
         .header { text-align: center; margin-bottom: 12px; z-index: 10; }
         .header h1 { font-size: 18px; color: var(--text-main); margin: 0 0 5px 0; letter-spacing: 0.5px; transition: 0.3s; }
@@ -137,7 +148,7 @@
         .theme-event-text { color: var(--event-text); font-weight: bold; }
     </style>
 </head>
-<body>
+<body data-skin="default">
 
     <canvas id="canvas-fx"></canvas>
     <canvas id="canvas-confetti"></canvas>
@@ -188,6 +199,7 @@
         </button>
     </div>
 
+    <!-- 底部操作栏变成4个按钮，新增了皮肤按钮 -->
     <div class="action-row">
         <button class="action-btn" onclick="openStats()">
             <svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 战绩
@@ -195,9 +207,30 @@
         <button class="action-btn" onclick="openRules()">
             <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 规则
         </button>
+        <button class="action-btn" onclick="openSkinModal()" style="color: #a855f7;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 1.5-1 2.5-2.5 2.5h-1.87a1.5 1.5 0 0 0-1.42 2.05l.38 1.15c.21.63-.3 1.3-.98 1.3H12Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="10.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="8.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg> 皮肤
+        </button>
         <button class="action-btn" id="theme-btn" onclick="toggleTheme()">
             <svg class="icon" id="theme-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> 护眼
         </button>
+    </div>
+
+    <!-- ======== 皮肤专属弹窗 ======== -->
+    <div class="modal-overlay" id="skinModal">
+        <div class="modal-content" style="text-align: center;">
+            <h2><svg class="icon" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 1.5-1 2.5-2.5 2.5h-1.87a1.5 1.5 0 0 0-1.42 2.05l.38 1.15c.21.63-.3 1.3-.98 1.3H12Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="10.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="8.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg> 专属色彩</h2>
+            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin-bottom: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button class="skin-opt" onclick="changeSkin('default')" style="background: linear-gradient(135deg, #e0c3fc, #8ec5fc); color: #1e293b;">
+                    <!-- 🚀 修复的完美 Sparkles 图标，替代之前的错误图标 -->
+                    <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg> 梦幻极光 (默认)
+                </button>
+                <button class="skin-opt" onclick="changeSkin('purple')" style="background: linear-gradient(135deg, #e2c0ff, #c49aeb); color: #3b0764;">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> 罗兰紫梦 (Irene专属)
+                </button>
+            </div>
+            <button class="close-btn" onclick="closeModal('skinModal')">选好了！</button>
+        </div>
     </div>
 
     <!-- ======== 规则弹窗 ======== -->
@@ -254,6 +287,17 @@
     </div>
 
     <script>
+        // ======== 🎨 皮肤引擎初始化 ========
+        let currentSkin = localStorage.getItem('ireSudokuSkin') || 'default';
+        document.body.setAttribute('data-skin', currentSkin);
+
+        function changeSkin(skin) {
+            currentSkin = skin;
+            document.body.setAttribute('data-skin', skin);
+            localStorage.setItem('ireSudokuSkin', skin);
+        }
+        function openSkinModal() { document.getElementById('skinModal').style.display = 'flex'; }
+
         // ======== 🎵 原生音效引擎 ========
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
@@ -265,6 +309,7 @@
             osc.connect(gain); gain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
             
+            // 🚀 彻底去除多余音效，只保留 Bubble 填字反馈和 Win 通关特效
             if (type === 'bubble') { 
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(300, now);
@@ -286,15 +331,15 @@
         document.body.addEventListener('touchstart', initAudio, {once:true});
         document.body.addEventListener('click', initAudio, {once:true});
 
-        // ======== 🏆 数据急救：只读最老的档案 ========
+        // ======== 🏆 数据安全急救与无损合并逻辑 ========
         let defaultStats = {
             '35': { best: null, avg: 0, count: 0, name: '简单模式' },
             '45': { best: null, avg: 0, count: 0, name: '中等模式' },
             '55': { best: null, avg: 0, count: 0, name: '困难模式' },
+            'event_total': { best: null, avg: 0, count: 0, name: '活动模式总榜' },
             'event': { best: null, avg: 0, count: 0, name: '活动困难模式' }
         };
 
-        // 直接读取你旧代码用的钥匙！绝不再造新抽屉！
         let localStats = JSON.parse(localStorage.getItem('ireSudokuStats'));
 
         if (!localStats) {
@@ -302,13 +347,16 @@
         } else {
             // 洗干净名字里的 Emoji
             if (!localStats['event']) localStats['event'] = defaultStats['event'];
+            if (!localStats['event_total']) localStats['event_total'] = defaultStats['event_total'];
+            
             localStats['35'].name = '简单模式';
             localStats['45'].name = '中等模式';
             localStats['55'].name = '困难模式';
+            localStats['event_total'].name = '活动模式总榜';
             localStats['event'].name = '活动困难模式';
 
             // 完美修复 Infinity 和 null
-            ['35', '45', '55', 'event'].forEach(k => {
+            ['35', '45', '55', 'event_total', 'event'].forEach(k => {
                 let s = localStats[k];
                 if (s.best === null || s.best === 0 || s.best === Infinity) {
                     s.best = s.count > 0 ? s.avg : null;
@@ -412,7 +460,7 @@
             let now = new Date(); let expireDate = new Date('2026-06-20T00:00:00+08:00'); 
             if (now > expireDate) {
                 let eventOpt = document.getElementById('event-option');
-                if (eventOpt) eventOpt.remove(); // 🚀 核心修复：直接把节点切除，防止 iOS 原生滚轮强制读取隐藏项
+                if (eventOpt) eventOpt.remove(); 
                 if (document.getElementById('diff-select').value === 'event') document.getElementById('diff-select').value = '45';
             }
         }
@@ -468,7 +516,6 @@
 
             if (diffKey === 'event') {
                 document.body.classList.add('theme-event');
-                document.getElementById('main-title').innerText = "端午节特别活动";
                 startEventBg();
                 let shapes = generateEventSolution();
                 if (shapes) {
@@ -478,7 +525,6 @@
                 } else generateSolution(); 
             } else {
                 document.body.classList.remove('theme-event');
-                document.getElementById('main-title').innerText = "Handrix给Irene的字母数独游戏：han luv ire";
                 stopEventBg();
                 generateSolution();
             }
@@ -616,7 +662,7 @@
             let correctChar = solution[selectedRow][selectedCol];
             if (userGrid[selectedRow][selectedCol] === correctChar) { showMessage("提示", "你已经凭实力填对啦，不需要浪费提示！", "#10b981"); return; }
 
-            playSound('bubble');
+            playSound('bubble'); // 🚀 提示也是填字，保留泡泡声
             saveState(); userGrid[selectedRow][selectedCol] = correctChar; autoCleanNotes(selectedRow, selectedCol, correctChar);
             hintsLeft--; document.getElementById('hint-text').innerText = `提示(${hintsLeft})`; renderBoard();
             setTimeout(() => { document.getElementById(`cell-${selectedRow}-${selectedCol}`).classList.add('just-placed'); }, 50);
@@ -624,7 +670,9 @@
 
         function inputLetter(l) {
             if (!gameActive || selectedRow === -1 || selectedCol === -1 || isFixed[selectedRow][selectedCol]) return;
-            playSound('bubble');
+            
+            playSound('bubble'); // 🚀 只在这里保留泡泡声
+            
             saveState(); let r = selectedRow, c = selectedCol;
             if (noteMode) {
                 if (userGrid[r][c] !== '') userGrid[r][c] = '';
@@ -669,25 +717,32 @@
                 }
             }
             
-            if (hasEmpty) showMessage("提示", "还有空格或者笔记未确认哦，请abb宝儿先填完！", "#f59e0b");
-            else if (hasError) showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#ef4444");
-            else {
-                gameActive = false; clearInterval(timerInterval);
-                let diffKey = document.getElementById('diff-select').value;
-                let s = localStats[diffKey];
-                
-                s.count++; s.avg = ((s.avg * (s.count - 1)) + timeElapsed) / s.count;
-                let isNewRecord = (s.best === null) || (timeElapsed < s.best);
-                if (isNewRecord) s.best = timeElapsed;
-                
-                localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
-
-                let msg = `太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！\n\n本局用时: ${formatTime(timeElapsed)}`;
-                if(isNewRecord && s.count > 1) msg += "\n打破了该难度的最佳记录！";
-                
-                triggerConfetti(); 
-                showMessage("过关", msg, "#10b981");
+            if (hasEmpty) { showMessage("提示", "还有空格或者笔记未确认哦，请abb宝儿先填完！", "#f59e0b"); return; }
+            if (hasError) { showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#ef4444"); return; }
+            
+            gameActive = false; clearInterval(timerInterval);
+            let diffKey = document.getElementById('diff-select').value;
+            let s = localStats[diffKey];
+            
+            s.count++; s.avg = ((s.avg * (s.count - 1)) + timeElapsed) / s.count;
+            let isNewRecord = (s.best === null) || (timeElapsed < s.best);
+            if (isNewRecord) s.best = timeElapsed;
+            
+            // 活动模式同步更新总榜
+            if (diffKey === 'event' && localStats['event_total']) {
+                let t = localStats['event_total'];
+                t.count++;
+                t.avg = ((t.avg * (t.count - 1)) + timeElapsed) / t.count;
+                if (t.best === null || timeElapsed < t.best) t.best = timeElapsed;
             }
+
+            localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
+
+            let msg = `太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！\n\n本局用时: ${formatTime(timeElapsed)}`;
+            if(isNewRecord && s.count > 1) msg += "\n宝，你刚刚打破了该难度的最佳记录诶！好厉害呀！又可以截图啦～";
+            
+            triggerConfetti(); 
+            showMessage("过关", msg, "#10b981");
         }
 
         function showMessage(title, body, color) {
@@ -699,12 +754,15 @@
             document.getElementById('messageModal').style.display = 'flex';
         }
 
+        // 🚀 确保战绩板永远显示 4 个核心榜单
         function openStats() {
-            playSound('bubble');
             let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>通关局数</th></tr>`;
-            ['35', '45', '55', 'event'].forEach(k => {
+            ['35', '45', '55', 'event_total', 'event'].forEach(k => {
                 let s = localStats[k];
-                if (k === 'event' && (!document.getElementById('event-option') || document.getElementById('event-option').style.display === 'none') && s.count === 0) return;
+                if (!s) return;
+                // 如果是当期活动 'event'，并且端午选项已被删除，就隐藏它
+                if (k === 'event' && !document.getElementById('event-option')) return;
+                
                 html += `<tr>
                     <td><b>${s.name}</b></td>
                     <td style="color: var(--stat-best-color); font-weight:bold;">${formatTime(s.best)}</td>
