@@ -347,7 +347,11 @@
         } else {
             // 洗干净名字里的 Emoji
             if (!localStats['event']) localStats['event'] = defaultStats['event'];
-            if (!localStats['event_total']) localStats['event_total'] = defaultStats['event_total'];
+            
+            // 如果总榜是空的，立刻把以前的端午/活动记录完美复制一份给总榜！
+            if (!localStats['event_total'] || localStats['event_total'].count === 0) {
+                localStats['event_total'] = JSON.parse(JSON.stringify(localStats['event']));
+            }
             
             localStats['35'].name = '简单模式';
             localStats['45'].name = '中等模式';
