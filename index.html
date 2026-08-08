@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Handrix给Irene的字母数独游戏: han luv ire</title>
+    <title>Handrix给Irene的字母数独游戏：han luv ire</title>
     <style>
         /* ======== 极简玻璃拟态主题变量 ======== */
         :root {
@@ -12,9 +12,7 @@
             --text-fixed: #0f172a; --text-user: #2563eb; --text-note: #64748b; --text-main: #334155;
             --btn-bg: rgba(255, 255, 255, 0.8); --btn-border: rgba(255, 255, 255, 0.6);
             --highlight-same: rgba(253, 230, 138, 0.6); --highlight-related: rgba(219, 234, 254, 0.5); --selected: rgba(147, 197, 253, 0.8);
-            --shadow: rgba(0, 0, 0, 0.05);
-            --hint-han: rgba(167, 243, 208, 0.5); --hint-luv: rgba(254, 202, 202, 0.5); --hint-ire: rgba(191, 219, 254, 0.5);
-            --event-text: #059669; --stat-best-color: #059669; 
+            --shadow: rgba(0, 0, 0, 0.05); --stat-best-color: #059669; 
         }
 
         [data-theme="dark"] {
@@ -23,19 +21,55 @@
             --text-fixed: #f8fafc; --text-user: #60a5fa; --text-note: #94a3b8; --text-main: #e2e8f0;
             --btn-bg: rgba(30, 41, 59, 0.8); --btn-border: rgba(255, 255, 255, 0.1);
             --highlight-same: rgba(202, 138, 4, 0.4); --highlight-related: rgba(30, 58, 138, 0.4); --selected: rgba(37, 99, 235, 0.6);
-            --shadow: rgba(0, 0, 0, 0.3);
-            --hint-han: rgba(5, 150, 105, 0.4); --hint-luv: rgba(190, 18, 60, 0.4); --hint-ire: rgba(29, 78, 216, 0.4);
-            --event-text: #34d399; --stat-best-color: #34d399; 
+            --shadow: rgba(0, 0, 0, 0.3); --stat-best-color: #34d399; 
         }
-
-        body.theme-event { --gradient-1: #d4fc79; --gradient-2: #96e6a1; }
-        [data-theme="dark"] body.theme-event { --gradient-1: #06170e; --gradient-2: #164027; }
 
         /* ======== 🎨 皮肤系统 ======== */
         body[data-skin="default"] { --gradient-1: #e0c3fc; --gradient-2: #8ec5fc; --bg-color: #f6f8fb; }
         body[data-skin="purple"] { --gradient-1: #e2c0ff; --gradient-2: #c49aeb; --bg-color: #fdfaff; }
         [data-theme="dark"] body[data-skin="default"] { --gradient-1: #0f2027; --gradient-2: #203a43; --bg-color: #0f172a; }
         [data-theme="dark"] body[data-skin="purple"] { --gradient-1: #2a0845; --gradient-2: #1a0b2e; --bg-color: #0f0514; }
+
+        /* 🌌 星河鹊桥专属：宇宙深空背景 + 琉璃棋盘 */
+        body.theme-event { 
+            --gradient-1: #160b2b; /* 宇宙极暗紫 */
+            --gradient-2: #0b1528; /* 星云深渊蓝 */
+            --bg-color: #050814; 
+            --text-main: #f8fafc; 
+        }
+        body.theme-event .board {
+            /* 棋盘变为深邃的星空毛玻璃，让底部的流星透过来 */
+            background: rgba(10, 15, 35, 0.4); 
+            border: 2px solid rgba(147, 197, 253, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(147, 197, 253, 0.05);
+        }
+        body.theme-event .cell { background-color: rgba(15, 23, 42, 0.5); color: #f8fafc; border-color: rgba(147, 197, 253, 0.15); }
+        body.theme-event .cell.fixed { color: #93c5fd; font-weight: 900; } /* 题目字体用星空亮蓝 */
+        body.theme-event .cell:nth-child(3n) { border-right: 2px solid rgba(147, 197, 253, 0.3); }
+        body.theme-event .cell:nth-child(n+19):nth-child(-n+27), body.theme-event .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid rgba(147, 197, 253, 0.3); }
+        
+        body.theme-event .glass-panel { background: rgba(15, 23, 42, 0.6); border-color: rgba(147, 197, 253, 0.2); color: #f8fafc; }
+        body.theme-event select option { color: #0f172a; } 
+        body.theme-event .key, body.theme-event .action-btn { background: rgba(30, 41, 59, 0.7); color: #f8fafc; border-color: rgba(147, 197, 253, 0.2); }
+        body.theme-event .key.undo-btn { color: #fde047; background: rgba(116, 66, 16, 0.6); border-color: rgba(202, 138, 4, 0.4); }
+        body.theme-event .action-btn.active-note { background: rgba(202, 138, 4, 0.8) !important; border-color: #fde047 !important; }
+
+        /* 🌉 鹊桥颜色保留：石砖灰 + 海棠粉 (半透明融入宇宙) */
+        body.theme-event .cell.hint-han, body.theme-event .cell.hint-ire { 
+            background-color: rgba(71, 85, 105, 0.7) !important; 
+            color: #ffffff !important; 
+        }
+        body.theme-event .cell.hint-luv { 
+            background-color: rgba(219, 39, 119, 0.6) !important; 
+            color: #ffffff !important; 
+            box-shadow: inset 0 0 15px rgba(244, 114, 182, 0.3);
+        }
+        
+        body.theme-event .cell.related { background-color: rgba(56, 189, 248, 0.15); }
+        body.theme-event .cell.same { background-color: rgba(250, 204, 21, 0.2); }
+        body.theme-event .cell.selected { background-color: rgba(56, 189, 248, 0.3); box-shadow: inset 0 0 0 2px #38bdf8; z-index: 2; }
+        body.theme-event .hint-watermark { color: rgba(255,255,255,0.3); }
+        body.theme-event .note-item { color: rgba(147, 197, 253, 0.8); } /* 笔记变成浅蓝色星光 */
 
         .skin-opt {
             border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer;
@@ -54,8 +88,9 @@
 
         @keyframes auroraBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        #canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
-        #canvas-fx { z-index: -1; }
+        #canvas-bg, #canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
+        #canvas-bg { z-index: -2; }
+        #canvas-fx { z-index: 9998; }
         #canvas-confetti { z-index: 9999; }
 
         .header { text-align: center; margin-bottom: 12px; z-index: 10; }
@@ -65,12 +100,12 @@
             display: flex; justify-content: space-between; align-items: center; gap: 8px;
             width: 100%; max-width: 400px; margin-bottom: 15px; z-index: 10; 
         }
-        select, button, .timer-display {
+        .glass-panel, select, button, .timer-display {
             box-sizing: border-box; padding: 8px 0; font-size: 14px; font-weight: bold; border-radius: 10px;
             border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-main); 
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); outline: none; cursor: pointer; transition: 0.2s;
         }
-        select#diff-select, #new-game-btn { flex: 1; max-width: 110px; text-align: center; }
+        select#diff-select, #new-game-btn { flex: 1; max-width: 130px; text-align: center; }
         .timer-display { flex: 0 0 95px; width: 95px; cursor: default; display: flex; justify-content: center; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
         
         .board {
@@ -78,6 +113,7 @@
             width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 20px; flex-shrink: 0;
             background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border: 2px solid var(--grid-line-thick); border-radius: 8px; overflow: hidden; box-shadow: 0 8px 32px var(--shadow); z-index: 10;
+            transition: 0.4s;
         }
 
         .cell {
@@ -94,6 +130,8 @@
         
         .cell.fixed { color: var(--text-fixed); font-weight: 800;}
         .cell.user { color: var(--text-user); }
+        
+        /* 非活动模式的保底颜色 */
         .cell.hint-han { background-color: var(--hint-han); } .cell.hint-luv { background-color: var(--hint-luv); } .cell.hint-ire { background-color: var(--hint-ire); }
         .cell.related { background-color: var(--highlight-related); } .cell.same { background-color: var(--highlight-same); }
         .cell.selected { background-color: var(--selected); box-shadow: inset 0 0 0 2px var(--text-user); z-index: 2; }
@@ -134,7 +172,7 @@
             padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); max-height: 80vh; overflow-y: auto;
         }
         .modal-content h2 { font-size: 18px; margin-top: 0; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;}
-        .modal-content h3 { font-size: 15px; margin: 15px 0 5px 0; opacity: 0.9; display: flex; align-items: center; }
+        .modal-content h3 { font-size: 15px; margin: 15px 0 5px 0; opacity: 0.9; display: flex; align-items: center; color: #3b82f6;}
         .modal-content ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6; }
         .close-btn {
             width: 100%; background: #3b82f6; color: white !important; border: none; padding: 12px; border-radius: 12px; 
@@ -145,11 +183,13 @@
         .stats-table th { background: var(--th-bg); padding: 10px 8px; border-bottom: 1px solid var(--glass-border); border-radius: 8px 8px 0 0;}
         .stats-table td { border-bottom: 1px solid var(--glass-border); padding: 12px 8px; }
         
-        .theme-event-text { color: var(--event-text); font-weight: bold; }
+        .theme-event-text { color: #db2777 !important; font-weight: bold; }
     </style>
 </head>
 <body data-skin="default">
 
+    <!-- 画布层 -->
+    <canvas id="canvas-bg"></canvas>
     <canvas id="canvas-fx"></canvas>
     <canvas id="canvas-confetti"></canvas>
 
@@ -158,13 +198,13 @@
     </div>
 
     <div class="top-controls">
-        <select id="diff-select" onchange="startNewGame()">
-            <option value="35">&#9679; 简单模式</option>
-            <option value="45" selected>&#9679; 中等模式</option>
-            <option value="55">&#9679; 困难模式</option>
-            <option value="event" id="event-option">&#10022; 活动困难模式</option>
+        <select id="diff-select" class="glass-panel" onchange="startNewGame()">
+            <option value="35">简单模式</option>
+            <option value="45" selected>中等模式</option>
+            <option value="55">困难模式</option>
+            <option value="event_qixi" id="event-option">七夕特别活动</option>
         </select>
-        <div class="timer-display" id="timer">
+        <div class="timer-display glass-panel" id="timer">
             <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 00:00
         </div>
         <button id="new-game-btn" onclick="startNewGame()" style="background:#8b5cf6; color:white; border:none; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);">新游戏</button>
@@ -199,7 +239,6 @@
         </button>
     </div>
 
-    <!-- 底部操作栏变成4个按钮，新增了皮肤按钮 -->
     <div class="action-row">
         <button class="action-btn" onclick="openStats()">
             <svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 战绩
@@ -218,11 +257,10 @@
     <!-- ======== 皮肤专属弹窗 ======== -->
     <div class="modal-overlay" id="skinModal">
         <div class="modal-content" style="text-align: center;">
-            <h2><svg class="icon" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 1.5-1 2.5-2.5 2.5h-1.87a1.5 1.5 0 0 0-1.42 2.05l.38 1.15c.21.63-.3 1.3-.98 1.3H12Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="10.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="8.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg> 专属色彩</h2>
+            <h2 style="color: #a855f7;"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 1.5-1 2.5-2.5 2.5h-1.87a1.5 1.5 0 0 0-1.42 2.05l.38 1.15c.21.63-.3 1.3-.98 1.3H12Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="10.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="8.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg> 专属色彩</h2>
             <hr style="border: 0; border-top: 1px solid var(--glass-border); margin-bottom: 20px;">
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <button class="skin-opt" onclick="changeSkin('default')" style="background: linear-gradient(135deg, #e0c3fc, #8ec5fc); color: #1e293b;">
-                    <!-- 🚀 修复的完美 Sparkles 图标，替代之前的错误图标 -->
                     <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg> 梦幻极光 (默认)
                 </button>
                 <button class="skin-opt" onclick="changeSkin('purple')" style="background: linear-gradient(135deg, #e2c0ff, #c49aeb); color: #3b0764;">
@@ -233,7 +271,7 @@
         </div>
     </div>
 
-    <!-- ======== 规则弹窗 ======== -->
+    <!-- ======== 规则弹窗 (纯净无Emoji版) ======== -->
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">
             <h2><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 定制字母数独规则</h2>
@@ -245,11 +283,11 @@
                 <li>其次 这下绝对不会有广告啦</li>
             </ul>
             
-            <h3 id="rule-event-title" style="display:none;" class="theme-event-text"><svg class="inline-icon" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg> 端午特别活动规则：</h3>
+            <h3 id="rule-event-title" style="display:none;" class="theme-event-text"><svg class="inline-icon" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg> 七夕特别活动规则：</h3>
             <ul id="rule-event-body" style="display:none;" class="theme-event-text">
-                <li>活动模式基于“困难难度”。</li>
-                <li>棋盘中会出现三组带颜色的水彩质感格子，它们是相连的组合！</li>
-                <li>分别是连在一起的 han、luv、ire，这能大幅降低推理难度，6月19日下线哦！</li>
+                <li>水水宝，七夕时牛郎织女会跨越星河相会。盘面中会随机出现特殊的『星河鹊桥』或『爱心』连线噢~</li>
+                <li>这是han给ire的特殊爱的暗号，能降低推理难度，8月底下线哦！</li>
+                <li style="font-weight: 800; list-style-type: none; margin-top: 5px;">Enjoy~ <svg class="inline-icon" viewBox="0 0 24 24" style="color:#db2777; fill:#db2777;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></li>
             </ul>
             
             <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.954.954 0 0 0-.288.877l.13 1.011c.088.684-.061 1.405-.434 2.02-.374.615-.992 1.04-1.745 1.196l-.995.207a.953.953 0 0 0-.743.518l-.48 1.002c-.328.685-.899 1.204-1.608 1.464a2.585 2.585 0 0 1-2.198-.108l-.872-.51a.95.95 0 0 0-1.04 0l-.872.51a2.584 2.584 0 0 1-2.198.108 2.584 2.584 0 0 1-1.608-1.464l-.48-1.002a.954.954 0 0 0-.743-.518l-.995-.207a2.586 2.586 0 0 1-1.745-1.196 2.586 2.586 0 0 1-.434-2.02l.13-1.011a.954.954 0 0 0-.288-.877l-1.611-1.611a2.41 2.41 0 0 1 0-3.408l1.568-1.568a.954.954 0 0 0 .289-.878l-.13-1.011a2.586 2.586 0 0 1 .434-2.02 2.586 2.586 0 0 1 1.745-1.196l.995-.207a.953.953 0 0 0 .743-.518l.48-1.002a2.584 2.584 0 0 1 1.608-1.464 2.584 2.584 0 0 1 2.198.108l.872.51a.95.95 0 0 0 1.04 0l.872-.51a2.584 2.584 0 0 1 2.198-.108 2.584 2.584 0 0 1 1.608 1.464l.48 1.002a.954.954 0 0 0 .743.518l.995.207c.753.156 1.371.58 1.745 1.196.373.615.522 1.336.434 2.02l-.13 1.011Z"/></svg> 填字规则：</h3>
@@ -292,13 +330,11 @@
         document.body.setAttribute('data-skin', currentSkin);
 
         function changeSkin(skin) {
-            currentSkin = skin;
-            document.body.setAttribute('data-skin', skin);
-            localStorage.setItem('ireSudokuSkin', skin);
+            currentSkin = skin; document.body.setAttribute('data-skin', skin); localStorage.setItem('ireSudokuSkin', skin);
         }
         function openSkinModal() { document.getElementById('skinModal').style.display = 'flex'; }
 
-        // ======== 🎵 原生音效引擎 ========
+        // ======== 🎵 原生音效引擎 (严格静音，仅在填字发声) ========
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
         function initAudio() { if (!audioCtx) { audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); } }
@@ -309,13 +345,10 @@
             osc.connect(gain); gain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
             
-            // 🚀 彻底去除多余音效，只保留 Bubble 填字反馈和 Win 通关特效
             if (type === 'bubble') { 
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
-                gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+                gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.5, now + 0.01); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
                 osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'win') { 
                 const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51];
@@ -328,97 +361,189 @@
                 });
             }
         }
-        document.body.addEventListener('touchstart', initAudio, {once:true});
-        document.body.addEventListener('click', initAudio, {once:true});
+        document.body.addEventListener('touchstart', initAudio, {once:true}); document.body.addEventListener('click', initAudio, {once:true});
 
-        // ======== 🏆 数据安全急救与无损合并逻辑 ========
+        // ======== 🏆 数据记录逻辑 ========
         let defaultStats = {
             '35': { best: null, avg: 0, count: 0, name: '简单模式' },
             '45': { best: null, avg: 0, count: 0, name: '中等模式' },
             '55': { best: null, avg: 0, count: 0, name: '困难模式' },
             'event_total': { best: null, avg: 0, count: 0, name: '活动模式总榜' },
-            'event': { best: null, avg: 0, count: 0, name: '活动困难模式' }
+            'event_qixi': { best: null, avg: 0, count: 0, name: '七夕特别活动' }
         };
 
-        let localStats = JSON.parse(localStorage.getItem('ireSudokuStats'));
+        let localStats = JSON.parse(localStorage.getItem('ireSudokuStats')) || defaultStats;
+        if (!localStats['event_total']) localStats['event_total'] = defaultStats['event_total'];
+        if (!localStats['event_qixi']) localStats['event_qixi'] = defaultStats['event_qixi'];
 
-        if (!localStats) {
-            localStats = JSON.parse(JSON.stringify(defaultStats));
-        } else {
-            // 洗干净名字里的 Emoji
-            if (!localStats['event']) localStats['event'] = defaultStats['event'];
-            
-            // 如果总榜是空的，立刻把以前的端午/活动记录完美复制一份给总榜！
-            if (!localStats['event_total'] || localStats['event_total'].count === 0) {
-                localStats['event_total'] = JSON.parse(JSON.stringify(localStats['event']));
-            }
-            
-            localStats['35'].name = '简单模式';
-            localStats['45'].name = '中等模式';
-            localStats['55'].name = '困难模式';
-            localStats['event_total'].name = '活动模式总榜';
-            localStats['event'].name = '活动困难模式';
-
-            // 完美修复 Infinity 和 null
-            ['35', '45', '55', 'event_total', 'event'].forEach(k => {
-                let s = localStats[k];
-                if (s.best === null || s.best === 0 || s.best === Infinity) {
-                    s.best = s.count > 0 ? s.avg : null;
-                }
-            });
+        // 无损继承旧端午数据
+        if (localStats['event'] && localStats['event'].count > 0 && localStats['event_total'].count === 0) {
+            localStats['event_total'].count = localStats['event'].count;
+            localStats['event_total'].avg = localStats['event'].avg;
+            localStats['event_total'].best = localStats['event'].best;
         }
+
+        ['35', '45', '55', 'event_total', 'event_qixi'].forEach(k => {
+            let s = localStats[k];
+            if (s) {
+                s.name = defaultStats[k].name;
+                if (s.best === null || s.best === 0 || s.best === Infinity) s.best = s.count > 0 ? s.avg : null;
+            }
+        });
         localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
 
-        // ======== 🎨 Canvas 发热优化 (竹叶飘落纯数学公式) ========
+        // ======== 🎨 Canvas 引擎 (零发热宇宙星空 + 双向飞鸟爱心彩蛋) ========
+        const bgCanvas = document.getElementById('canvas-bg'); const bgCtx = bgCanvas.getContext('2d');
         const fxCanvas = document.getElementById('canvas-fx'); const fxCtx = fxCanvas.getContext('2d');
         const confCanvas = document.getElementById('canvas-confetti'); const confCtx = confCanvas.getContext('2d');
-        let fxParticles = []; let confParticles = []; let reqFx, reqConf;
+        let bgParticles = []; let fxParticles = []; let confParticles = []; let reqBg, reqFx, reqConf;
+        
+        let magpieTriggered = false; let luvCells = []; let magpies = []; let hearts = []; let magpiePhase = 0;
 
         function resizeCanvas() {
+            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
             fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight;
             confCanvas.width = window.innerWidth; confCanvas.height = window.innerHeight;
         }
         window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
         function startEventBg() {
-            fxParticles = [];
-            for(let i=0; i<20; i++) {
-                fxParticles.push({
-                    x: Math.random() * fxCanvas.width, 
-                    y: Math.random() * fxCanvas.height - fxCanvas.height,
-                    speed: Math.random() * 1.5 + 0.5, 
-                    size: Math.random() * 15 + 10,
-                    angle: Math.random() * Math.PI * 2, 
-                    rotSpeed: (Math.random() - 0.5) * 0.05,
-                    opacity: Math.random() * 0.4 + 0.2
+            bgParticles = [];
+            // 星空粒子
+            for(let i=0; i<60; i++) {
+                bgParticles.push({
+                    x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
+                    radius: Math.random() * 1.5, alpha: Math.random(), speedAlpha: (Math.random() - 0.5) * 0.02, isShooting: false
                 });
             }
-            if(reqFx) cancelAnimationFrame(reqFx);
+            if(reqBg) cancelAnimationFrame(reqBg);
             function render() {
-                fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-                fxParticles.forEach(p => {
-                    p.y += p.speed; p.angle += p.rotSpeed;
-                    if(p.y > fxCanvas.height + 20) { p.y = -20; p.x = Math.random() * fxCanvas.width; }
-                    
-                    fxCtx.save(); 
-                    fxCtx.translate(p.x, p.y); 
-                    fxCtx.rotate(p.angle);
-                    fxCtx.fillStyle = `rgba(46, 125, 50, ${p.opacity})`; 
-                    
-                    // 纯数学公式画竹叶 (零发热)
-                    fxCtx.beginPath();
-                    fxCtx.moveTo(0, 0);
-                    fxCtx.quadraticCurveTo(p.size/2, -p.size/3, p.size, 0);
-                    fxCtx.quadraticCurveTo(p.size/2, p.size/3, 0, 0);
-                    fxCtx.fill();
-                    fxCtx.restore();
-                });
-                reqFx = requestAnimationFrame(render);
+                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+                
+                // 偶然流星
+                if(Math.random() < 0.01) { 
+                    bgParticles.push({
+                        x: Math.random() * bgCanvas.width, y: 0,
+                        len: Math.random() * 50 + 50, speed: Math.random() * 10 + 10,
+                        angle: Math.PI / 4, isShooting: true, alpha: 1
+                    });
+                }
+                
+                for (let i = bgParticles.length - 1; i >= 0; i--) {
+                    let p = bgParticles[i];
+                    if (p.isShooting) {
+                        p.x -= p.speed * Math.cos(p.angle); p.y += p.speed * Math.sin(p.angle); p.alpha -= 0.02;
+                        bgCtx.beginPath(); bgCtx.moveTo(p.x, p.y); bgCtx.lineTo(p.x + p.len * Math.cos(p.angle), p.y - p.len * Math.sin(p.angle));
+                        bgCtx.strokeStyle = `rgba(255, 255, 255, ${p.alpha})`; bgCtx.lineWidth = 1.5; bgCtx.stroke();
+                        if (p.alpha <= 0) bgParticles.splice(i, 1);
+                    } else {
+                        p.alpha += p.speedAlpha; if(p.alpha <= 0.1 || p.alpha >= 0.8) p.speedAlpha *= -1;
+                        bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+                        bgCtx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`; bgCtx.fill();
+                    }
+                }
+                
+                // 渲染鹊桥飞鸟动画
+                if (magpieTriggered) renderMagpies();
+                
+                reqBg = requestAnimationFrame(render);
             }
             render();
         }
 
-        function stopEventBg() { if(reqFx) cancelAnimationFrame(reqFx); fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height); }
+        // 绘制 SVG 数学爱心
+        function drawHeart(ctx, x, y, size, alpha) {
+            ctx.save(); ctx.translate(x, y); ctx.scale(size, size);
+            ctx.fillStyle = `rgba(244, 114, 182, ${alpha})`;
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-1, -1, -2, 1, 0, 2); ctx.bezierCurveTo(2, 1, 1, -1, 0, 0); ctx.fill();
+            ctx.restore();
+        }
+
+        // 触发青鸟红鸟相会
+        function triggerMagpies() {
+            playSound('win');
+            magpies = [
+                { x: 0, y: fxCanvas.height/4, color: '#60a5fa', tx: fxCanvas.width/2 - 15, ty: fxCanvas.height/2 }, 
+                { x: fxCanvas.width, y: fxCanvas.height/4, color: '#f472b6', tx: fxCanvas.width/2 + 15, ty: fxCanvas.height/2 } 
+            ];
+            hearts = []; magpiePhase = 0;
+            if (!reqFx) renderMagpiesLoop(); 
+        }
+
+        function renderMagpiesLoop() {
+            fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+            let active = false;
+            
+            if (magpies.length > 0 || hearts.length > 0) {
+                active = true;
+                if (magpiePhase === 0) {
+                    let reached = 0;
+                    magpies.forEach(b => {
+                        let dx = b.tx - b.x; let dy = b.ty - b.y;
+                        b.x += dx * 0.05; b.y += dy * 0.05;
+                        if (Math.abs(dx) < 2 && Math.abs(dy) < 2) reached++;
+                        
+                        fxCtx.shadowBlur = 15; fxCtx.shadowColor = b.color;
+                        fxCtx.fillStyle = '#ffffff';
+                        fxCtx.beginPath(); fxCtx.arc(b.x, b.y, 4, 0, Math.PI*2); fxCtx.fill();
+                        fxCtx.shadowBlur = 0;
+                    });
+                    if (reached === 2) {
+                        magpiePhase = 1; magpies = [];
+                        for(let i=0; i<30; i++) {
+                            hearts.push({
+                                x: fxCanvas.width/2, y: fxCanvas.height/2,
+                                vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10 - 2,
+                                alpha: 1, size: Math.random() * 5 + 3
+                            });
+                        }
+                    }
+                } else if (magpiePhase === 1) {
+                    hearts.forEach(h => {
+                        h.x += h.vx; h.y += h.vy; h.alpha -= 0.02;
+                        if (h.alpha > 0) drawHeart(fxCtx, h.x, h.y, h.size, h.alpha);
+                    });
+                    if (hearts.every(h => h.alpha <= 0)) hearts = []; 
+                }
+            }
+            
+            if(active) reqFx = requestAnimationFrame(renderMagpiesLoop); else { reqFx = null; magpieTriggered = false; }
+        }
+
+        function renderMagpies() {
+            // 这个被放在 bgCanvas 的循环里执行
+            if (magpiePhase === 0) {
+                let reached = 0;
+                magpies.forEach(b => {
+                    let dx = b.tx - b.x; let dy = b.ty - b.y;
+                    b.x += dx * 0.06; b.y += dy * 0.06;
+                    if (Math.abs(dx) < 2 && Math.abs(dy) < 2) reached++;
+                    
+                    bgCtx.shadowBlur = 15; bgCtx.shadowColor = b.color;
+                    bgCtx.fillStyle = '#ffffff';
+                    bgCtx.beginPath(); bgCtx.arc(b.x, b.y, 4, 0, Math.PI*2); bgCtx.fill();
+                    bgCtx.shadowBlur = 0;
+                });
+                if (reached === 2) {
+                    magpiePhase = 1; magpies = [];
+                    for(let i=0; i<25; i++) {
+                        hearts.push({
+                            x: bgCanvas.width/2, y: bgCanvas.height/2,
+                            vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10 - 2,
+                            alpha: 1, size: Math.random() * 5 + 3
+                        });
+                    }
+                }
+            } else if (magpiePhase === 1) {
+                hearts.forEach(h => {
+                    h.x += h.vx; h.y += h.vy; h.alpha -= 0.02;
+                    if (h.alpha > 0) drawHeart(bgCtx, h.x, h.y, h.size, h.alpha);
+                });
+                if (hearts.every(h => h.alpha <= 0)) { magpieTriggered = false; hearts = []; }
+            }
+        }
+
+        function stopEventBg() { if(reqBg) cancelAnimationFrame(reqBg); bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height); magpieTriggered = false; }
 
         function triggerConfetti() {
             playSound('win'); confParticles = [];
@@ -460,12 +585,13 @@
         let timerInterval = null; let timeElapsed = 0; let gameActive = false;
         let eventHints = {}; let hintsLeft = 3;
 
+        // 七夕在8月底过期
         function checkEventExpiry() {
-            let now = new Date(); let expireDate = new Date('2026-06-20T00:00:00+08:00'); 
+            let now = new Date(); let expireDate = new Date('2026-08-30T00:00:00+08:00'); 
             if (now > expireDate) {
                 let eventOpt = document.getElementById('event-option');
                 if (eventOpt) eventOpt.remove(); 
-                if (document.getElementById('diff-select').value === 'event') document.getElementById('diff-select').value = '45';
+                if (document.getElementById('diff-select').value === 'event_qixi') document.getElementById('diff-select').value = '45';
             }
         }
 
@@ -479,58 +605,67 @@
             } else {
                 body.setAttribute('data-theme', 'dark');
                 themeIcon.innerHTML = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'; 
-                showMessage("晚安提醒", "是不是大晚上了还在玩呀？\n别玩太晚哦，早点休息宝宝 😘", "#8b5cf6");
             }
         }
 
-        function findConnectedTromino(grid, charSet) {
-            let shapes = [ [[0,0], [0,1], [0,2]], [[0,0], [1,0], [2,0]], [[0,0], [0,1], [1,0]], [[0,0], [0,1], [-1,0]], [[0,0], [1,0], [1,1]], [[0,0], [1,0], [1,-1]] ];
-            for (let r = 0; r < 9; r++) {
-                for (let c = 0; c < 9; c++) {
-                    for (let shape of shapes) {
-                        let cells = [], chars = [], valid = true;
-                        for (let pt of shape) {
-                            let nr = r + pt[0], nc = c + pt[1];
-                            if (nr < 0 || nr >= 9 || nc < 0 || nc >= 9) { valid = false; break; }
-                            cells.push({r: nr, c: nc}); chars.push(grid[nr][nc]);
-                        }
-                        if (valid && chars.slice().sort().join('') === charSet.slice().sort().join('')) return cells;
-                    }
+        // 🚀 核心算法：七夕动态生成 100% 完美的对角线/心形
+        function shuffleArray(array) {
+            let arr = array.slice();
+            for (let i = arr.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function generateQixiSolution() {
+            let shapes = [
+                { type: 'diagonal', han: [[0,0],[1,1],[2,2]], luv: [[3,3],[4,4],[5,5]], ire: [[6,6],[7,7],[8,8]] },
+                { type: 'diagonal', han: [[8,0],[7,1],[6,2]], luv: [[5,3],[4,4],[3,5]], ire: [[2,6],[1,7],[0,8]] },
+                { type: 'bridge', han: [[4,0],[4,1],[4,2]], luv: [[4,3],[4,4],[4,5]], ire: [[4,6],[4,7],[4,8]] },
+                { type: 'heart', han: [[1,3],[2,2],[3,3]], luv: [[2,4],[4,4],[5,4]], ire: [[1,5],[2,6],[3,5]] }
+            ];
+            let pattern = shapes[Math.floor(Math.random() * shapes.length)];
+
+            for(let attempt = 0; attempt < 50; attempt++) {
+                for(let r=0; r<9; r++) solution[r].fill(0);
+                
+                let hChars = shuffleArray(['h','a','n']);
+                let lChars = shuffleArray(['l','u','v']);
+                let iChars = shuffleArray(['i','r','e']);
+
+                for(let j=0; j<3; j++) {
+                    solution[pattern.han[j][0]][pattern.han[j][1]] = hChars[j];
+                    solution[pattern.luv[j][0]][pattern.luv[j][1]] = lChars[j];
+                    solution[pattern.ire[j][0]][pattern.ire[j][1]] = iChars[j];
                 }
-            }
-            return null;
-        }
 
-        function generateEventSolution() {
-            for(let i=0; i<100; i++) {
-                generateSolution();
-                let han = findConnectedTromino(solution, ['h','a','n']);
-                let luv = findConnectedTromino(solution, ['l','u','v']);
-                let ire = findConnectedTromino(solution, ['i','r','e']);
-                if(han && luv && ire) return {han, luv, ire};
+                if (solveSudoku(solution)) return pattern;
             }
             return null; 
         }
 
         function startNewGame() {
             let diffKey = document.getElementById('diff-select').value;
-            let blanks = diffKey === 'event' ? 55 : parseInt(diffKey);
-            eventHints = {}; let forcedBlanks = [];
+            let blanks = diffKey.startsWith('event_') ? 55 : parseInt(diffKey);
+            eventHints = {}; let forcedBlanks = []; luvCells = []; magpieTriggered = false;
             hintsLeft = 3; document.getElementById('hint-text').innerText = `提示(3)`;
 
-            if (diffKey === 'event') {
+            if (diffKey === 'event_qixi') {
                 document.body.classList.add('theme-event');
+                document.getElementById('main-title').innerText = "七夕特别活动：星河鹊桥局";
                 startEventBg();
-                let shapes = generateEventSolution();
+                
+                let shapes = generateQixiSolution();
                 if (shapes) {
-                    shapes.han.forEach(p => { forcedBlanks.push(p); eventHints[`${p.r}-${p.c}`] = 'han'; });
-                    shapes.luv.forEach(p => { forcedBlanks.push(p); eventHints[`${p.r}-${p.c}`] = 'luv'; });
-                    shapes.ire.forEach(p => { forcedBlanks.push(p); eventHints[`${p.r}-${p.c}`] = 'ire'; });
+                    shapes.han.forEach(p => { forcedBlanks.push(p); eventHints[`${p[0]}-${p[1]}`] = 'han'; });
+                    shapes.luv.forEach(p => { forcedBlanks.push(p); eventHints[`${p[0]}-${p[1]}`] = 'luv'; luvCells.push(p); });
+                    shapes.ire.forEach(p => { forcedBlanks.push(p); eventHints[`${p[0]}-${p[1]}`] = 'ire'; });
                 } else generateSolution(); 
             } else {
                 document.body.classList.remove('theme-event');
-                stopEventBg();
-                generateSolution();
+                document.getElementById('main-title').innerText = "Handrix给Irene的字母数独游戏：han luv ire";
+                stopEventBg(); generateSolution();
             }
 
             createPuzzle(blanks, forcedBlanks);
@@ -563,7 +698,7 @@
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
                     if (grid[r][c] === 0) {
-                        let shuffled = [...LETTERS].sort(() => Math.random() - 0.5);
+                        let shuffled = shuffleArray(LETTERS); // 真正打乱，保证每次题不同
                         for (let letter of shuffled) {
                             if (isValid(grid, r, c, letter)) { grid[r][c] = letter; if (solveSudoku(grid)) return true; grid[r][c] = 0; }
                         }
@@ -599,7 +734,7 @@
                 for(let c=0; c<9; c++) { board[r][c] = solution[r][c]; userGrid[r][c] = ''; notesGrid[r][c] = []; isFixed[r][c] = true; }
             }
             let removed = 0;
-            for(let p of forcedBlanks) { if(board[p.r][p.c] !== 0) { board[p.r][p.c] = 0; isFixed[p.r][p.c] = false; removed++; } }
+            for(let p of forcedBlanks) { if(board[p[0]][p[1]] !== 0) { board[p[0]][p[1]] = 0; isFixed[p[0]][p[1]] = false; removed++; } }
             let positions = [];
             for (let i = 0; i < 81; i++) positions.push([Math.floor(i/9), i%9]);
             positions.sort(() => Math.random() - 0.5);
@@ -648,14 +783,30 @@
             }
         }
 
-        function selectCell(r, c) { 
-            selectedRow = r; selectedCol = c; renderBoard(); 
-        }
+        function selectCell(r, c) { selectedRow = r; selectedCol = c; renderBoard(); }
 
         function toggleNoteMode() {
             noteMode = !noteMode; let btn = document.getElementById('note-btn');
             if(noteMode) { btn.classList.add('active-note'); } 
             else { btn.classList.remove('active-note'); }
+        }
+
+        function checkMagpieAnimation() {
+            if (document.getElementById('diff-select').value !== 'event_qixi' || magpieTriggered || luvCells.length === 0) return;
+            let allCorrect = luvCells.every(p => {
+                let r = p[0], c = p[1];
+                let val = isFixed[r][c] ? board[r][c] : userGrid[r][c];
+                return val === solution[r][c];
+            });
+            if (allCorrect) {
+                magpieTriggered = true;
+                // 触发双向奔赴
+                magpies = [
+                    { x: 0, y: bgCanvas.height/3, color: '#60a5fa', tx: bgCanvas.width/2 - 15, ty: bgCanvas.height/2 }, 
+                    { x: bgCanvas.width, y: bgCanvas.height/3, color: '#f472b6', tx: bgCanvas.width/2 + 15, ty: bgCanvas.height/2 } 
+                ];
+                hearts = []; magpiePhase = 0;
+            }
         }
 
         function useHint() {
@@ -666,17 +817,17 @@
             let correctChar = solution[selectedRow][selectedCol];
             if (userGrid[selectedRow][selectedCol] === correctChar) { showMessage("提示", "你已经凭实力填对啦，不需要浪费提示！", "#10b981"); return; }
 
-            playSound('bubble'); // 🚀 提示也是填字，保留泡泡声
+            playSound('bubble');
             saveState(); userGrid[selectedRow][selectedCol] = correctChar; autoCleanNotes(selectedRow, selectedCol, correctChar);
             hintsLeft--; document.getElementById('hint-text').innerText = `提示(${hintsLeft})`; renderBoard();
             setTimeout(() => { document.getElementById(`cell-${selectedRow}-${selectedCol}`).classList.add('just-placed'); }, 50);
+            
+            checkMagpieAnimation(); 
         }
 
         function inputLetter(l) {
             if (!gameActive || selectedRow === -1 || selectedCol === -1 || isFixed[selectedRow][selectedCol]) return;
-            
-            playSound('bubble'); // 🚀 只在这里保留泡泡声
-            
+            playSound('bubble');
             saveState(); let r = selectedRow, c = selectedCol;
             if (noteMode) {
                 if (userGrid[r][c] !== '') userGrid[r][c] = '';
@@ -688,6 +839,8 @@
             }
             renderBoard();
             if(!noteMode) setTimeout(() => { document.getElementById(`cell-${r}-${c}`).classList.add('just-placed'); }, 50);
+            
+            if(!noteMode) checkMagpieAnimation(); 
         }
 
         function autoCleanNotes(row, col, letter) {
@@ -732,8 +885,7 @@
             let isNewRecord = (s.best === null) || (timeElapsed < s.best);
             if (isNewRecord) s.best = timeElapsed;
             
-            // 活动模式同步更新总榜
-            if (diffKey === 'event' && localStats['event_total']) {
+            if (diffKey.startsWith('event_') && localStats['event_total']) {
                 let t = localStats['event_total'];
                 t.count++;
                 t.avg = ((t.avg * (t.count - 1)) + timeElapsed) / t.count;
@@ -741,11 +893,11 @@
             }
 
             localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
+            triggerConfetti(); 
 
             let msg = `太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！\n\n本局用时: ${formatTime(timeElapsed)}`;
-            if(isNewRecord && s.count > 1) msg += "\n宝，你刚刚打破了该难度的最佳记录诶！好厉害呀！又可以截图啦～";
+            if(isNewRecord && s.count > 1) msg += "\n打破了该难度的最佳记录！";
             
-            triggerConfetti(); 
             showMessage("过关", msg, "#10b981");
         }
 
@@ -758,14 +910,12 @@
             document.getElementById('messageModal').style.display = 'flex';
         }
 
-        // 🚀 确保战绩板永远显示 4 个核心榜单
         function openStats() {
             let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>通关局数</th></tr>`;
-            ['35', '45', '55', 'event_total', 'event'].forEach(k => {
+            ['35', '45', '55', 'event_total', 'event_qixi'].forEach(k => {
                 let s = localStats[k];
                 if (!s) return;
-                // 如果是当期活动 'event'，并且端午选项已被删除，就隐藏它
-                if (k === 'event' && !document.getElementById('event-option')) return;
+                if (k.startsWith('event_') && k !== 'event_total' && !document.getElementById('event-option') && s.count === 0) return;
                 
                 html += `<tr>
                     <td><b>${s.name}</b></td>
@@ -779,7 +929,7 @@
         }
 
         function openRules() {
-            let isEvent = document.getElementById('diff-select').value === 'event';
+            let isEvent = document.getElementById('diff-select').value === 'event_qixi';
             document.getElementById('rule-event-title').style.display = isEvent ? 'block' : 'none';
             document.getElementById('rule-event-body').style.display = isEvent ? 'block' : 'none';
             document.getElementById('rulesModal').style.display = 'flex';
