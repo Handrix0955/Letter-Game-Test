@@ -30,21 +30,21 @@
         [data-theme="dark"] body[data-skin="default"] { --gradient-1: #0f2027; --gradient-2: #203a43; --bg-color: #0f172a; }
         [data-theme="dark"] body[data-skin="purple"] { --gradient-1: #2a0845; --gradient-2: #1a0b2e; --bg-color: #0f0514; }
 
-        /* 🌌 星河鹊桥专属：宇宙深空背景 + 琉璃棋盘 */
+        /* 🌌 完美修复：七夕星空背景 + 暗黑面板 */
         body.theme-event { 
-            --gradient-1: #160b2b; /* 宇宙极暗紫 */
+            --gradient-1: #160b2b; /* 宇宙深紫 */
             --gradient-2: #0b1528; /* 星云深渊蓝 */
             --bg-color: #050814; 
-            --text-main: #f8fafc; 
+            --text-main: #f8fafc; /* 外围控制栏文字为白 */
         }
         body.theme-event .board {
-            /* 棋盘变为深邃的星空毛玻璃，让底部的流星透过来 */
-            background: rgba(10, 15, 35, 0.4); 
+            /* 棋盘变为极具质感的暗黑毛玻璃 */
+            background: rgba(10, 15, 35, 0.5); 
             border: 2px solid rgba(147, 197, 253, 0.3);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(147, 197, 253, 0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
         }
         body.theme-event .cell { background-color: rgba(15, 23, 42, 0.5); color: #f8fafc; border-color: rgba(147, 197, 253, 0.15); }
-        body.theme-event .cell.fixed { color: #93c5fd; font-weight: 900; } /* 题目字体用星空亮蓝 */
+        body.theme-event .cell.fixed { color: #93c5fd; font-weight: 900; }
         body.theme-event .cell:nth-child(3n) { border-right: 2px solid rgba(147, 197, 253, 0.3); }
         body.theme-event .cell:nth-child(n+19):nth-child(-n+27), body.theme-event .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid rgba(147, 197, 253, 0.3); }
         
@@ -54,22 +54,22 @@
         body.theme-event .key.undo-btn { color: #fde047; background: rgba(116, 66, 16, 0.6); border-color: rgba(202, 138, 4, 0.4); }
         body.theme-event .action-btn.active-note { background: rgba(202, 138, 4, 0.8) !important; border-color: #fde047 !important; }
 
-        /* 🌉 鹊桥颜色保留：石砖灰 + 海棠粉 (半透明融入宇宙) */
+        /* 🌉 鹊桥颜色高级定制：石砖灰 + 海棠粉 */
         body.theme-event .cell.hint-han, body.theme-event .cell.hint-ire { 
-            background-color: rgba(71, 85, 105, 0.7) !important; 
+            background-color: #475569 !important; /* 青石砖色 */
             color: #ffffff !important; 
         }
         body.theme-event .cell.hint-luv { 
-            background-color: rgba(219, 39, 119, 0.6) !important; 
+            background-color: #db2777 !important; /* 海棠粉色 */
             color: #ffffff !important; 
-            box-shadow: inset 0 0 15px rgba(244, 114, 182, 0.3);
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.2);
         }
         
         body.theme-event .cell.related { background-color: rgba(56, 189, 248, 0.15); }
         body.theme-event .cell.same { background-color: rgba(250, 204, 21, 0.2); }
         body.theme-event .cell.selected { background-color: rgba(56, 189, 248, 0.3); box-shadow: inset 0 0 0 2px #38bdf8; z-index: 2; }
-        body.theme-event .hint-watermark { color: rgba(255,255,255,0.3); }
-        body.theme-event .note-item { color: rgba(147, 197, 253, 0.8); } /* 笔记变成浅蓝色星光 */
+        body.theme-event .hint-watermark { color: rgba(255,255,255,0.4); }
+        body.theme-event .note-item { color: rgba(147, 197, 253, 0.8); }
 
         .skin-opt {
             border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer;
@@ -88,9 +88,8 @@
 
         @keyframes auroraBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        #canvas-bg, #canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
-        #canvas-bg { z-index: -2; }
-        #canvas-fx { z-index: 9998; }
+        #canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
+        #canvas-fx { z-index: -1; }
         #canvas-confetti { z-index: 9999; }
 
         .header { text-align: center; margin-bottom: 12px; z-index: 10; }
@@ -189,7 +188,6 @@
 <body data-skin="default">
 
     <!-- 画布层 -->
-    <canvas id="canvas-bg"></canvas>
     <canvas id="canvas-fx"></canvas>
     <canvas id="canvas-confetti"></canvas>
 
@@ -271,7 +269,7 @@
         </div>
     </div>
 
-    <!-- ======== 规则弹窗 (纯净无Emoji版) ======== -->
+    <!-- ======== 规则弹窗 (纯净线条图标 + 专属文案) ======== -->
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">
             <h2><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 定制字母数独规则</h2>
@@ -283,7 +281,7 @@
                 <li>其次 这下绝对不会有广告啦</li>
             </ul>
             
-            <h3 id="rule-event-title" style="display:none;" class="theme-event-text"><svg class="inline-icon" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg> 七夕特别活动规则：</h3>
+            <h3 id="rule-event-title" style="display:none;" class="theme-event-text"><svg class="inline-icon" viewBox="0 0 24 24"><path d="M12 2l3 6 6 1-4.5 5 1.5 6-6-3.5L6 20l1.5-6L3 9l6-1z"/></svg> 七夕特别活动规则：</h3>
             <ul id="rule-event-body" style="display:none;" class="theme-event-text">
                 <li>水水宝，七夕时牛郎织女会跨越星河相会。盘面中会随机出现特殊的『星河鹊桥』或『爱心』连线噢~</li>
                 <li>这是han给ire的特殊爱的暗号，能降低推理难度，8月底下线哦！</li>
@@ -334,7 +332,7 @@
         }
         function openSkinModal() { document.getElementById('skinModal').style.display = 'flex'; }
 
-        // ======== 🎵 原生音效引擎 (严格静音，仅在填字发声) ========
+        // ======== 🎵 原生音效引擎 (无多余点击音效) ========
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
         function initAudio() { if (!audioCtx) { audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); } }
@@ -363,7 +361,7 @@
         }
         document.body.addEventListener('touchstart', initAudio, {once:true}); document.body.addEventListener('click', initAudio, {once:true});
 
-        // ======== 🏆 数据记录逻辑 ========
+        // ======== 🏆 数据安全急救与无损合并逻辑 ========
         let defaultStats = {
             '35': { best: null, avg: 0, count: 0, name: '简单模式' },
             '45': { best: null, avg: 0, count: 0, name: '中等模式' },
@@ -376,7 +374,7 @@
         if (!localStats['event_total']) localStats['event_total'] = defaultStats['event_total'];
         if (!localStats['event_qixi']) localStats['event_qixi'] = defaultStats['event_qixi'];
 
-        // 无损继承旧端午数据
+        // 无损继承端午数据
         if (localStats['event'] && localStats['event'].count > 0 && localStats['event_total'].count === 0) {
             localStats['event_total'].count = localStats['event'].count;
             localStats['event_total'].avg = localStats['event'].avg;
@@ -392,12 +390,13 @@
         });
         localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
 
-        // ======== 🎨 Canvas 顶级视觉引擎 (高亮拖尾 + 巨型爱心爆破) ========
+        // ======== 🎨 Canvas 引擎 (零发热宇宙星空 + 双向飞鸟爱心彩蛋) ========
         const fxCanvas = document.getElementById('canvas-fx'); const fxCtx = fxCanvas.getContext('2d');
         const confCanvas = document.getElementById('canvas-confetti'); const confCtx = confCanvas.getContext('2d');
         let bgParticles = []; let confParticles = []; let reqFx, reqConf;
         
-        let magpieTriggered = false; let magpies = []; let hearts = []; let magpiePhase = 0; let luvCells = [];
+        // 🚀 核心彩蛋追踪变量 (必须定义在全局)
+        let magpieTriggered = false; let luvCells = []; let magpies = []; let hearts = []; let magpiePhase = 0;
 
         function resizeCanvas() {
             fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight;
@@ -407,6 +406,7 @@
 
         function startEventBg() {
             bgParticles = [];
+            // 绘制宇宙背景极低发热粒子
             for(let i=0; i<60; i++) {
                 bgParticles.push({
                     x: Math.random() * fxCanvas.width, y: Math.random() * fxCanvas.height,
@@ -416,6 +416,8 @@
             if(reqFx) cancelAnimationFrame(reqFx);
             function render() {
                 fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+                
+                // 偶尔生成流星
                 if(Math.random() < 0.01) { 
                     bgParticles.push({
                         x: Math.random() * fxCanvas.width, y: 0,
@@ -423,6 +425,7 @@
                         angle: Math.PI / 4, isShooting: true, alpha: 1
                     });
                 }
+                
                 for (let i = bgParticles.length - 1; i >= 0; i--) {
                     let p = bgParticles[i];
                     if (p.isShooting) {
@@ -443,10 +446,17 @@
 
         function stopEventBg() { if(reqFx) cancelAnimationFrame(reqFx); fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height); magpieTriggered = false; }
 
-        // 🚀 彩蛋：双向奔赴与巨型爱心爆破
+        // 绘制 SVG 数学爱心
+        function drawHeart(ctx, x, y, size, alpha, hue) {
+            ctx.save(); ctx.translate(x, y); ctx.scale(size, size);
+            ctx.fillStyle = `hsla(${hue}, 100%, 60%, ${alpha})`;
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-1, -1, -2, 1, 0, 2); ctx.bezierCurveTo(2, 1, 1, -1, 0, 0); ctx.fill();
+            ctx.restore();
+        }
+
+        // 🚀 触发双向奔赴巨型爱心爆破
         function triggerMagpies() {
             playSound('win');
-            // 采用极高饱和度的荧光蓝和荧光粉，并加入 trail 数组记录彗星拖尾
             magpies = [
                 { x: -50, y: confCanvas.height/3, color: '0, 229, 255', tx: confCanvas.width/2, ty: confCanvas.height/2, trail: [] }, 
                 { x: confCanvas.width + 50, y: confCanvas.height/3, color: '255, 0, 127', tx: confCanvas.width/2, ty: confCanvas.height/2, trail: [] } 
@@ -478,10 +488,9 @@
                     let reached = 0;
                     magpies.forEach(b => {
                         let dx = b.tx - b.x; let dy = b.ty - b.y;
-                        b.x += dx * 0.08; b.y += dy * 0.08; // 增加飞行速度
+                        b.x += dx * 0.08; b.y += dy * 0.08; 
                         if (Math.abs(dx) < 3 && Math.abs(dy) < 3) reached++;
                         
-                        // 记录并渲染彗星拖尾
                         b.trail.push({x: b.x, y: b.y});
                         if (b.trail.length > 15) b.trail.shift();
                         
@@ -491,7 +500,6 @@
                             confCtx.fillStyle = `rgba(${b.color}, ${ratio * 0.6})`; confCtx.fill();
                         });
 
-                        // 画超大发光本体
                         confCtx.shadowBlur = 25; confCtx.shadowColor = `rgb(${b.color})`;
                         confCtx.fillStyle = '#ffffff';
                         confCtx.beginPath(); confCtx.arc(b.x, b.y, 10, 0, Math.PI*2); confCtx.fill();
@@ -500,29 +508,18 @@
                     
                     if (reached === 2) {
                         magpiePhase = 1; magpies = [];
-                        // 💥 炸出 80 个巨型爱心，四面八方喷射
                         for(let i=0; i<80; i++) {
                             hearts.push({
                                 x: confCanvas.width/2, y: confCanvas.height/2,
-                                vx: (Math.random()-0.5)*35, // 爆炸横向范围极大
-                                vy: (Math.random()-0.5)*35 - 5, // 向上爆炸力度极大
-                                alpha: 1, 
-                                size: Math.random() * 15 + 10, // 爱心尺寸极大
-                                hue: Math.random() * 40 + 320 // 限定为高饱和粉色与红色系
+                                vx: (Math.random()-0.5)*35, vy: (Math.random()-0.5)*35 - 5,
+                                alpha: 1, size: Math.random() * 12 + 6, hue: Math.random() * 40 + 320
                             });
                         }
                     }
                 } else if (magpiePhase === 1) {
                     hearts.forEach(h => {
-                        h.x += h.vx; h.y += h.vy; 
-                        h.vy += 0.8; // 引入真实重力，爱心像烟花一样散落
-                        h.alpha -= 0.015; // 停留时间变长
-                        if (h.alpha > 0) {
-                            confCtx.save(); confCtx.translate(h.x, h.y); confCtx.scale(h.size, h.size);
-                            confCtx.fillStyle = `hsla(${h.hue}, 100%, 60%, ${h.alpha})`;
-                            confCtx.beginPath(); confCtx.moveTo(0, 0); confCtx.bezierCurveTo(-1, -1, -2, 1, 0, 2); confCtx.bezierCurveTo(2, 1, 1, -1, 0, 0); confCtx.fill();
-                            confCtx.restore();
-                        }
+                        h.x += h.vx; h.y += h.vy; h.vy += 0.8; h.alpha -= 0.015; 
+                        if (h.alpha > 0) drawHeart(confCtx, h.x, h.y, h.size, h.alpha, h.hue);
                     });
                     if (hearts.every(h => h.alpha <= 0)) { hearts = []; magpieTriggered = false; }
                 }
@@ -544,7 +541,7 @@
             }
             if(!reqConf) renderConf();
         }
-        
+
         // ======== 游戏核心逻辑 ========
         const LETTERS = ['h', 'a', 'n', 'l', 'u', 'v', 'i', 'r', 'e'];
         let board = Array(9).fill().map(() => Array(9).fill(0));
@@ -581,7 +578,7 @@
             }
         }
 
-        // 🚀 核心算法：七夕动态生成 100% 完美的对角线/心形
+        // 🚀 核心算法：七夕随机动态阵型生成
         function shuffleArray(array) {
             let arr = array.slice();
             for (let i = arr.length - 1; i > 0; i--) {
@@ -598,21 +595,18 @@
                 { type: 'bridge', han: [[4,0],[4,1],[4,2]], luv: [[4,3],[4,4],[4,5]], ire: [[4,6],[4,7],[4,8]] },
                 { type: 'heart', han: [[1,3],[2,2],[3,3]], luv: [[2,4],[4,4],[5,4]], ire: [[1,5],[2,6],[3,5]] }
             ];
+
             let pattern = shapes[Math.floor(Math.random() * shapes.length)];
 
-            for(let attempt = 0; attempt < 50; attempt++) {
+            for(let i=0; i<100; i++) {
                 for(let r=0; r<9; r++) solution[r].fill(0);
-                
-                let hChars = shuffleArray(['h','a','n']);
-                let lChars = shuffleArray(['l','u','v']);
-                let iChars = shuffleArray(['i','r','e']);
-
-                for(let j=0; j<3; j++) {
-                    solution[pattern.han[j][0]][pattern.han[j][1]] = hChars[j];
-                    solution[pattern.luv[j][0]][pattern.luv[j][1]] = lChars[j];
-                    solution[pattern.ire[j][0]][pattern.ire[j][1]] = iChars[j];
-                }
-
+                ['han', 'luv', 'ire'].forEach(g => {
+                    let chars = g.split('').sort(() => Math.random() - 0.5);
+                    for (let j = 0; j < 3; j++) {
+                        let pt = pattern[g][j];
+                        solution[pt[0]][pt[1]] = chars[j];
+                    }
+                });
                 if (solveSudoku(solution)) return pattern;
             }
             return null; 
@@ -621,12 +615,13 @@
         function startNewGame() {
             let diffKey = document.getElementById('diff-select').value;
             let blanks = diffKey.startsWith('event_') ? 55 : parseInt(diffKey);
-            eventHints = {}; let forcedBlanks = []; luvCells = []; magpieTriggered = false;
+            eventHints = {}; let forcedBlanks = []; 
+            luvCells = []; magpieTriggered = false; // 重置彩蛋变量
             hintsLeft = 3; document.getElementById('hint-text').innerText = `提示(3)`;
 
             if (diffKey === 'event_qixi') {
                 document.body.classList.add('theme-event');
-                document.getElementById('main-title').innerText = "七夕特别活动：星河鹊桥局";
+                document.getElementById('main-title').innerText = "星河鹊桥局：han luv ire";
                 startEventBg();
                 
                 let shapes = generateQixiSolution();
@@ -764,6 +759,7 @@
             else { btn.classList.remove('active-note'); }
         }
 
+        // 🚀 核心：检查 LUV 是否全填对触发彩蛋
         function checkMagpieAnimation() {
             if (document.getElementById('diff-select').value !== 'event_qixi' || magpieTriggered || luvCells.length === 0) return;
             let allCorrect = luvCells.every(p => {
@@ -773,12 +769,7 @@
             });
             if (allCorrect) {
                 magpieTriggered = true;
-                // 触发双向奔赴
-                magpies = [
-                    { x: 0, y: bgCanvas.height/3, color: '#60a5fa', tx: bgCanvas.width/2 - 15, ty: bgCanvas.height/2 }, 
-                    { x: bgCanvas.width, y: bgCanvas.height/3, color: '#f472b6', tx: bgCanvas.width/2 + 15, ty: bgCanvas.height/2 } 
-                ];
-                hearts = []; magpiePhase = 0;
+                triggerMagpies();
             }
         }
 
@@ -795,7 +786,7 @@
             hintsLeft--; document.getElementById('hint-text').innerText = `提示(${hintsLeft})`; renderBoard();
             setTimeout(() => { document.getElementById(`cell-${selectedRow}-${selectedCol}`).classList.add('just-placed'); }, 50);
             
-            checkMagpieAnimation(); 
+            checkMagpieAnimation(); // 检查是否靠提示完成了 luv 桥梁
         }
 
         function inputLetter(l) {
@@ -813,7 +804,7 @@
             renderBoard();
             if(!noteMode) setTimeout(() => { document.getElementById(`cell-${r}-${c}`).classList.add('just-placed'); }, 50);
             
-            if(!noteMode) checkMagpieAnimation(); 
+            if(!noteMode) checkMagpieAnimation(); // 检查是否手动填完了 luv 桥梁
         }
 
         function autoCleanNotes(row, col, letter) {
