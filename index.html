@@ -392,16 +392,14 @@
         });
         localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
 
-        // ======== 🎨 Canvas 引擎 (零发热宇宙星空 + 双向飞鸟爱心彩蛋) ========
-        const bgCanvas = document.getElementById('canvas-bg'); const bgCtx = bgCanvas.getContext('2d');
+        // ======== 🎨 Canvas 顶级视觉引擎 (高亮拖尾 + 巨型爱心爆破) ========
         const fxCanvas = document.getElementById('canvas-fx'); const fxCtx = fxCanvas.getContext('2d');
         const confCanvas = document.getElementById('canvas-confetti'); const confCtx = confCanvas.getContext('2d');
-        let bgParticles = []; let fxParticles = []; let confParticles = []; let reqBg, reqFx, reqConf;
+        let bgParticles = []; let confParticles = []; let reqFx, reqConf;
         
-        let magpieTriggered = false; let luvCells = []; let magpies = []; let hearts = []; let magpiePhase = 0;
+        let magpieTriggered = false; let magpies = []; let hearts = []; let magpiePhase = 0; let luvCells = [];
 
         function resizeCanvas() {
-            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
             fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight;
             confCanvas.width = window.innerWidth; confCanvas.height = window.innerHeight;
         }
@@ -409,147 +407,129 @@
 
         function startEventBg() {
             bgParticles = [];
-            // 星空粒子
             for(let i=0; i<60; i++) {
                 bgParticles.push({
-                    x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
+                    x: Math.random() * fxCanvas.width, y: Math.random() * fxCanvas.height,
                     radius: Math.random() * 1.5, alpha: Math.random(), speedAlpha: (Math.random() - 0.5) * 0.02, isShooting: false
                 });
             }
-            if(reqBg) cancelAnimationFrame(reqBg);
+            if(reqFx) cancelAnimationFrame(reqFx);
             function render() {
-                bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-                
-                // 偶然流星
+                fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
                 if(Math.random() < 0.01) { 
                     bgParticles.push({
-                        x: Math.random() * bgCanvas.width, y: 0,
+                        x: Math.random() * fxCanvas.width, y: 0,
                         len: Math.random() * 50 + 50, speed: Math.random() * 10 + 10,
                         angle: Math.PI / 4, isShooting: true, alpha: 1
                     });
                 }
-                
                 for (let i = bgParticles.length - 1; i >= 0; i--) {
                     let p = bgParticles[i];
                     if (p.isShooting) {
                         p.x -= p.speed * Math.cos(p.angle); p.y += p.speed * Math.sin(p.angle); p.alpha -= 0.02;
-                        bgCtx.beginPath(); bgCtx.moveTo(p.x, p.y); bgCtx.lineTo(p.x + p.len * Math.cos(p.angle), p.y - p.len * Math.sin(p.angle));
-                        bgCtx.strokeStyle = `rgba(255, 255, 255, ${p.alpha})`; bgCtx.lineWidth = 1.5; bgCtx.stroke();
+                        fxCtx.beginPath(); fxCtx.moveTo(p.x, p.y); fxCtx.lineTo(p.x + p.len * Math.cos(p.angle), p.y - p.len * Math.sin(p.angle));
+                        fxCtx.strokeStyle = `rgba(255, 255, 255, ${p.alpha})`; fxCtx.lineWidth = 1.5; fxCtx.stroke();
                         if (p.alpha <= 0) bgParticles.splice(i, 1);
                     } else {
                         p.alpha += p.speedAlpha; if(p.alpha <= 0.1 || p.alpha >= 0.8) p.speedAlpha *= -1;
-                        bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
-                        bgCtx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`; bgCtx.fill();
+                        fxCtx.beginPath(); fxCtx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+                        fxCtx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`; fxCtx.fill();
                     }
                 }
-                
-                // 渲染鹊桥飞鸟动画
-                if (magpieTriggered) renderMagpies();
-                
-                reqBg = requestAnimationFrame(render);
+                reqFx = requestAnimationFrame(render);
             }
             render();
         }
 
-        // 绘制 SVG 数学爱心
-        function drawHeart(ctx, x, y, size, alpha) {
-            ctx.save(); ctx.translate(x, y); ctx.scale(size, size);
-            ctx.fillStyle = `rgba(244, 114, 182, ${alpha})`;
-            ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-1, -1, -2, 1, 0, 2); ctx.bezierCurveTo(2, 1, 1, -1, 0, 0); ctx.fill();
-            ctx.restore();
-        }
+        function stopEventBg() { if(reqFx) cancelAnimationFrame(reqFx); fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height); magpieTriggered = false; }
 
-        // 触发青鸟红鸟相会
+        // 🚀 彩蛋：双向奔赴与巨型爱心爆破
         function triggerMagpies() {
             playSound('win');
+            // 采用极高饱和度的荧光蓝和荧光粉，并加入 trail 数组记录彗星拖尾
             magpies = [
-                { x: 0, y: fxCanvas.height/4, color: '#60a5fa', tx: fxCanvas.width/2 - 15, ty: fxCanvas.height/2 }, 
-                { x: fxCanvas.width, y: fxCanvas.height/4, color: '#f472b6', tx: fxCanvas.width/2 + 15, ty: fxCanvas.height/2 } 
+                { x: -50, y: confCanvas.height/3, color: '0, 229, 255', tx: confCanvas.width/2, ty: confCanvas.height/2, trail: [] }, 
+                { x: confCanvas.width + 50, y: confCanvas.height/3, color: '255, 0, 127', tx: confCanvas.width/2, ty: confCanvas.height/2, trail: [] } 
             ];
             hearts = []; magpiePhase = 0;
-            if (!reqFx) renderMagpiesLoop(); 
+            if (!reqConf) renderConf(); 
         }
 
-        function renderMagpiesLoop() {
-            fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+        function renderConf() {
+            confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
             let active = false;
             
-            // 🚀 强化彩蛋：双向奔赴与巨型爱心爆破
+            // 1. 渲染胜利纸屑
+            if (confParticles.length > 0) {
+                confParticles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy; p.vy += 0.4; p.rot += p.rotSpeed;
+                    if(p.y < confCanvas.height + 20) {
+                        active = true; confCtx.save(); confCtx.translate(p.x, p.y); confCtx.rotate(p.rot * Math.PI / 180);
+                        confCtx.fillStyle = p.color; confCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size); confCtx.restore();
+                    }
+                });
+                if (confParticles.every(p => p.y >= confCanvas.height + 20)) confParticles = [];
+            }
+            
+            // 2. 渲染彩蛋：青鸟与红鸟的高亮拖尾相撞
             if (magpies.length > 0 || hearts.length > 0) {
                 active = true;
                 if (magpiePhase === 0) {
                     let reached = 0;
                     magpies.forEach(b => {
                         let dx = b.tx - b.x; let dy = b.ty - b.y;
-                        b.x += dx * 0.08; b.y += dy * 0.08; // 飞行的速度变快一点
+                        b.x += dx * 0.08; b.y += dy * 0.08; // 增加飞行速度
                         if (Math.abs(dx) < 3 && Math.abs(dy) < 3) reached++;
                         
-                        confCtx.shadowBlur = 25; confCtx.shadowColor = b.color; // 光晕扩大
+                        // 记录并渲染彗星拖尾
+                        b.trail.push({x: b.x, y: b.y});
+                        if (b.trail.length > 15) b.trail.shift();
+                        
+                        b.trail.forEach((pt, i) => {
+                            let ratio = i / b.trail.length;
+                            confCtx.beginPath(); confCtx.arc(pt.x, pt.y, 14 * ratio, 0, Math.PI*2);
+                            confCtx.fillStyle = `rgba(${b.color}, ${ratio * 0.6})`; confCtx.fill();
+                        });
+
+                        // 画超大发光本体
+                        confCtx.shadowBlur = 25; confCtx.shadowColor = `rgb(${b.color})`;
                         confCtx.fillStyle = '#ffffff';
-                        confCtx.beginPath(); confCtx.arc(b.x, b.y, 8, 0, Math.PI*2); confCtx.fill(); // 鸟的体积扩大一倍
+                        confCtx.beginPath(); confCtx.arc(b.x, b.y, 10, 0, Math.PI*2); confCtx.fill();
                         confCtx.shadowBlur = 0;
                     });
+                    
                     if (reached === 2) {
                         magpiePhase = 1; magpies = [];
-                        // 炸出 80 个大爱心，向四面八方喷射
+                        // 💥 炸出 80 个巨型爱心，四面八方喷射
                         for(let i=0; i<80; i++) {
                             hearts.push({
                                 x: confCanvas.width/2, y: confCanvas.height/2,
-                                vx: (Math.random()-0.5)*30, // 横向爆炸范围扩大3倍
-                                vy: (Math.random()-0.5)*30 - 5, // 向上爆炸力度增强
+                                vx: (Math.random()-0.5)*35, // 爆炸横向范围极大
+                                vy: (Math.random()-0.5)*35 - 5, // 向上爆炸力度极大
                                 alpha: 1, 
-                                size: Math.random() * 12 + 6 // 爱心尺寸扩大两倍多
+                                size: Math.random() * 15 + 10, // 爱心尺寸极大
+                                hue: Math.random() * 40 + 320 // 限定为高饱和粉色与红色系
                             });
                         }
                     }
                 } else if (magpiePhase === 1) {
                     hearts.forEach(h => {
                         h.x += h.vx; h.y += h.vy; 
-                        h.vy += 0.5; // 加入真实重力，让爱心像烟花一样呈抛物线散落
+                        h.vy += 0.8; // 引入真实重力，爱心像烟花一样散落
                         h.alpha -= 0.015; // 停留时间变长
-                        if (h.alpha > 0) drawHeart(confCtx, h.x, h.y, h.size, h.alpha);
+                        if (h.alpha > 0) {
+                            confCtx.save(); confCtx.translate(h.x, h.y); confCtx.scale(h.size, h.size);
+                            confCtx.fillStyle = `hsla(${h.hue}, 100%, 60%, ${h.alpha})`;
+                            confCtx.beginPath(); confCtx.moveTo(0, 0); confCtx.bezierCurveTo(-1, -1, -2, 1, 0, 2); confCtx.bezierCurveTo(2, 1, 1, -1, 0, 0); confCtx.fill();
+                            confCtx.restore();
+                        }
                     });
-                    if (hearts.every(h => h.alpha <= 0)) hearts = []; 
+                    if (hearts.every(h => h.alpha <= 0)) { hearts = []; magpieTriggered = false; }
                 }
             }
             
-            if(active) reqFx = requestAnimationFrame(renderMagpiesLoop); else { reqFx = null; magpieTriggered = false; }
+            if(active) reqConf = requestAnimationFrame(renderConf); else reqConf = null;
         }
-
-        function renderMagpies() {
-            // 这个被放在 bgCanvas 的循环里执行
-            if (magpiePhase === 0) {
-                let reached = 0;
-                magpies.forEach(b => {
-                    let dx = b.tx - b.x; let dy = b.ty - b.y;
-                    b.x += dx * 0.06; b.y += dy * 0.06;
-                    if (Math.abs(dx) < 2 && Math.abs(dy) < 2) reached++;
-                    
-                    bgCtx.shadowBlur = 15; bgCtx.shadowColor = b.color;
-                    bgCtx.fillStyle = '#ffffff';
-                    bgCtx.beginPath(); bgCtx.arc(b.x, b.y, 4, 0, Math.PI*2); bgCtx.fill();
-                    bgCtx.shadowBlur = 0;
-                });
-                if (reached === 2) {
-                    magpiePhase = 1; magpies = [];
-                    for(let i=0; i<25; i++) {
-                        hearts.push({
-                            x: bgCanvas.width/2, y: bgCanvas.height/2,
-                            vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10 - 2,
-                            alpha: 1, size: Math.random() * 5 + 3
-                        });
-                    }
-                }
-            } else if (magpiePhase === 1) {
-                hearts.forEach(h => {
-                    h.x += h.vx; h.y += h.vy; h.alpha -= 0.02;
-                    if (h.alpha > 0) drawHeart(bgCtx, h.x, h.y, h.size, h.alpha);
-                });
-                if (hearts.every(h => h.alpha <= 0)) { magpieTriggered = false; hearts = []; }
-            }
-        }
-
-        function stopEventBg() { if(reqBg) cancelAnimationFrame(reqBg); bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height); magpieTriggered = false; }
 
         function triggerConfetti() {
             playSound('win'); confParticles = [];
@@ -562,22 +542,9 @@
                     rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 15
                 });
             }
-            if(reqConf) cancelAnimationFrame(reqConf);
-            function renderConf() {
-                confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
-                let active = false;
-                confParticles.forEach(p => {
-                    p.x += p.vx; p.y += p.vy; p.vy += 0.4; p.rot += p.rotSpeed;
-                    if(p.y < confCanvas.height + 20) {
-                        active = true; confCtx.save(); confCtx.translate(p.x, p.y); confCtx.rotate(p.rot * Math.PI / 180);
-                        confCtx.fillStyle = p.color; confCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size); confCtx.restore();
-                    }
-                });
-                if(active) reqConf = requestAnimationFrame(renderConf);
-            }
-            renderConf();
+            if(!reqConf) renderConf();
         }
-
+        
         // ======== 游戏核心逻辑 ========
         const LETTERS = ['h', 'a', 'n', 'l', 'u', 'v', 'i', 'r', 'e'];
         let board = Array(9).fill().map(() => Array(9).fill(0));
