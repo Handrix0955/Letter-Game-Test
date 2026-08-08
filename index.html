@@ -474,34 +474,40 @@
             fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
             let active = false;
             
+            // 🚀 强化彩蛋：双向奔赴与巨型爱心爆破
             if (magpies.length > 0 || hearts.length > 0) {
                 active = true;
                 if (magpiePhase === 0) {
                     let reached = 0;
                     magpies.forEach(b => {
                         let dx = b.tx - b.x; let dy = b.ty - b.y;
-                        b.x += dx * 0.05; b.y += dy * 0.05;
-                        if (Math.abs(dx) < 2 && Math.abs(dy) < 2) reached++;
+                        b.x += dx * 0.08; b.y += dy * 0.08; // 飞行的速度变快一点
+                        if (Math.abs(dx) < 3 && Math.abs(dy) < 3) reached++;
                         
-                        fxCtx.shadowBlur = 15; fxCtx.shadowColor = b.color;
-                        fxCtx.fillStyle = '#ffffff';
-                        fxCtx.beginPath(); fxCtx.arc(b.x, b.y, 4, 0, Math.PI*2); fxCtx.fill();
-                        fxCtx.shadowBlur = 0;
+                        confCtx.shadowBlur = 25; confCtx.shadowColor = b.color; // 光晕扩大
+                        confCtx.fillStyle = '#ffffff';
+                        confCtx.beginPath(); confCtx.arc(b.x, b.y, 8, 0, Math.PI*2); confCtx.fill(); // 鸟的体积扩大一倍
+                        confCtx.shadowBlur = 0;
                     });
                     if (reached === 2) {
                         magpiePhase = 1; magpies = [];
-                        for(let i=0; i<30; i++) {
+                        // 炸出 80 个大爱心，向四面八方喷射
+                        for(let i=0; i<80; i++) {
                             hearts.push({
-                                x: fxCanvas.width/2, y: fxCanvas.height/2,
-                                vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10 - 2,
-                                alpha: 1, size: Math.random() * 5 + 3
+                                x: confCanvas.width/2, y: confCanvas.height/2,
+                                vx: (Math.random()-0.5)*30, // 横向爆炸范围扩大3倍
+                                vy: (Math.random()-0.5)*30 - 5, // 向上爆炸力度增强
+                                alpha: 1, 
+                                size: Math.random() * 12 + 6 // 爱心尺寸扩大两倍多
                             });
                         }
                     }
                 } else if (magpiePhase === 1) {
                     hearts.forEach(h => {
-                        h.x += h.vx; h.y += h.vy; h.alpha -= 0.02;
-                        if (h.alpha > 0) drawHeart(fxCtx, h.x, h.y, h.size, h.alpha);
+                        h.x += h.vx; h.y += h.vy; 
+                        h.vy += 0.5; // 加入真实重力，让爱心像烟花一样呈抛物线散落
+                        h.alpha -= 0.015; // 停留时间变长
+                        if (h.alpha > 0) drawHeart(confCtx, h.x, h.y, h.size, h.alpha);
                     });
                     if (hearts.every(h => h.alpha <= 0)) hearts = []; 
                 }
