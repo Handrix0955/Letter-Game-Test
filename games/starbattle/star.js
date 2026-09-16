@@ -127,8 +127,10 @@ function startNewGame() {
 
 function buildBoard() {
     const boardEl = document.getElementById('star-board');
-    boardEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-    boardEl.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+    // minmax(0, 1fr): 防止 Safari 用 min-content 撑破轨道, 导致棋盘被拉成矩形
+    boardEl.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
+    boardEl.style.gridTemplateRows = `repeat(${size}, minmax(0, 1fr))`;
+    boardEl.style.gridAutoRows = 'minmax(0, 1fr)';
     boardEl.innerHTML = ''; 
 
     for (let r = 0; r < size; r++) {
@@ -183,6 +185,7 @@ let lastTapCell = null;
 let isDragging = false;
 let startX = 0, startY = 0;
 let hasMoved = false;
+let dragErase = false; // 本次滑动是"擦除"模式 (起点是已画叉的格子)
 
 boardEl.addEventListener('pointerdown', (e) => {
     if (isGameOver) return;
@@ -190,6 +193,9 @@ boardEl.addEventListener('pointerdown', (e) => {
     hasMoved = false;
     startX = e.clientX;
     startY = e.clientY;
+    // 滑动模式在按下瞬间定调: 起点若已是叉, 整段滑动为擦除; 否则为画叉
+    const originCell = e.target && e.target.closest ? e.target.closest('.cell') : null;
+    dragErase = !!(originCell && originCell.classList.contains('marked'));
     e.target.setPointerCapture(e.pointerId);
 });
 
@@ -197,15 +203,19 @@ boardEl.addEventListener('pointermove', (e) => {
     if (!isDragging || isGameOver) return;
     if (!hasMoved && Math.hypot(e.clientX - startX, e.clientY - startY) > 10) {
         hasMoved = true;
+        lastTapTime = 0; // 一旦拖动, 清除双击计时, 避免"点-拖-点"被误判为双击
     }
     if (hasMoved) {
         let el = document.elementFromPoint(e.clientX, e.clientY);
         let cell = el ? el.closest('.cell') : null;
         if (cell && !cell.dataset.locked) {
-            cell.classList.add('marked');
+            if (dragErase) cell.classList.remove('marked');
+            else cell.classList.add('marked');
         }
     }
 });
+
+boardEl.addEventListener('pointercancel', () => { isDragging = false; });
 
 boardEl.addEventListener('pointerup', (e) => {
     isDragging = false;

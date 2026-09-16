@@ -28,6 +28,9 @@ select#diff-select, #new-game-btn { flex: 1; max-width: 130px; text-align: cente
     box-shadow: 0 8px 32px var(--shadow); z-index: 10;
     touch-action: none; 
     transition: background-color 0.3s, border-color 0.3s;
+    /* 移动端修复: 禁止被 body 的 column flex 容器纵向压缩成矩形 */
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1 !important;
 }
 
 /* 修复：暗黑模式下棋盘底板完全黑化，消除白光割裂感 */
@@ -44,6 +47,10 @@ select#diff-select, #new-game-btn { flex: 1; max-width: 130px; text-align: cente
     display: flex; justify-content: center; align-items: center;
     transition: background-color 0.2s;
     user-select: none; -webkit-user-select: none;
+    /* 移动端修复: 强制格子为正方形, 并消除内容撑开导致的变形 */
+    aspect-ratio: 1 / 1;
+    min-width: 0;
+    min-height: 0;
 }
 
 /* 核心修复：找回白天模式的 Bento 加粗边界！ */

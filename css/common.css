@@ -24,6 +24,7 @@
     
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.06); 
     --stat-best-color: #059669;
+    --streak-shift: 14%; /* 斜切光瀑整体右移量 (手机可视区右侧偏暗, 右移补齐) */
 }
 
 /* 护眼模式核心 (黑夜模式 Dark) */
@@ -194,8 +195,12 @@ body::before {
 body::after {
     content: '';
     position: fixed; inset: 0; z-index: -2; pointer-events: none;
-    transform: skewX(45deg);
+    transform: translateX(var(--streak-shift)) skewX(45deg);
     background: linear-gradient(180deg, var(--streak-color) 0%, rgba(0, 0, 0, 0) 100%);
+}
+/* 手机窄屏: 光瀑再往右让一点, 避免可视区右侧发黑 */
+@media (max-width: 480px) {
+    :root { --streak-shift: 22%; }
 }
 
 /* 渐进增强: 仅在支持 mask 的浏览器启用条纹遮罩 (不支持则退化为柔和顶部渐变) */
