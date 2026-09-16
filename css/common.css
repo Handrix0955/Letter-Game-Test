@@ -1,0 +1,219 @@
+/* ======== 极简玻璃拟态主题变量 (白天模式 Default) ======== */
+:root {
+    --bg-color: #f8fafc; /* 干净的奶白底色 */
+    --dot-color: rgba(0, 0, 0, 0.05); /* 淡灰色细网格 */
+    
+    --glass-bg: rgba(255, 255, 255, 0.65); 
+    --glass-border: rgba(255, 255, 255, 0.9);
+    --glass-border-hover: #ffffff;
+    
+    --cell-bg: rgba(255, 255, 255, 0.9); 
+    --grid-line: #cbd5e1; 
+    --grid-line-thick: #475569;
+    
+    --text-fixed: #0f172a; 
+    --text-user: #2563eb; 
+    --text-note: #64748b; 
+    --text-main: #1e293b; /* 白天深色文字 */
+    
+    --btn-bg: rgba(255, 255, 255, 0.8); 
+    --btn-border: rgba(255, 255, 255, 0.6);
+    --highlight-same: rgba(253, 230, 138, 0.6); 
+    --highlight-related: rgba(219, 234, 254, 0.5); 
+    --selected: rgba(147, 197, 253, 0.8);
+    
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.06); 
+    --stat-best-color: #059669;
+}
+
+/* 护眼模式核心 (黑夜模式 Dark) */
+[data-theme="dark"] {
+    --bg-color: #050505; /* 极客深黑 */
+    --dot-color: rgba(255, 255, 255, 0.06); /* 白光细网格 */
+    
+    --glass-bg: rgba(15, 15, 20, 0.4); 
+    --glass-border: rgba(255, 255, 255, 0.05); 
+    --glass-border-hover: rgba(255, 255, 255, 0.4);
+    
+    --cell-bg: rgba(30, 41, 59, 0.85); 
+    --grid-line: #334155; 
+    --grid-line-thick: #94a3b8;
+    
+    --text-fixed: #f8fafc; 
+    --text-user: #60a5fa; 
+    --text-note: #a1a1aa; 
+    --text-main: #f8fafc; /* 黑夜白色文字 */
+    
+    --btn-bg: rgba(255, 255, 255, 0.03); 
+    --btn-border: rgba(255, 255, 255, 0.08);
+    --highlight-same: rgba(202, 138, 4, 0.4); 
+    --highlight-related: rgba(30, 58, 138, 0.4); 
+    --selected: rgba(37, 99, 235, 0.6);
+    
+    --shadow: 0 20px 40px rgba(0, 0, 0, 0.7); 
+    --stat-best-color: #34d399;
+}
+
+/* ======== 双色战略 (蓝/紫) x (白天/黑夜) ======== */
+
+/* 1. 默认蓝色系 (白天: 晴空蓝 / 黑夜: 赛博青 #00CFFF) */
+body[data-skin="default"] {
+    --ray-color: rgba(2, 132, 199, 0.10);
+    --glow-color: rgba(14, 165, 233, 0.3);
+    --streak-color: rgba(2, 132, 199, 0.18);
+    --corner-glow: rgba(2, 132, 199, 0.06);
+}
+body[data-theme="dark"][data-skin="default"] {
+    --ray-color: rgba(0, 207, 255, 0.12);
+    --glow-color: rgba(0, 207, 255, 0.25);
+    --streak-color: rgba(0, 207, 255, 0.25);
+    --corner-glow: rgba(62, 62, 66, 0.85);
+}
+
+/* 2. 专属紫色系 (白天: 晨曦紫 / 黑夜: 暗夜霓虹紫) */
+body[data-skin="purple"] {
+    --ray-color: rgba(147, 51, 234, 0.08);
+    --glow-color: rgba(168, 85, 247, 0.25);
+    --streak-color: rgba(147, 51, 234, 0.14);
+    --corner-glow: rgba(147, 51, 234, 0.05);
+}
+body[data-theme="dark"][data-skin="purple"] {
+    --ray-color: rgba(168, 85, 247, 0.12);
+    --glow-color: rgba(168, 85, 247, 0.25);
+    --streak-color: rgba(168, 85, 247, 0.25);
+    --corner-glow: rgba(88, 28, 135, 0.4);
+}
+
+/* ======== 全局背景重塑 (点阵 + 射线统一架构) ======== */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px;
+    display: flex; flex-direction: column; align-items: center; touch-action: manipulation; padding-bottom: 40px; overflow-x: hidden;
+    transition: background-color 0.4s ease, --streak-color 0.4s ease, --corner-glow 0.4s ease;
+    
+        /* 统一的背景结构 (顶部光晕 + 点阵)；斜切光瀑/辉光/颗粒由伪元素承载，颜色随模式自动切换 */
+    background-image:
+        radial-gradient(ellipse 100% 100% at 50% -20%, var(--ray-color), transparent 60%),
+        radial-gradient(circle at 1px 1px, var(--dot-color) 1px, transparent 0);
+    background-size: 100% 100%, 20px 20px;
+    background-attachment: fixed;
+}
+
+/* ======== 顶级卡片与交互 (白天晶莹剔透，黑夜暗黑深邃) ======== */
+.glass-panel, select, button, .timer-display {
+    box-sizing: border-box; padding: 8px 0; font-size: 14px; font-weight: bold; border-radius: 12px;
+    border: 1px solid var(--glass-border); 
+    /* 顶部高光反射 (白天黑夜自适应) */
+    border-top: 1px solid var(--glass-border-hover);
+    background: var(--glass-bg); color: var(--text-main);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); 
+    outline: none; cursor: pointer; 
+    box-shadow: var(--shadow);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* 悬停与按下的果冻回弹 + 呼吸辉光交互 */
+.glass-panel:hover, select:hover, button:hover,
+.glass-panel:active, select:active, button:active {
+    transform: scale(1.03); 
+    border-color: var(--glow-color);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 30px var(--glow-color);
+}
+[data-theme="dark"] .glass-panel:hover, 
+[data-theme="dark"] select:hover, 
+[data-theme="dark"] button:hover {
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px var(--glow-color);
+}
+
+.icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+.inline-icon { width: 16px; height: 16px; margin-right: 4px; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+#canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
+#canvas-fx { z-index: -1; }
+#canvas-confetti { z-index: 9999; }
+
+.header { text-align: center; margin-bottom: 12px; z-index: 10; }
+.header h1 { font-size: 18px; color: var(--text-main); margin: 0 0 5px 0; letter-spacing: 0.5px; transition: 0.3s; }
+
+.hall-back {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 8px 18px; margin-bottom: 10px; text-decoration: none; font-size: 13px;
+}
+
+.glass-panel, select, button, .timer-display {
+    box-sizing: border-box; padding: 8px 0; font-size: 14px; font-weight: bold; border-radius: 10px;
+    border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-main);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); outline: none; cursor: pointer; transition: 0.2s;
+}
+
+.icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+.inline-icon { width: 16px; height: 16px; margin-right: 4px; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.skin-opt {
+    border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 4px 6px var(--shadow); transition: 0.2s; margin-bottom: 12px; width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px;
+}
+.skin-opt:active { transform: scale(0.95); }
+
+.modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px); z-index: 10000; justify-content: center; align-items: center;
+}
+.modal-content {
+    background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--glass-border); color: var(--text-main); width: 85%; max-width: 350px; border-radius: 20px;
+    padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); max-height: 80vh; overflow-y: auto;
+}
+.modal-content h2 { font-size: 18px; margin-top: 0; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;}
+.modal-content h3 { font-size: 15px; margin: 15px 0 5px 0; opacity: 0.9; display: flex; align-items: center; color: #3b82f6;}
+.modal-content ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6; }
+.close-btn {
+    width: 100%; background: #3b82f6; color: white !important; border: none; padding: 12px; border-radius: 12px;
+    font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.2s;
+}
+.close-btn:active { transform: scale(0.95); }
+
+.theme-event-text { color: #db2777 !important; font-weight: bold; }
+
+/* 弹窗标题 SVG 图标 (替代 emoji) */
+.msg-icon { display: inline-flex; align-items: center; margin-right: 6px; }
+.msg-icon .icon { width: 20px; height: 20px; }
+
+/* ======== 氛围层: 角落辉光 + 胶片颗粒 + 斜切光瀑 (黑夜主视觉, 白天低浓度日光版) ======== */
+@property --streak-color { syntax: '<color>'; inherits: true; initial-value: rgba(0, 0, 0, 0); }
+@property --corner-glow { syntax: '<color>'; inherits: true; initial-value: rgba(0, 0, 0, 0); }
+
+/* ::before: 左上角辉光 (角落微光, 营造深邃感) */
+body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: -3; pointer-events: none;
+    background-image: radial-gradient(ellipse 125% 100% at 0% 0%, var(--corner-glow) 0%, transparent 70%);
+}
+/* ::after: 五束斜切光瀑 (skewX(45deg) + 条纹遮罩, 颜色随皮肤/主题变量过渡) */
+body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    transform: skewX(45deg);
+    background: linear-gradient(180deg, var(--streak-color) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* 渐进增强: 仅在支持 mask 的浏览器启用条纹遮罩 (不支持则退化为柔和顶部渐变) */
+@supports ((mask-image: linear-gradient(#000, #000)) or (-webkit-mask-image: linear-gradient(#000, #000))) {
+    body::after {
+        -webkit-mask-image:
+            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgb(0,0,0) 20%, rgba(0,0,0,0) 36%, rgb(0,0,0) 55%, rgba(0,0,0,0.13) 67%, rgb(0,0,0) 78%, rgba(0,0,0,0) 97%),
+            linear-gradient(90deg, rgba(0,0,0,0) 11%, rgb(0,0,0) 25%, rgba(0,0,0,0.55) 41%, rgba(0,0,0,0.13) 67%, rgb(0,0,0) 78%, rgba(0,0,0,0) 97%),
+            linear-gradient(90deg, rgba(0,0,0,0) 9%, rgb(0,0,0) 20%, rgba(0,0,0,0.55) 28%, rgba(0,0,0,0.424) 40%, rgb(0,0,0) 48%, rgba(0,0,0,0.267) 54%, rgba(0,0,0,0.13) 78%, rgb(0,0,0) 88%, rgba(0,0,0,0) 97%),
+            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgb(0,0,0) 17%, rgba(0,0,0,0.55) 26%, rgb(0,0,0) 35%, rgba(0,0,0,0) 47%, rgba(0,0,0,0.13) 69%, rgb(0,0,0) 79%, rgba(0,0,0,0) 97%),
+            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgb(0,0,0) 20%, rgba(0,0,0,0.55) 27%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.13) 67%, rgb(0,0,0) 74%, rgb(0,0,0) 82%, rgba(0,0,0,0.47) 88%, rgba(0,0,0,0) 97%);
+        -webkit-mask-composite: source-over;
+        mask-image:
+            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgb(0,0,0) 20%, rgba(0,0,0,0) 36%, rgb(0,0,0) 55%, rgba(0,0,0,0.13) 67%, rgb(0,0,0) 78%, rgba(0,0,0,0) 97%),
+            linear-gradient(90deg, rgba(0,0,0,0) 11%, rgb(0,0,0) 25%, rgba(0,0,0,0.55) 41%, rgba(0,0,0,0.13) 67%, rgb(0,0,0) 78%, rgba(0,0,0,0) 97%),
+            linear-gradient(90deg, rgba(0,0,0,0) 9%, rgb(0,0,0) 20%, rgba(0,0,0,0.55) 28%, rgba(0,0,0,0.424) 40%, rgb(0,0,0) 48%, rgba(0,0,0,0.267) 54%, rgba(0,0,0,0.13) 78%, rgb(0,0,0) 88%, rgba(0,0,0,0) 97%),
+            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgb(0,0,0) 17%, rgba(0,0,0,0.55) 26%, rgb(0,0,0) 35%, rgba(0,0,0,0) 47%, rgba(0,0,0,0.13) 69%, rgb(0,0,0) 79%, rgba(0,0,0,0) 97%),
+            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgb(0,0,0) 20%, rgba(0,0,0,0.55) 27%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.13) 67%, rgb(0,0,0) 74%, rgb(0,0,0) 82%, rgba(0,0,0,0.47) 88%, rgba(0,0,0,0) 97%);
+        mask-composite: add;
+    }
+}

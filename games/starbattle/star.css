@@ -1,0 +1,108 @@
+/* ======== 排版框架 (继承自数独的完美布局) ======== */
+.top-controls {
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    width: 100%; max-width: 400px; margin-bottom: 15px; z-index: 10;
+}
+select#diff-select, #new-game-btn { flex: 1; max-width: 130px; text-align: center; }
+
+.timer-display { flex: 0 0 95px; width: 95px; cursor: default; display: flex; justify-content: center; align-items: center; gap: 4px; }
+.heart-icon { width: 20px; height: 20px; fill: #ef4444; stroke: #b91c1c; stroke-width: 1; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.heart-icon.lost { fill: transparent; stroke: var(--text-note); opacity: 0.5; transform: scale(0.8); }
+
+.action-row { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 10px; z-index: 10; }
+.action-btn {
+    background: var(--btn-bg); border: 1px solid var(--btn-border); border-radius: 10px; color: var(--text-main);
+    font-size: 13px; font-weight: bold; padding: 10px 0; 
+    display: flex; align-items: center; justify-content: center; flex-direction: row; gap: 6px; flex: 1;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 4px 6px var(--shadow);
+    transition: 0.15s; cursor: pointer; user-select: none;
+}
+.action-btn:active { transform: scale(0.92); background: var(--highlight-related); }
+
+/* ======== 星战专属棋盘样式 ======== */
+.board {
+    display: grid; 
+    width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 20px; 
+    background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 3px solid var(--grid-line-thick); border-radius: 8px; 
+    box-shadow: 0 8px 32px var(--shadow); z-index: 10;
+    touch-action: none; 
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* 修复：暗黑模式下棋盘底板完全黑化，消除白光割裂感 */
+[data-theme="dark"] .board {
+    background: #0f172a; 
+    border-color: #334155;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+}
+
+.cell {
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.08); 
+    box-sizing: border-box;
+    display: flex; justify-content: center; align-items: center;
+    transition: background-color 0.2s;
+    user-select: none; -webkit-user-select: none;
+}
+
+/* 核心修复：找回白天模式的 Bento 加粗边界！ */
+.cell.b-top { border-top: 3px solid var(--grid-line-thick) !important; }
+.cell.b-bottom { border-bottom: 3px solid var(--grid-line-thick) !important; }
+.cell.b-left { border-left: 3px solid var(--grid-line-thick) !important; }
+.cell.b-right { border-right: 3px solid var(--grid-line-thick) !important; }
+
+.cell.marked::before, .cell.marked::after {
+    content: ''; position: absolute;
+    width: 65%; height: 5px; background-color: #ffffff;
+    border-radius: 3px; opacity: 1; box-shadow: 0 1px 4px rgba(0,0,0,0.4); animation: fadeIn 0.1s ease-out;
+}
+.cell.marked::before { transform: rotate(45deg); }
+.cell.marked::after { transform: rotate(-45deg); animation: fadeInReverse 0.1s ease-out; }
+
+.cell.error-lock::before, .cell.error-lock::after {
+    content: ''; position: absolute; width: 75%; height: 6px;
+    background-color: #ef4444; border-radius: 3px; z-index: 5; box-shadow: 0 2px 6px rgba(185, 28, 28, 0.6);
+}
+.cell.error-lock::before { transform: rotate(45deg); }
+.cell.error-lock::after { transform: rotate(-45deg); }
+.cell.error-lock { background-color: rgba(239, 68, 68, 0.25) !important; animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+.cell-avatar {
+    width: 82%; height: 82%; border-radius: 20%; object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 2; pointer-events: none;
+}
+
+/* 战绩表格样式 */
+.stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; font-size: 14px; }
+.stats-table th { background: rgba(0,0,0,0.05); padding: 10px 8px; border-bottom: 1px solid var(--glass-border); border-radius: 8px 8px 0 0;}
+[data-theme="dark"] .stats-table th { background: rgba(255,255,255,0.05); }
+.stats-table td { border-bottom: 1px solid var(--glass-border); padding: 12px 8px; }
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.5) rotate(45deg); } to { opacity: 1; transform: scale(1) rotate(45deg); } }
+@keyframes fadeInReverse { from { opacity: 0; transform: scale(0.5) rotate(-45deg); } to { opacity: 1; transform: scale(1) rotate(-45deg); } }
+@keyframes popIn { from { opacity: 0; transform: scale(0.2); } to { opacity: 1; transform: scale(1); } }
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+    40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+/* ======== 区域专属色彩系统 (白天/黑夜自动切换) ======== */
+.cell[data-cid="0"] { background-color: #93c5fd; } 
+.cell[data-cid="1"] { background-color: #fef08a; } 
+.cell[data-cid="2"] { background-color: #dcfce7; } 
+.cell[data-cid="3"] { background-color: #fce7f3; } 
+.cell[data-cid="4"] { background-color: #d8b4fe; } 
+.cell[data-cid="5"] { background-color: #ffedd5; } 
+.cell[data-cid="6"] { background-color: #cffafe; } 
+.cell[data-cid="7"] { background-color: #f3f4f6; } 
+.cell[data-cid="8"] { background-color: #fca5a5; } 
+
+/* 护眼模式下的边界线适配 */
+[data-theme="dark"] .cell.b-top { border-top: 3px solid #64748b !important; }
+[data-theme="dark"] .cell.b-bottom { border-bottom: 3px solid #64748b !important; }
+[data-theme="dark"] .cell.b-left { border-left: 3px solid #64748b !important; }
+[data-theme="dark"] .cell.b-right { border-right: 3px solid #64748b !important; }

@@ -3,902 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Handrix给Irene的字母数独游戏：han luv ire</title>
+    <title>Puzzle Box · han luv ire</title>
+    <link rel="stylesheet" href="css/common.css">
     <style>
-        /* ======== 极简玻璃拟态主题变量 ======== */
-        :root {
-            --bg-color: #f6f8fb; --glass-bg: rgba(255, 255, 255, 0.6); --glass-border: rgba(255, 255, 255, 0.8);
-            --cell-bg: rgba(255, 255, 255, 0.9); --grid-line: #cbd5e1; --grid-line-thick: #475569;
-            --text-fixed: #0f172a; --text-user: #2563eb; --text-note: #64748b; --text-main: #334155;
-            --btn-bg: rgba(255, 255, 255, 0.8); --btn-border: rgba(255, 255, 255, 0.6);
-            --highlight-same: rgba(253, 230, 138, 0.6); --highlight-related: rgba(219, 234, 254, 0.5); --selected: rgba(147, 197, 253, 0.8);
-            --shadow: rgba(0, 0, 0, 0.05); --stat-best-color: #059669; 
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #0f172a; --glass-bg: rgba(30, 41, 59, 0.6); --glass-border: rgba(255, 255, 255, 0.1);
-            --cell-bg: rgba(30, 41, 59, 0.85); --grid-line: #334155; --grid-line-thick: #94a3b8;
-            --text-fixed: #f8fafc; --text-user: #60a5fa; --text-note: #94a3b8; --text-main: #e2e8f0;
-            --btn-bg: rgba(30, 41, 59, 0.8); --btn-border: rgba(255, 255, 255, 0.1);
-            --highlight-same: rgba(202, 138, 4, 0.4); --highlight-related: rgba(30, 58, 138, 0.4); --selected: rgba(37, 99, 235, 0.6);
-            --shadow: rgba(0, 0, 0, 0.3); --stat-best-color: #34d399; 
-        }
-
-        /* ======== 🎨 皮肤系统 ======== */
-        body[data-skin="default"] { --gradient-1: #e0c3fc; --gradient-2: #8ec5fc; --bg-color: #f6f8fb; }
-        body[data-skin="purple"] { --gradient-1: #e2c0ff; --gradient-2: #c49aeb; --bg-color: #fdfaff; }
-        [data-theme="dark"] body[data-skin="default"] { --gradient-1: #0f2027; --gradient-2: #203a43; --bg-color: #0f172a; }
-        [data-theme="dark"] body[data-skin="purple"] { --gradient-1: #2a0845; --gradient-2: #1a0b2e; --bg-color: #0f0514; }
-
-        /* 🌌 完美修复：七夕星空背景 + 暗黑面板 */
-        body.theme-event { 
-            --gradient-1: #160b2b; /* 宇宙深紫 */
-            --gradient-2: #0b1528; /* 星云深渊蓝 */
-            --bg-color: #050814; 
-            --text-main: #f8fafc; /* 外围控制栏文字为白 */
-        }
-        body.theme-event .board {
-            /* 棋盘变为极具质感的暗黑毛玻璃 */
-            background: rgba(10, 15, 35, 0.5); 
-            border: 2px solid rgba(147, 197, 253, 0.3);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-        }
-        body.theme-event .cell { background-color: rgba(15, 23, 42, 0.5); color: #f8fafc; border-color: rgba(147, 197, 253, 0.15); }
-        body.theme-event .cell.fixed { color: #93c5fd; font-weight: 900; }
-        body.theme-event .cell:nth-child(3n) { border-right: 2px solid rgba(147, 197, 253, 0.3); }
-        body.theme-event .cell:nth-child(n+19):nth-child(-n+27), body.theme-event .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid rgba(147, 197, 253, 0.3); }
-        
-        body.theme-event .glass-panel { background: rgba(15, 23, 42, 0.6); border-color: rgba(147, 197, 253, 0.2); color: #f8fafc; }
-        body.theme-event select option { color: #0f172a; } 
-        body.theme-event .key, body.theme-event .action-btn { background: rgba(30, 41, 59, 0.7); color: #f8fafc; border-color: rgba(147, 197, 253, 0.2); }
-        body.theme-event .key.undo-btn { color: #fde047; background: rgba(116, 66, 16, 0.6); border-color: rgba(202, 138, 4, 0.4); }
-        body.theme-event .action-btn.active-note { background: rgba(202, 138, 4, 0.8) !important; border-color: #fde047 !important; }
-
-        /* 🌉 鹊桥颜色高级定制：石砖灰 + 海棠粉 */
-        body.theme-event .cell.hint-han, body.theme-event .cell.hint-ire { 
-            background-color: #475569 !important; /* 青石砖色 */
-            color: #ffffff !important; 
-        }
-        body.theme-event .cell.hint-luv { 
-            background-color: #db2777 !important; /* 海棠粉色 */
-            color: #ffffff !important; 
-            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.2);
-        }
-        
-        body.theme-event .cell.related { background-color: rgba(56, 189, 248, 0.15); }
-        body.theme-event .cell.same { background-color: rgba(250, 204, 21, 0.2); }
-        body.theme-event .cell.selected { background-color: rgba(56, 189, 248, 0.3); box-shadow: inset 0 0 0 2px #38bdf8; z-index: 2; }
-        body.theme-event .hint-watermark { color: rgba(255,255,255,0.4); }
-        body.theme-event .note-item { color: rgba(147, 197, 253, 0.8); }
-
-        .skin-opt {
-            border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 6px var(--shadow); transition: 0.2s; margin-bottom: 12px; width: 100%;
-            display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px;
-        }
-        .skin-opt:active { transform: scale(0.95); }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px; 
-            display: flex; flex-direction: column; align-items: center; touch-action: manipulation; padding-bottom: 40px; overflow-x: hidden;
-            background: linear-gradient(-45deg, var(--gradient-1), var(--gradient-2), var(--bg-color));
-            background-size: 400% 400%; animation: auroraBG 15s ease infinite; transition: 0.5s;
+            min-height: 100vh;
+            justify-content: center;
+            padding: 32px 20px 48px;
+            box-sizing: border-box;
         }
 
-        @keyframes auroraBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        #canvas-fx, #canvas-confetti { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
-        #canvas-fx { z-index: -1; }
-        #canvas-confetti { z-index: 9999; }
-
-        .header { text-align: center; margin-bottom: 12px; z-index: 10; }
-        .header h1 { font-size: 18px; color: var(--text-main); margin: 0 0 5px 0; letter-spacing: 0.5px; transition: 0.3s; }
-        
-        .top-controls { 
-            display: flex; justify-content: space-between; align-items: center; gap: 8px;
-            width: 100%; max-width: 400px; margin-bottom: 15px; z-index: 10; 
-        }
-        .glass-panel, select, button, .timer-display {
-            box-sizing: border-box; padding: 8px 0; font-size: 14px; font-weight: bold; border-radius: 10px;
-            border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-main); 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); outline: none; cursor: pointer; transition: 0.2s;
-        }
-        select#diff-select, #new-game-btn { flex: 1; max-width: 130px; text-align: center; }
-        .timer-display { flex: 0 0 95px; width: 95px; cursor: default; display: flex; justify-content: center; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
-        
-        .board {
-            display: grid; grid-template-columns: repeat(9, 1fr); grid-template-rows: repeat(9, 1fr);
-            width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 20px; flex-shrink: 0;
-            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 2px solid var(--grid-line-thick); border-radius: 8px; overflow: hidden; box-shadow: 0 8px 32px var(--shadow); z-index: 10;
-            transition: 0.4s;
+        .hall {
+            width: 100%;
+            max-width: 420px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
         }
 
-        .cell {
-            background-color: var(--cell-bg); display: flex; align-items: center; justify-content: center;
-            font-size: 24px; font-weight: bold; cursor: pointer; position: relative; 
-            border-right: 1px solid var(--grid-line); border-bottom: 1px solid var(--grid-line);
-            box-sizing: border-box; min-height: 0; transition: background-color 0.2s;
+        .hall-brand {
+            text-align: center;
+            margin-bottom: 8px;
         }
-        
-        .cell:nth-child(3n) { border-right: 2px solid var(--grid-line-thick); }
-        .cell:nth-child(9n) { border-right: none; }
-        .cell:nth-child(n+19):nth-child(-n+27), .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--grid-line-thick); }
-        .cell:nth-child(n+73):nth-child(-n+81) { border-bottom: none; }
-        
-        .cell.fixed { color: var(--text-fixed); font-weight: 800;}
-        .cell.user { color: var(--text-user); }
-        
-        /* 非活动模式的保底颜色 */
-        .cell.hint-han { background-color: var(--hint-han); } .cell.hint-luv { background-color: var(--hint-luv); } .cell.hint-ire { background-color: var(--hint-ire); }
-        .cell.related { background-color: var(--highlight-related); } .cell.same { background-color: var(--highlight-same); }
-        .cell.selected { background-color: var(--selected); box-shadow: inset 0 0 0 2px var(--text-user); z-index: 2; }
 
-        @keyframes shine { 0% { background-color: rgba(255,255,255,1); } 100% { background-color: transparent; } }
-        .cell.just-placed::after { content: ''; position: absolute; inset: 0; animation: shine 0.4s ease-out; pointer-events: none; }
-
-        .hint-watermark { position: absolute; top: 1px; right: 3px; font-size: 11px; color: var(--text-note); opacity: 0.9; font-weight: 700; }
-        .notes-grid { position: absolute; inset: 1px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; pointer-events: none; }
-        .note-item { display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: var(--text-note); }
-
-        .keyboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 400px; margin-bottom: 12px; z-index: 10; }
-        .key, .action-btn {
-            background: var(--btn-bg); border: 1px solid var(--btn-border); border-radius: 10px; color: var(--text-main);
-            font-size: 20px; font-weight: bold; height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 4px 6px var(--shadow);
-            transition: 0.15s; cursor: pointer; user-select: none; gap: 4px;
+        .hall-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-note);
+            font-weight: 700;
+            margin-bottom: 10px;
         }
-        .key:active, .action-btn:active { transform: scale(0.92); background: var(--highlight-related); }
-        .key.undo-btn { color: #d97706; background: rgba(253, 230, 138, 0.4); font-size: 13px; flex-direction: row; }
-        
-        .action-btn.active-note { background: #f59e0b !important; color: #ffffff !important; border: 1px solid #d97706 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important; }
-        .action-btn.active-note .icon { stroke: #ffffff; }
 
-        .action-row { display: flex; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 10px; z-index: 10; }
-        .action-row .action-btn { flex: 1; font-size: 13px; height: auto; padding: 10px 0; flex-direction: row; gap: 6px; }
+        .hall-brand h1 {
+            font-size: 26px;
+            letter-spacing: 0.5px;
+            margin: 0 0 8px;
+            color: var(--text-main);
+        }
 
-        .icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
-        .inline-icon { width: 16px; height: 16px; margin-right: 4px; vertical-align: text-bottom; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .hall-brand p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-note);
+            font-weight: 600;
+        }
 
-        .modal-overlay {
-            display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px); z-index: 10000; justify-content: center; align-items: center;
+        .game-card {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px;
+            padding: 22px 20px;
+            box-shadow: 0 12px 32px var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .modal-content {
-            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border); color: var(--text-main); width: 85%; max-width: 350px; border-radius: 20px;
-            padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); max-height: 80vh; overflow-y: auto;
+
+        .game-card:active { transform: scale(0.98); }
+
+        .game-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
         }
-        .modal-content h2 { font-size: 18px; margin-top: 0; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;}
-        .modal-content h3 { font-size: 15px; margin: 15px 0 5px 0; opacity: 0.9; display: flex; align-items: center; color: #3b82f6;}
-        .modal-content ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6; }
-        .close-btn {
-            width: 100%; background: #3b82f6; color: white !important; border: none; padding: 12px; border-radius: 12px; 
-            font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: 0.2s;
+
+        .game-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            flex-shrink: 0;
         }
-        .close-btn:active { transform: scale(0.95); }
-        .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; font-size: 14px; }
-        .stats-table th { background: var(--th-bg); padding: 10px 8px; border-bottom: 1px solid var(--glass-border); border-radius: 8px 8px 0 0;}
-        .stats-table td { border-bottom: 1px solid var(--glass-border); padding: 12px 8px; }
-        
-        .theme-event-text { color: #db2777 !important; font-weight: bold; }
+
+        .game-icon .icon { width: 22px; height: 22px; }
+
+        .game-card h2 {
+            margin: 0 0 6px;
+            font-size: 18px;
+        }
+
+        .game-card p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--text-note);
+            font-weight: 600;
+        }
+
+        .game-meta {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .status-live { color: #059669; }
+        .status-soon { color: #d97706; }
+
+        [data-theme="dark"] .status-live { color: #34d399; }
+        [data-theme="dark"] .status-soon { color: #fbbf24; }
+
+        .enter-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-main);
+        }
+
+        .hall-theme {
+            align-self: center;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            margin-top: 6px;
+        }
+
+        .card-sudoku .game-icon { color: #2563eb; }
+        .card-star .game-icon { color: #a855f7; }
+
+        .hall-bottom { display: flex; gap: 10px; align-self: center; }
+        .hall-bottom .hall-theme { margin-top: 0; }
     </style>
 </head>
-<body data-skin="default">
-
-    <!-- 画布层 -->
+<body data-skin="default" data-theme="dark">
     <canvas id="canvas-fx"></canvas>
     <canvas id="canvas-confetti"></canvas>
 
-    <div class="header">
-        <h1 id="main-title">Handrix给Irene的字母数独游戏：han luv ire</h1>
-    </div>
-
-    <div class="top-controls">
-        <select id="diff-select" class="glass-panel" onchange="startNewGame()">
-            <option value="35">简单模式</option>
-            <option value="45" selected>中等模式</option>
-            <option value="55">困难模式</option>
-            <option value="event_qixi" id="event-option">七夕特别活动</option>
-        </select>
-        <div class="timer-display glass-panel" id="timer">
-            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 00:00
+    <div class="hall">
+        <div class="hall-brand">
+            <div class="hall-kicker">
+                <svg class="icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                IRENE'S PUZZLE BOX
+            </div>
+            <h1>Handrix Loves Irene</h1>
+            <p>为 abb 打造的专属解谜星球</p>
         </div>
-        <button id="new-game-btn" onclick="startNewGame()" style="background:#8b5cf6; color:white; border:none; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);">新游戏</button>
-    </div>
 
-    <div class="board" id="board"></div>
+        <a class="game-card card-sudoku" href="games/sudoku/sudoku.html">
+            <div class="game-card-top">
+                <div>
+                    <h2>han luv ire 专属数独</h2>
+                    <p>将 h a n l u v i r e 填满九宫格。每一次无冲突的逻辑推理，都是一句完美的告白。</p>
+                </div>
+                <div class="game-icon">
+                    <svg class="icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/><path d="M3 15h18"/><path d="M15 21V9"/></svg>
+                </div>
+            </div>
+            <div class="game-meta">
+                <span class="status-live">可游玩</span>
+                <span class="enter-hint">进入
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </span>
+            </div>
+        </a>
 
-    <div class="keyboard">
-        <div class="key" onclick="inputLetter('h')">h</div>
-        <div class="key" onclick="inputLetter('a')">a</div>
-        <div class="key" onclick="inputLetter('n')">n</div>
-        <div class="key" onclick="inputLetter('l')">l</div>
-        <div class="key" onclick="inputLetter('u')">u</div>
-        <div class="key" onclick="inputLetter('v')">v</div>
-        <div class="key" onclick="inputLetter('i')">i</div>
-        <div class="key" onclick="inputLetter('r')">r</div>
-        <div class="key" onclick="inputLetter('e')">e</div>
-        <div class="key undo-btn" onclick="undo()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg> 撤回
+        <a class="game-card card-star" href="games/starbattle/star.html">
+            <div class="game-card-top">
+                <div>
+                    <h2>abb 捕捉大作战</h2>
+                    <p>在交错的网格中找出躲藏的宝宝，排除掉世界上所有的错误选项，剩下的那一个，必定是命中注定的你。</p>
+                </div>
+                <div class="game-icon">
+                    <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15 8.5 22 9.3 17 14.2 18.2 21 12 17.8 5.8 21 7 14.2 2 9.3 9 8.5 12 2"/></svg>
+                </div>
+            </div>
+            <div class="game-meta">
+                <span class="status-soon">测试中</span>
+                <span class="enter-hint">进入
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </span>
+            </div>
+        </a>
+
+        <div class="hall-bottom">
+            <button type="button" class="hall-theme glass-panel" onclick="openSkinModal()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 1.5-1 2.5-2.5 2.5h-1.87a1.5 1.5 0 0 0-1.42 2.05l.38 1.15c.21.63-.3 1.3-.98 1.3H12Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="10.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="8.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg>
+                专属主题
+            </button>
+            <button type="button" class="hall-theme glass-panel" id="theme-btn" onclick="toggleTheme()">
+                <svg class="icon" id="theme-icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.7.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                <span id="theme-text">开灯</span>
+            </button>
         </div>
     </div>
-    
-    <div class="action-row">
-        <button class="action-btn" id="note-btn" onclick="toggleNoteMode()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> 笔记
-        </button>
-        <button class="action-btn" id="hint-btn" onclick="useHint()" style="color: #0ea5e9;">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> <span id="hint-text">提示(3)</span>
-        </button>
-        <button class="action-btn" onclick="checkWin()" style="color: #10b981;">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 检查
-        </button>
-    </div>
 
-    <div class="action-row">
-        <button class="action-btn" onclick="openStats()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 战绩
-        </button>
-        <button class="action-btn" onclick="openRules()">
-            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 规则
-        </button>
-        <button class="action-btn" onclick="openSkinModal()" style="color: #a855f7;">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 1.5-1 2.5-2.5 2.5h-1.87a1.5 1.5 0 0 0-1.42 2.05l.38 1.15c.21.63-.3 1.3-.98 1.3H12Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="10.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="8.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg> 皮肤
-        </button>
-        <button class="action-btn" id="theme-btn" onclick="toggleTheme()">
-            <svg class="icon" id="theme-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> 护眼
-        </button>
-    </div>
-
-    <!-- ======== 皮肤专属弹窗 ======== -->
+    <!-- 专属主题弹窗 -->
     <div class="modal-overlay" id="skinModal">
         <div class="modal-content" style="text-align: center;">
             <h2 style="color: #a855f7;"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 1.5-1 2.5-2.5 2.5h-1.87a1.5 1.5 0 0 0-1.42 2.05l.38 1.15c.21.63-.3 1.3-.98 1.3H12Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="10.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="8.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg> 专属色彩</h2>
             <hr style="border: 0; border-top: 1px solid var(--glass-border); margin-bottom: 20px;">
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <button class="skin-opt" onclick="changeSkin('default')" style="background: linear-gradient(135deg, #e0c3fc, #8ec5fc); color: #1e293b;">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg> 梦幻极光 (默认)
+                    <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg> 星空青 (Cyan)
                 </button>
                 <button class="skin-opt" onclick="changeSkin('purple')" style="background: linear-gradient(135deg, #e2c0ff, #c49aeb); color: #3b0764;">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> 罗兰紫梦 (Irene专属)
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> 罗兰紫 (Purple)
                 </button>
             </div>
             <button class="close-btn" onclick="closeModal('skinModal')">选好了！</button>
         </div>
     </div>
 
-    <!-- ======== 规则弹窗 (纯净线条图标 + 专属文案) ======== -->
-    <div class="modal-overlay" id="rulesModal">
-        <div class="modal-content">
-            <h2><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 定制字母数独规则</h2>
-            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin-bottom: 10px;">
-            
-            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> 主旨规则：</h3>
-            <ul>
-                <li>首先 Handrix 非常 Luv Irene！么么</li>
-                <li>其次 这下绝对不会有广告啦</li>
-            </ul>
-            
-            <h3 id="rule-event-title" style="display:none;" class="theme-event-text"><svg class="inline-icon" viewBox="0 0 24 24"><path d="M12 2l3 6 6 1-4.5 5 1.5 6-6-3.5L6 20l1.5-6L3 9l6-1z"/></svg> 七夕特别活动规则：</h3>
-            <ul id="rule-event-body" style="display:none;" class="theme-event-text">
-                <li>水水宝，七夕时牛郎织女会跨越星河相会。盘面中会随机出现特殊的『星河鹊桥』或『爱心』连线噢~</li>
-                <li>这是han给ire的特殊爱的暗号，能降低推理难度，8月底下线哦！</li>
-                <li style="font-weight: 800; list-style-type: none; margin-top: 5px;">Enjoy~ <svg class="inline-icon" viewBox="0 0 24 24" style="color:#db2777; fill:#db2777;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></li>
-            </ul>
-            
-            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.954.954 0 0 0-.288.877l.13 1.011c.088.684-.061 1.405-.434 2.02-.374.615-.992 1.04-1.745 1.196l-.995.207a.953.953 0 0 0-.743.518l-.48 1.002c-.328.685-.899 1.204-1.608 1.464a2.585 2.585 0 0 1-2.198-.108l-.872-.51a.95.95 0 0 0-1.04 0l-.872.51a2.584 2.584 0 0 1-2.198.108 2.584 2.584 0 0 1-1.608-1.464l-.48-1.002a.954.954 0 0 0-.743-.518l-.995-.207a2.586 2.586 0 0 1-1.745-1.196 2.586 2.586 0 0 1-.434-2.02l.13-1.011a.954.954 0 0 0-.288-.877l-1.611-1.611a2.41 2.41 0 0 1 0-3.408l1.568-1.568a.954.954 0 0 0 .289-.878l-.13-1.011a2.586 2.586 0 0 1 .434-2.02 2.586 2.586 0 0 1 1.745-1.196l.995-.207a.953.953 0 0 0 .743-.518l.48-1.002a2.584 2.584 0 0 1 1.608-1.464 2.584 2.584 0 0 1 2.198.108l.872.51a.95.95 0 0 0 1.04 0l.872-.51a2.584 2.584 0 0 1 2.198-.108 2.584 2.584 0 0 1 1.608 1.464l.48 1.002a.954.954 0 0 0 .743.518l.995.207c.753.156 1.371.58 1.745 1.196.373.615.522 1.336.434 2.02l-.13 1.011Z"/></svg> 填字规则：</h3>
-            <ul>
-                <li><b>9x9 棋盘</b>：填入 <b>h, a, n, l, u, v, i, r, e</b>。</li>
-                <li><b>每个 3x3 宫格</b> 内，每个字母且只能出现一次。</li>
-            </ul>
-            
-            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg> 操作小技巧：</h3>
-            <ul>
-                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg> 选中高亮</b>：点击格子会自动高亮关联区域和相同字母。</li>
-                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> 笔记模式</b>：单格最多填4个猜想；确认答案后，系统会自动清理冲突笔记！</li>
-                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> 提示求助</b>：不怕不怕～每局提供 3 次揭晓答案的机会哦！</li>
-                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg> 撤回功能</b>：宝宝填错不怕，支持撤回最近的 15 步操作。</li>
-            </ul>
-            <button class="close-btn" onclick="closeModal('rulesModal')">知道啦宝宝！</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="statsModal">
-        <div class="modal-content">
-            <h2><svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 个人战绩看板</h2>
-            <table class="stats-table" id="statsTable"></table>
-            <p style="font-size: 11px; color: var(--text-note); text-align: center; margin-top: 15px;">* 数据安全储存在本手机芯片内，绝对隐私</p>
-            <button class="close-btn" onclick="closeModal('statsModal')">继续加油！</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="messageModal">
-        <div class="modal-content" style="text-align: center;">
-            <h2 id="msgTitle">提示</h2>
-            <p id="msgBody" style="font-size: 15px; line-height: 1.5; margin: 20px 0; font-weight: 500;"></p>
-            <button class="close-btn" id="msgCloseBtn" onclick="closeModal('messageModal')">知道啦！</button>
-        </div>
-    </div>
-
-    <script>
-        // ======== 🎨 皮肤引擎初始化 ========
-        let currentSkin = localStorage.getItem('ireSudokuSkin') || 'default';
-        document.body.setAttribute('data-skin', currentSkin);
-
-        function changeSkin(skin) {
-            currentSkin = skin; document.body.setAttribute('data-skin', skin); localStorage.setItem('ireSudokuSkin', skin);
-        }
-        function openSkinModal() { document.getElementById('skinModal').style.display = 'flex'; }
-
-        // ======== 🎵 原生音效引擎 (无多余点击音效) ========
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx;
-        function initAudio() { if (!audioCtx) { audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); } }
-
-        function playSound(type) {
-            initAudio(); if (!audioCtx) return;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-            
-            if (type === 'bubble') { 
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
-                gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.5, now + 0.01); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-                osc.start(now); osc.stop(now + 0.1);
-            } else if (type === 'win') { 
-                const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51];
-                freqs.forEach((freq, i) => {
-                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-                    o.connect(g); g.connect(audioCtx.destination); o.type = 'sine'; o.frequency.value = freq;
-                    g.gain.setValueAtTime(0, now + i*0.08); g.gain.linearRampToValueAtTime(0.2, now + i*0.08 + 0.02);
-                    g.gain.exponentialRampToValueAtTime(0.01, now + i*0.08 + 0.6);
-                    o.start(now + i*0.08); o.stop(now + i*0.08 + 0.7);
-                });
-            }
-        }
-        document.body.addEventListener('touchstart', initAudio, {once:true}); document.body.addEventListener('click', initAudio, {once:true});
-
-        // ======== 🏆 数据安全急救与无损合并逻辑 ========
-        let defaultStats = {
-            '35': { best: null, avg: 0, count: 0, name: '简单模式' },
-            '45': { best: null, avg: 0, count: 0, name: '中等模式' },
-            '55': { best: null, avg: 0, count: 0, name: '困难模式' },
-            'event_total': { best: null, avg: 0, count: 0, name: '活动模式总榜' },
-            'event_qixi': { best: null, avg: 0, count: 0, name: '七夕特别活动' }
-        };
-
-        let localStats = JSON.parse(localStorage.getItem('ireSudokuStats')) || defaultStats;
-        if (!localStats['event_total']) localStats['event_total'] = defaultStats['event_total'];
-        if (!localStats['event_qixi']) localStats['event_qixi'] = defaultStats['event_qixi'];
-
-        // 无损继承端午数据
-        if (localStats['event'] && localStats['event'].count > 0 && localStats['event_total'].count === 0) {
-            localStats['event_total'].count = localStats['event'].count;
-            localStats['event_total'].avg = localStats['event'].avg;
-            localStats['event_total'].best = localStats['event'].best;
-        }
-
-        ['35', '45', '55', 'event_total', 'event_qixi'].forEach(k => {
-            let s = localStats[k];
-            if (s) {
-                s.name = defaultStats[k].name;
-                if (s.best === null || s.best === 0 || s.best === Infinity) s.best = s.count > 0 ? s.avg : null;
-            }
-        });
-        localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
-
-        // ======== 🎨 Canvas 引擎 (零发热宇宙星空 + 双向飞鸟爱心彩蛋) ========
-        const fxCanvas = document.getElementById('canvas-fx'); const fxCtx = fxCanvas.getContext('2d');
-        const confCanvas = document.getElementById('canvas-confetti'); const confCtx = confCanvas.getContext('2d');
-        let bgParticles = []; let confParticles = []; let reqFx, reqConf;
-        
-        // 🚀 核心彩蛋追踪变量 (必须定义在全局)
-        let magpieTriggered = false; let luvCells = []; let magpies = []; let hearts = []; let magpiePhase = 0;
-
-        function resizeCanvas() {
-            fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight;
-            confCanvas.width = window.innerWidth; confCanvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas); resizeCanvas();
-
-        function startEventBg() {
-            bgParticles = [];
-            // 绘制宇宙背景极低发热粒子
-            for(let i=0; i<60; i++) {
-                bgParticles.push({
-                    x: Math.random() * fxCanvas.width, y: Math.random() * fxCanvas.height,
-                    radius: Math.random() * 1.5, alpha: Math.random(), speedAlpha: (Math.random() - 0.5) * 0.02, isShooting: false
-                });
-            }
-            if(reqFx) cancelAnimationFrame(reqFx);
-            function render() {
-                fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-                
-                // 偶尔生成流星
-                if(Math.random() < 0.01) { 
-                    bgParticles.push({
-                        x: Math.random() * fxCanvas.width, y: 0,
-                        len: Math.random() * 50 + 50, speed: Math.random() * 10 + 10,
-                        angle: Math.PI / 4, isShooting: true, alpha: 1
-                    });
-                }
-                
-                for (let i = bgParticles.length - 1; i >= 0; i--) {
-                    let p = bgParticles[i];
-                    if (p.isShooting) {
-                        p.x -= p.speed * Math.cos(p.angle); p.y += p.speed * Math.sin(p.angle); p.alpha -= 0.02;
-                        fxCtx.beginPath(); fxCtx.moveTo(p.x, p.y); fxCtx.lineTo(p.x + p.len * Math.cos(p.angle), p.y - p.len * Math.sin(p.angle));
-                        fxCtx.strokeStyle = `rgba(255, 255, 255, ${p.alpha})`; fxCtx.lineWidth = 1.5; fxCtx.stroke();
-                        if (p.alpha <= 0) bgParticles.splice(i, 1);
-                    } else {
-                        p.alpha += p.speedAlpha; if(p.alpha <= 0.1 || p.alpha >= 0.8) p.speedAlpha *= -1;
-                        fxCtx.beginPath(); fxCtx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
-                        fxCtx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`; fxCtx.fill();
-                    }
-                }
-                reqFx = requestAnimationFrame(render);
-            }
-            render();
-        }
-
-        function stopEventBg() { if(reqFx) cancelAnimationFrame(reqFx); fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height); magpieTriggered = false; }
-
-        // 绘制 SVG 数学爱心
-        function drawHeart(ctx, x, y, size, alpha, hue) {
-            ctx.save(); ctx.translate(x, y); ctx.scale(size, size);
-            ctx.fillStyle = `hsla(${hue}, 100%, 60%, ${alpha})`;
-            ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(-1, -1, -2, 1, 0, 2); ctx.bezierCurveTo(2, 1, 1, -1, 0, 0); ctx.fill();
-            ctx.restore();
-        }
-
-        // 🚀 触发双向奔赴巨型爱心爆破
-        function triggerMagpies() {
-            playSound('win');
-            magpies = [
-                { x: -50, y: confCanvas.height/3, color: '0, 229, 255', tx: confCanvas.width/2, ty: confCanvas.height/2, trail: [] }, 
-                { x: confCanvas.width + 50, y: confCanvas.height/3, color: '255, 0, 127', tx: confCanvas.width/2, ty: confCanvas.height/2, trail: [] } 
-            ];
-            hearts = []; magpiePhase = 0;
-            if (!reqConf) renderConf(); 
-        }
-
-        function renderConf() {
-            confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
-            let active = false;
-            
-            // 1. 渲染胜利纸屑
-            if (confParticles.length > 0) {
-                confParticles.forEach(p => {
-                    p.x += p.vx; p.y += p.vy; p.vy += 0.4; p.rot += p.rotSpeed;
-                    if(p.y < confCanvas.height + 20) {
-                        active = true; confCtx.save(); confCtx.translate(p.x, p.y); confCtx.rotate(p.rot * Math.PI / 180);
-                        confCtx.fillStyle = p.color; confCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size); confCtx.restore();
-                    }
-                });
-                if (confParticles.every(p => p.y >= confCanvas.height + 20)) confParticles = [];
-            }
-            
-            // 2. 渲染彩蛋：青鸟与红鸟的高亮拖尾相撞
-            if (magpies.length > 0 || hearts.length > 0) {
-                active = true;
-                if (magpiePhase === 0) {
-                    let reached = 0;
-                    magpies.forEach(b => {
-                        let dx = b.tx - b.x; let dy = b.ty - b.y;
-                        b.x += dx * 0.08; b.y += dy * 0.08; 
-                        if (Math.abs(dx) < 3 && Math.abs(dy) < 3) reached++;
-                        
-                        b.trail.push({x: b.x, y: b.y});
-                        if (b.trail.length > 15) b.trail.shift();
-                        
-                        b.trail.forEach((pt, i) => {
-                            let ratio = i / b.trail.length;
-                            confCtx.beginPath(); confCtx.arc(pt.x, pt.y, 14 * ratio, 0, Math.PI*2);
-                            confCtx.fillStyle = `rgba(${b.color}, ${ratio * 0.6})`; confCtx.fill();
-                        });
-
-                        confCtx.shadowBlur = 25; confCtx.shadowColor = `rgb(${b.color})`;
-                        confCtx.fillStyle = '#ffffff';
-                        confCtx.beginPath(); confCtx.arc(b.x, b.y, 10, 0, Math.PI*2); confCtx.fill();
-                        confCtx.shadowBlur = 0;
-                    });
-                    
-                    if (reached === 2) {
-                        magpiePhase = 1; magpies = [];
-                        for(let i=0; i<80; i++) {
-                            hearts.push({
-                                x: confCanvas.width/2, y: confCanvas.height/2,
-                                vx: (Math.random()-0.5)*35, vy: (Math.random()-0.5)*35 - 5,
-                                alpha: 1, size: Math.random() * 12 + 6, hue: Math.random() * 40 + 320
-                            });
-                        }
-                    }
-                } else if (magpiePhase === 1) {
-                    hearts.forEach(h => {
-                        h.x += h.vx; h.y += h.vy; h.vy += 0.8; h.alpha -= 0.015; 
-                        if (h.alpha > 0) drawHeart(confCtx, h.x, h.y, h.size, h.alpha, h.hue);
-                    });
-                    if (hearts.every(h => h.alpha <= 0)) { hearts = []; magpieTriggered = false; }
-                }
-            }
-            
-            if(active) reqConf = requestAnimationFrame(renderConf); else reqConf = null;
-        }
-
-        function triggerConfetti() {
-            playSound('win'); confParticles = [];
-            for(let i=0; i<120; i++) {
-                let isLeft = Math.random() < 0.5;
-                confParticles.push({
-                    x: isLeft ? 0 : confCanvas.width, y: confCanvas.height,
-                    vx: (Math.random() * 12 + 4) * (isLeft ? 1 : -1), vy: -(Math.random() * 18 + 10),
-                    color: `hsl(${Math.random()*360}, 90%, 65%)`, size: Math.random() * 8 + 6,
-                    rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 15
-                });
-            }
-            if(!reqConf) renderConf();
-        }
-
-        // ======== 游戏核心逻辑 ========
-        const LETTERS = ['h', 'a', 'n', 'l', 'u', 'v', 'i', 'r', 'e'];
-        let board = Array(9).fill().map(() => Array(9).fill(0));
-        let solution = Array(9).fill().map(() => Array(9).fill(0));
-        let userGrid = Array(9).fill().map(() => Array(9).fill(''));
-        let notesGrid = Array(9).fill().map(() => Array(9).fill().map(()=>[]));
-        let isFixed = Array(9).fill().map(() => Array(9).fill(false));
-        
-        let selectedRow = -1; let selectedCol = -1; let noteMode = false;
-        let historyStack = []; const MAX_HISTORY = 15;
-        let timerInterval = null; let timeElapsed = 0; let gameActive = false;
-        let eventHints = {}; let hintsLeft = 3;
-
-        // 七夕在8月底过期
-        function checkEventExpiry() {
-            let now = new Date(); let expireDate = new Date('2026-08-30T00:00:00+08:00'); 
-            if (now > expireDate) {
-                let eventOpt = document.getElementById('event-option');
-                if (eventOpt) eventOpt.remove(); 
-                if (document.getElementById('diff-select').value === 'event_qixi') document.getElementById('diff-select').value = '45';
-            }
-        }
-
-        window.onload = () => { checkEventExpiry(); startNewGame(); };
-
-        function toggleTheme() {
-            const body = document.body; const themeIcon = document.getElementById('theme-icon');
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                themeIcon.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'; 
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeIcon.innerHTML = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'; 
-            }
-        }
-
-        // 🚀 核心算法：七夕随机动态阵型生成
-        function shuffleArray(array) {
-            let arr = array.slice();
-            for (let i = arr.length - 1; i > 0; i--) {
-                let j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
-        function generateQixiSolution() {
-            let shapes = [
-                { type: 'diagonal', han: [[0,0],[1,1],[2,2]], luv: [[3,3],[4,4],[5,5]], ire: [[6,6],[7,7],[8,8]] },
-                { type: 'diagonal', han: [[8,0],[7,1],[6,2]], luv: [[5,3],[4,4],[3,5]], ire: [[2,6],[1,7],[0,8]] },
-                { type: 'bridge', han: [[4,0],[4,1],[4,2]], luv: [[4,3],[4,4],[4,5]], ire: [[4,6],[4,7],[4,8]] },
-                { type: 'heart', han: [[1,3],[2,2],[3,3]], luv: [[2,4],[4,4],[5,4]], ire: [[1,5],[2,6],[3,5]] }
-            ];
-
-            let pattern = shapes[Math.floor(Math.random() * shapes.length)];
-
-            for(let i=0; i<100; i++) {
-                for(let r=0; r<9; r++) solution[r].fill(0);
-                ['han', 'luv', 'ire'].forEach(g => {
-                    let chars = g.split('').sort(() => Math.random() - 0.5);
-                    for (let j = 0; j < 3; j++) {
-                        let pt = pattern[g][j];
-                        solution[pt[0]][pt[1]] = chars[j];
-                    }
-                });
-                if (solveSudoku(solution)) return pattern;
-            }
-            return null; 
-        }
-
-        function startNewGame() {
-            let diffKey = document.getElementById('diff-select').value;
-            let blanks = diffKey.startsWith('event_') ? 55 : parseInt(diffKey);
-            eventHints = {}; let forcedBlanks = []; 
-            luvCells = []; magpieTriggered = false; // 重置彩蛋变量
-            hintsLeft = 3; document.getElementById('hint-text').innerText = `提示(3)`;
-
-            if (diffKey === 'event_qixi') {
-                document.body.classList.add('theme-event');
-                document.getElementById('main-title').innerText = "星河鹊桥局：han luv ire";
-                startEventBg();
-                
-                let shapes = generateQixiSolution();
-                if (shapes) {
-                    shapes.han.forEach(p => { forcedBlanks.push(p); eventHints[`${p[0]}-${p[1]}`] = 'han'; });
-                    shapes.luv.forEach(p => { forcedBlanks.push(p); eventHints[`${p[0]}-${p[1]}`] = 'luv'; luvCells.push(p); });
-                    shapes.ire.forEach(p => { forcedBlanks.push(p); eventHints[`${p[0]}-${p[1]}`] = 'ire'; });
-                } else generateSolution(); 
-            } else {
-                document.body.classList.remove('theme-event');
-                document.getElementById('main-title').innerText = "Handrix给Irene的字母数独游戏：han luv ire";
-                stopEventBg(); generateSolution();
-            }
-
-            createPuzzle(blanks, forcedBlanks);
-            selectedRow = -1; selectedCol = -1; historyStack = []; 
-            renderBoard();
-            gameActive = true; clearInterval(timerInterval); timeElapsed = 0; updateTimerDisplay();
-            timerInterval = setInterval(() => { timeElapsed++; updateTimerDisplay(); }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            let m = Math.floor(timeElapsed / 60).toString().padStart(2, '0');
-            let s = (timeElapsed % 60).toString().padStart(2, '0');
-            document.getElementById('timer').innerHTML = `<svg class="icon" style="vertical-align: text-bottom; width: 16px; height: 16px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${m}:${s}`;
-        }
-
-        function saveState() {
-            if (historyStack.length >= MAX_HISTORY) historyStack.shift(); 
-            historyStack.push({ user: JSON.parse(JSON.stringify(userGrid)), notes: JSON.parse(JSON.stringify(notesGrid)) });
-        }
-
-        function undo() {
-            if (historyStack.length === 0 || !gameActive) return; 
-            let lastState = historyStack.pop();
-            userGrid = lastState.user; notesGrid = lastState.notes;
-            renderBoard();
-        }
-
-        function generateSolution() { for (let i = 0; i < 9; i++) solution[i].fill(0); solveSudoku(solution); }
-        function solveSudoku(grid) {
-            for (let r = 0; r < 9; r++) {
-                for (let c = 0; c < 9; c++) {
-                    if (grid[r][c] === 0) {
-                        let shuffled = shuffleArray(LETTERS); // 真正打乱，保证每次题不同
-                        for (let letter of shuffled) {
-                            if (isValid(grid, r, c, letter)) { grid[r][c] = letter; if (solveSudoku(grid)) return true; grid[r][c] = 0; }
-                        }
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-        function isValid(grid, row, col, letter) {
-            for (let i = 0; i < 9; i++) if (grid[row][i] === letter || grid[i][col] === letter) return false;
-            let sr = Math.floor(row / 3) * 3, sc = Math.floor(col / 3) * 3;
-            for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (grid[sr + i][sc + j] === letter) return false;
-            return true;
-        }
-        function countSolutions(grid, limit = 2) {
-            for (let r = 0; r < 9; r++) {
-                for (let c = 0; c < 9; c++) {
-                    if (grid[r][c] === 0) {
-                        let count = 0;
-                        for (let letter of LETTERS) {
-                            if (isValid(grid, r, c, letter)) { grid[r][c] = letter; count += countSolutions(grid, limit); grid[r][c] = 0; if (count >= limit) return count; }
-                        }
-                        return count;
-                    }
-                }
-            }
-            return 1;
-        }
-
-        function createPuzzle(blanks, forcedBlanks = []) {
-            for(let r=0; r<9; r++) {
-                for(let c=0; c<9; c++) { board[r][c] = solution[r][c]; userGrid[r][c] = ''; notesGrid[r][c] = []; isFixed[r][c] = true; }
-            }
-            let removed = 0;
-            for(let p of forcedBlanks) { if(board[p[0]][p[1]] !== 0) { board[p[0]][p[1]] = 0; isFixed[p[0]][p[1]] = false; removed++; } }
-            let positions = [];
-            for (let i = 0; i < 81; i++) positions.push([Math.floor(i/9), i%9]);
-            positions.sort(() => Math.random() - 0.5);
-            
-            for (let pos of positions) {
-                if (removed >= blanks) break;
-                let r = pos[0], c = pos[1]; let backup = board[r][c]; 
-                if(backup !== 0) { board[r][c] = 0; if (countSolutions(board) !== 1) board[r][c] = backup; else { isFixed[r][c] = false; removed++; } }
-            }
-        }
-
-        function renderBoard() {
-            const boardDiv = document.getElementById('board'); boardDiv.innerHTML = '';
-            let currentVal = '';
-            if(selectedRow !== -1 && selectedCol !== -1) currentVal = isFixed[selectedRow][selectedCol] ? board[selectedRow][selectedCol] : userGrid[selectedRow][selectedCol];
-
-            for (let r = 0; r < 9; r++) {
-                for (let c = 0; c < 9; c++) {
-                    let cellDiv = document.createElement('div');
-                    cellDiv.className = 'cell'; cellDiv.id = `cell-${r}-${c}`;
-                    cellDiv.onclick = () => { if(gameActive) selectCell(r, c); };
-
-                    let hintGroup = eventHints[`${r}-${c}`];
-                    if (hintGroup) cellDiv.classList.add(`hint-${hintGroup}`);
-
-                    if (isFixed[r][c]) {
-                        cellDiv.classList.add('fixed'); cellDiv.innerText = board[r][c];
-                    } else if (userGrid[r][c] !== '') {
-                        cellDiv.classList.add('user'); cellDiv.innerText = userGrid[r][c];
-                    } else if (notesGrid[r][c].length > 0) {
-                        let noteHTML = `<div class="notes-grid">`;
-                        for(let k=0; k<4; k++) noteHTML += `<div class="note-item">${notesGrid[r][c][k] || ''}</div>`;
-                        noteHTML += `</div>`; cellDiv.innerHTML = noteHTML;
-                    }
-
-                    if (hintGroup && cellDiv.innerText === '') cellDiv.innerHTML += `<div class="hint-watermark">${hintGroup}</div>`;
-
-                    if (r === selectedRow && c === selectedCol) cellDiv.classList.add('selected');
-                    else if (selectedRow !== -1 && (r === selectedRow || c === selectedCol || (Math.floor(r/3) === Math.floor(selectedRow/3) && Math.floor(c/3) === Math.floor(selectedCol/3)))) {
-                        cellDiv.classList.add('related');
-                    }
-
-                    if (currentVal !== '' && cellDiv.innerText === currentVal && cellDiv.children.length === 0) cellDiv.classList.add('same');
-                    boardDiv.appendChild(cellDiv);
-                }
-            }
-        }
-
-        function selectCell(r, c) { selectedRow = r; selectedCol = c; renderBoard(); }
-
-        function toggleNoteMode() {
-            noteMode = !noteMode; let btn = document.getElementById('note-btn');
-            if(noteMode) { btn.classList.add('active-note'); } 
-            else { btn.classList.remove('active-note'); }
-        }
-
-        // 🚀 核心：检查 LUV 是否全填对触发彩蛋
-        function checkMagpieAnimation() {
-            if (document.getElementById('diff-select').value !== 'event_qixi' || magpieTriggered || luvCells.length === 0) return;
-            let allCorrect = luvCells.every(p => {
-                let r = p[0], c = p[1];
-                let val = isFixed[r][c] ? board[r][c] : userGrid[r][c];
-                return val === solution[r][c];
-            });
-            if (allCorrect) {
-                magpieTriggered = true;
-                triggerMagpies();
-            }
-        }
-
-        function useHint() {
-            if (!gameActive) return;
-            if (hintsLeft <= 0) { showMessage("提示", "3次提示机会已经用完啦宝宝～靠你自己咯！", "#f59e0b"); return; }
-            if (selectedRow === -1 || selectedCol === -1) { showMessage("提示", "请先点击选中一个你想要提示的空白格子哦！", "#3b82f6"); return; }
-            if (isFixed[selectedRow][selectedCol]) { showMessage("提示", "这个已经是题目啦，不需要提示！", "#f59e0b"); return; }
-            let correctChar = solution[selectedRow][selectedCol];
-            if (userGrid[selectedRow][selectedCol] === correctChar) { showMessage("提示", "你已经凭实力填对啦，不需要浪费提示！", "#10b981"); return; }
-
-            playSound('bubble');
-            saveState(); userGrid[selectedRow][selectedCol] = correctChar; autoCleanNotes(selectedRow, selectedCol, correctChar);
-            hintsLeft--; document.getElementById('hint-text').innerText = `提示(${hintsLeft})`; renderBoard();
-            setTimeout(() => { document.getElementById(`cell-${selectedRow}-${selectedCol}`).classList.add('just-placed'); }, 50);
-            
-            checkMagpieAnimation(); // 检查是否靠提示完成了 luv 桥梁
-        }
-
-        function inputLetter(l) {
-            if (!gameActive || selectedRow === -1 || selectedCol === -1 || isFixed[selectedRow][selectedCol]) return;
-            playSound('bubble');
-            saveState(); let r = selectedRow, c = selectedCol;
-            if (noteMode) {
-                if (userGrid[r][c] !== '') userGrid[r][c] = '';
-                let idx = notesGrid[r][c].indexOf(l);
-                if (idx === -1) { if (notesGrid[r][c].length < 4) notesGrid[r][c].push(l); } 
-                else notesGrid[r][c].splice(idx, 1);
-            } else {
-                userGrid[r][c] = l; autoCleanNotes(r, c, l);
-            }
-            renderBoard();
-            if(!noteMode) setTimeout(() => { document.getElementById(`cell-${r}-${c}`).classList.add('just-placed'); }, 50);
-            
-            if(!noteMode) checkMagpieAnimation(); // 检查是否手动填完了 luv 桥梁
-        }
-
-        function autoCleanNotes(row, col, letter) {
-            for (let i = 0; i < 9; i++) { removeNote(row, i, letter); removeNote(i, col, letter); }
-            let sr = Math.floor(row / 3) * 3, sc = Math.floor(col / 3) * 3;
-            for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) removeNote(sr + i, sc + j, letter);
-        }
-
-        function removeNote(r, c, letter) {
-            if(!isFixed[r][c] && userGrid[r][c] === '') {
-                let idx = notesGrid[r][c].indexOf(letter);
-                if(idx !== -1) notesGrid[r][c].splice(idx, 1);
-            }
-        }
-
-        function formatTime(sec) {
-            if (sec === null || sec === Infinity) return "--:--";
-            let m = Math.floor(sec / 60).toString().padStart(2, '0');
-            let s = Math.round(sec % 60).toString().padStart(2, '0');
-            return `${m}:${s}`;
-        }
-
-        function checkWin() {
-            if(!gameActive) return;
-            let hasEmpty = false, hasError = false;
-            for (let r = 0; r < 9; r++) {
-                for (let c = 0; c < 9; c++) {
-                    let val = isFixed[r][c] ? board[r][c] : userGrid[r][c];
-                    if (val === '') hasEmpty = true;
-                    else if (val !== solution[r][c]) hasError = true;
-                }
-            }
-            
-            if (hasEmpty) { showMessage("提示", "还有空格或者笔记未确认哦，请abb宝儿先填完！", "#f59e0b"); return; }
-            if (hasError) { showMessage("错误", "好像有些地方填错了，仔细检查一下abb宝儿～", "#ef4444"); return; }
-            
-            gameActive = false; clearInterval(timerInterval);
-            let diffKey = document.getElementById('diff-select').value;
-            let s = localStats[diffKey];
-            
-            s.count++; s.avg = ((s.avg * (s.count - 1)) + timeElapsed) / s.count;
-            let isNewRecord = (s.best === null) || (timeElapsed < s.best);
-            if (isNewRecord) s.best = timeElapsed;
-            
-            if (diffKey.startsWith('event_') && localStats['event_total']) {
-                let t = localStats['event_total'];
-                t.count++;
-                t.avg = ((t.avg * (t.count - 1)) + timeElapsed) / t.count;
-                if (t.best === null || timeElapsed < t.best) t.best = timeElapsed;
-            }
-
-            localStorage.setItem('ireSudokuStats', JSON.stringify(localStats));
-            triggerConfetti(); 
-
-            let msg = `太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！\n\n本局用时: ${formatTime(timeElapsed)}`;
-            if(isNewRecord && s.count > 1) msg += "\n打破了该难度的最佳记录！";
-            
-            showMessage("过关", msg, "#10b981");
-        }
-
-        function showMessage(title, body, color) {
-            document.getElementById('msgTitle').innerText = title;
-            document.getElementById('msgTitle').style.color = color;
-            document.getElementById('msgBody').innerText = body;
-            let closeBtn = document.getElementById('msgCloseBtn');
-            closeBtn.style.background = color;
-            document.getElementById('messageModal').style.display = 'flex';
-        }
-
-        function openStats() {
-            let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>通关局数</th></tr>`;
-            ['35', '45', '55', 'event_total', 'event_qixi'].forEach(k => {
-                let s = localStats[k];
-                if (!s) return;
-                if (k.startsWith('event_') && k !== 'event_total' && !document.getElementById('event-option') && s.count === 0) return;
-                
-                html += `<tr>
-                    <td><b>${s.name}</b></td>
-                    <td style="color: var(--stat-best-color); font-weight:bold;">${formatTime(s.best)}</td>
-                    <td>${s.count === 0 ? '--:--' : formatTime(s.avg)}</td>
-                    <td>${s.count}</td>
-                </tr>`;
-            });
-            document.getElementById('statsTable').innerHTML = html;
-            document.getElementById('statsModal').style.display = 'flex';
-        }
-
-        function openRules() {
-            let isEvent = document.getElementById('diff-select').value === 'event_qixi';
-            document.getElementById('rule-event-title').style.display = isEvent ? 'block' : 'none';
-            document.getElementById('rule-event-body').style.display = isEvent ? 'block' : 'none';
-            document.getElementById('rulesModal').style.display = 'flex';
-        }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    </script>
+    <script src="js/common.js"></script>
 </body>
 </html>

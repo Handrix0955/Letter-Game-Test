@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+    <title>爱意九宫格：han luv ire</title>
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="sudoku.css">
+</head>
+<body data-skin="default" data-theme="dark">
+
+    <canvas id="canvas-fx"></canvas>
+    <canvas id="canvas-confetti"></canvas>
+
+    <div class="header">
+        <a href="../../index.html" class="hall-back glass-panel">
+            <svg class="icon" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            返回大厅
+        </a>
+        <h1 id="main-title">爱意九宫格：han luv ire</h1>
+    </div>
+
+    <div class="top-controls">
+        <select id="diff-select" class="glass-panel" onchange="startNewGame()">
+            <option value="35">简单模式</option>
+            <option value="45" selected>中等模式</option>
+            <option value="55">困难模式</option>
+            <option value="event_qixi" id="event-option">七夕特别活动</option>
+        </select>
+        <div class="timer-display glass-panel" id="timer">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 00:00
+        </div>
+        <button id="new-game-btn" onclick="startNewGame()" style="background:#8b5cf6; color:white; border:none; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);">新游戏</button>
+    </div>
+
+    <div class="board" id="board"></div>
+
+    <div class="keyboard">
+        <div class="key" onclick="inputLetter('h')">h</div>
+        <div class="key" onclick="inputLetter('a')">a</div>
+        <div class="key" onclick="inputLetter('n')">n</div>
+        <div class="key" onclick="inputLetter('l')">l</div>
+        <div class="key" onclick="inputLetter('u')">u</div>
+        <div class="key" onclick="inputLetter('v')">v</div>
+        <div class="key" onclick="inputLetter('i')">i</div>
+        <div class="key" onclick="inputLetter('r')">r</div>
+        <div class="key" onclick="inputLetter('e')">e</div>
+        <div class="key undo-btn" onclick="undo()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg> 撤回
+        </div>
+    </div>
+
+    <div class="action-row">
+        <button class="action-btn" id="note-btn" onclick="toggleNoteMode()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> 笔记
+        </button>
+        <button class="action-btn" id="hint-btn" onclick="useHint()" style="color: #0ea5e9;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> <span id="hint-text">提示(3)</span>
+        </button>
+        <button class="action-btn" onclick="checkWin()" style="color: #10b981;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg> 检查
+        </button>
+    </div>
+
+    <div class="action-row">
+        <button class="action-btn" onclick="openStats()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 战绩
+        </button>
+        <button class="action-btn" onclick="openRules()">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 规则
+        </button>
+        <button class="action-btn" onclick="openSkinModal()" style="color: #a855f7;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 1.5-1 2.5-2.5 2.5h-1.87a1.5 1.5 0 0 0-1.42 2.05l.38 1.15c.21.63-.3 1.3-.98 1.3H12Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="10.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="8.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg> 皮肤
+        </button>
+        <button class="action-btn" id="theme-btn" onclick="toggleTheme()">
+            <svg class="icon" id="theme-icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.7.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> <span id="theme-text">开灯</span>
+        </button>
+    </div>
+
+    <div class="modal-overlay" id="skinModal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="color: #a855f7;"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22a10 10 0 1 1 10-10c0 1.5-1 2.5-2.5 2.5h-1.87a1.5 1.5 0 0 0-1.42 2.05l.38 1.15c.21.63-.3 1.3-.98 1.3H12Z"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="10.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="8.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg> 专属色彩</h2>
+            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin-bottom: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button class="skin-opt" onclick="changeSkin('default')" style="background: linear-gradient(135deg, #e0c3fc, #8ec5fc); color: #1e293b;">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg> 星空青 (Cyan)
+                </button>
+                <button class="skin-opt" onclick="changeSkin('purple')" style="background: linear-gradient(135deg, #e2c0ff, #c49aeb); color: #3b0764;">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> 罗兰紫 (Purple)
+                </button>
+            </div>
+            <button class="close-btn" onclick="closeModal('skinModal')">选好了！</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal-content">
+            <h2><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 定制字母数独规则</h2>
+            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin-bottom: 10px;">
+
+            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> 主旨规则：</h3>
+            <ul>
+                <li>首先 Handrix 非常 Luv Irene！么么</li>
+                <li>其次 这下绝对不会有广告啦</li>
+            </ul>
+
+            <h3 id="rule-event-title" style="display:none;" class="theme-event-text"><svg class="inline-icon" viewBox="0 0 24 24"><path d="M12 2l3 6 6 1-4.5 5 1.5 6-6-3.5L6 20l1.5-6L3 9l6-1z"/></svg> 七夕特别活动规则：</h3>
+            <ul id="rule-event-body" style="display:none;" class="theme-event-text">
+                <li>水水宝，七夕时牛郎织女会跨越星河相会。盘面中会随机出现特殊的『星河鹊桥』或『爱心』连线噢~</li>
+                <li>这是han给ire的特殊爱的暗号，能降低推理难度，8月底下线哦！</li>
+                <li style="font-weight: 800; list-style-type: none; margin-top: 5px;">Enjoy~ <svg class="inline-icon" viewBox="0 0 24 24" style="color:#db2777; fill:#db2777;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></li>
+            </ul>
+
+            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.954.954 0 0 0-.288.877l.13 1.011c.088.684-.061 1.405-.434 2.02-.374.615-.992 1.04-1.745 1.196l-.995.207a.953.953 0 0 0-.743.518l-.48 1.002c-.328.685-.899 1.204-1.608 1.464a2.585 2.585 0 0 1-2.198-.108l-.872-.51a.95.95 0 0 0-1.04 0l-.872.51a2.584 2.584 0 0 1-2.198.108 2.584 2.584 0 0 1-1.608-1.464l-.48-1.002a.954.954 0 0 0-.743-.518l-.995-.207a2.586 2.586 0 0 1-1.745-1.196 2.586 2.586 0 0 1-.434-2.02l.13-1.011a.954.954 0 0 0-.288-.877l-1.611-1.611a2.41 2.41 0 0 1 0-3.408l1.568-1.568a.954.954 0 0 0 .289-.878l-.13-1.011a2.586 2.586 0 0 1 .434-2.02 2.586 2.586 0 0 1 1.745-1.196l.995-.207a.953.953 0 0 0 .743-.518l.48-1.002a2.584 2.584 0 0 1 1.608-1.464 2.584 2.584 0 0 1 2.198.108l.872.51a.95.95 0 0 0 1.04 0l.872-.51a2.584 2.584 0 0 1 2.198-.108 2.584 2.584 0 0 1 1.608 1.464l.48 1.002a.954.954 0 0 0 .743.518l.995.207c.753.156 1.371.58 1.745 1.196.373.615.522 1.336.434 2.02l-.13 1.011Z"/></svg> 填字规则：</h3>
+            <ul>
+                <li><b>9x9 棋盘</b>：填入 <b>h, a, n, l, u, v, i, r, e</b>。</li>
+                <li><b>每个 3x3 宫格</b> 内，每个字母且只能出现一次。</li>
+            </ul>
+
+            <h3><svg class="inline-icon" viewBox="0 0 24 24"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg> 操作小技巧：</h3>
+            <ul>
+                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg> 选中高亮</b>：点击格子会自动高亮关联区域和相同字母。</li>
+                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> 笔记模式</b>：单格最多填4个猜想；确认答案后，系统会自动清理冲突笔记！</li>
+                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> 提示求助</b>：不怕不怕～每局提供 3 次揭晓答案的机会哦！</li>
+                <li><b><svg class="inline-icon" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg> 撤回功能</b>：宝宝填错不怕，支持撤回最近的 15 步操作。</li>
+            </ul>
+            <button class="close-btn" onclick="closeModal('rulesModal')">知道啦宝宝！</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="statsModal">
+        <div class="modal-content">
+            <h2><svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 个人战绩看板</h2>
+            <table class="stats-table" id="statsTable"></table>
+            <p style="font-size: 11px; color: var(--text-note); text-align: center; margin-top: 15px;">* 数据安全储存在本手机芯片内，绝对隐私</p>
+            <button class="close-btn" onclick="closeModal('statsModal')">继续加油！</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="messageModal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 id="msgTitle">提示</h2>
+            <p id="msgBody" style="font-size: 15px; line-height: 1.5; margin: 20px 0; font-weight: 500;"></p>
+            <button class="close-btn" id="msgCloseBtn" onclick="closeModal('messageModal')">知道啦！</button>
+        </div>
+    </div>
+
+    <script src="../../js/common.js"></script>
+    <script src="sudoku.js"></script>
+</body>
+</html>
