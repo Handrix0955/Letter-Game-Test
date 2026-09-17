@@ -153,6 +153,7 @@ function buildBoard() {
             boardEl.appendChild(cell);
         }
     }
+    lockBoardSquare();
 }
 
 // ======== 状态渲染逻辑 ========
@@ -216,6 +217,17 @@ boardEl.addEventListener('pointermove', (e) => {
 });
 
 boardEl.addEventListener('pointercancel', () => { isDragging = false; });
+
+// 移动端保险: 个别 iOS/Safari 版本解析"flex 子项 + aspect-ratio"时会算错高度,
+// 导致棋盘非正方形(行高 != 列宽) -> 格子被拉长或露出底板黑缝。
+// 这里用实测宽度锁定高度(border-box 下正好等于宽度), 保证棋盘恒为正方形。
+function lockBoardSquare() {
+    const rect = boardEl.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    if (Math.abs(rect.height - rect.width) > 0.5) boardEl.style.height = rect.width + 'px';
+}
+window.addEventListener('resize', lockBoardSquare);
+window.addEventListener('orientationchange', () => setTimeout(lockBoardSquare, 250));
 
 boardEl.addEventListener('pointerup', (e) => {
     isDragging = false;

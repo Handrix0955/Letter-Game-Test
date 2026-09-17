@@ -21,8 +21,11 @@ select#diff-select, #new-game-btn { flex: 1; max-width: 130px; text-align: cente
 
 /* ======== 星战专属棋盘样式 ======== */
 .board {
-    display: grid; 
-    width: 100%; max-width: 400px; aspect-ratio: 1/1; margin-bottom: 20px; 
+    display: grid;
+    /* border-box: 让 aspect-ratio 与 width 作用于同一个盒子(边框盒),
+       消除"内容盒 vs 边框盒"两种解释造成的行列尺寸不一致 -> 缝隙 */
+    box-sizing: border-box; 
+    width: 100%; max-width: 400px; margin-bottom: 20px; 
     background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border: 3px solid var(--grid-line-thick); border-radius: 8px; 
     box-shadow: 0 8px 32px var(--shadow); z-index: 10;
@@ -30,7 +33,11 @@ select#diff-select, #new-game-btn { flex: 1; max-width: 130px; text-align: cente
     transition: background-color 0.3s, border-color 0.3s;
     /* 移动端修复: 禁止被 body 的 column flex 容器纵向压缩成矩形 */
     flex-shrink: 0;
+    flex-grow: 0;
+    height: auto;
     aspect-ratio: 1 / 1 !important;
+    /* 关键: 格子始终铺满行高, 绝不给底板(黑夜近黑)留出黑缝 */
+    align-items: stretch;
 }
 
 /* 修复：暗黑模式下棋盘底板完全黑化，消除白光割裂感 */
@@ -47,8 +54,11 @@ select#diff-select, #new-game-btn { flex: 1; max-width: 130px; text-align: cente
     display: flex; justify-content: center; align-items: center;
     transition: background-color 0.2s;
     user-select: none; -webkit-user-select: none;
-    /* 移动端修复: 强制格子为正方形, 并消除内容撑开导致的变形 */
-    aspect-ratio: 1 / 1;
+    /* 移动端修复: 禁止删除 aspect-ratio 后又加回!
+       格子必须"铺满行高", 绝不能自带比例——
+       一旦格子按自身宽度算高度, 它与行高的任何亚像素差都会
+       露出棋盘底板(黑夜近黑) -> iOS 上满屏黑色横线。
+       正方形由棋盘本体 aspect-ratio:1/1 保证。 */
     min-width: 0;
     min-height: 0;
 }
