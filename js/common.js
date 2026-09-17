@@ -80,6 +80,7 @@ function applyThemeUI() {
 // (a black bar at the bottom until navigation). Force one repaint of those layers.
 function kickThemeRepaint() {
     document.body.classList.add("theme-kick");
+    resizeCanvas(); // force canvas layers to rebuild (clears stale black tiles on iOS)
     requestAnimationFrame(() => {
         window.scrollBy(0, 1);
         requestAnimationFrame(() => window.scrollBy(0, -1));
@@ -151,8 +152,16 @@ let magpieTriggered = false; let magpies = []; let hearts = []; let magpiePhase 
 
 function resizeCanvas() {
     if (!fxCanvas || !confCanvas) return;
-    fxCanvas.width = window.innerWidth; fxCanvas.height = window.innerHeight;
-    confCanvas.width = window.innerWidth; confCanvas.height = window.innerHeight;
+    // iOS fix: pin CSS size to the bitmap. 100vh is the LARGE viewport on iOS, so the
+    // canvas element used to extend past its own bitmap, leaving an unpainted bottom
+    // band that iOS renders as a black bar after compositing churn (theme toggle).
+    const w = document.documentElement.clientWidth;
+    const h = document.documentElement.clientHeight;
+    [fxCanvas, confCanvas].forEach(function (cv) {
+        cv.width = w; cv.height = h;
+        cv.style.width = w + "px";
+        cv.style.height = h + "px";
+    });
 }
 window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
