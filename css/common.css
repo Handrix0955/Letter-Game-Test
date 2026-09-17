@@ -91,7 +91,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px;
     display: flex; flex-direction: column; align-items: center; touch-action: manipulation; padding-bottom: 40px; overflow-x: hidden;
-    transition: background-color 0.4s ease, --streak-color 0.4s ease, --corner-glow 0.4s ease;
+    /* theme transition moved to desktop-only media query below (iOS repaint fix) */
     
         /* 统一的背景结构 (顶部光晕 + 点阵)；斜切光瀑/辉光/颗粒由伪元素承载，颜色随模式自动切换 */
     background-image:
@@ -99,6 +99,13 @@ body {
         radial-gradient(circle at 1px 1px, var(--dot-color) 1px, transparent 0);
     background-size: 100% 100%, 20px 20px;
     background-attachment: fixed;
+}
+
+/* Theme smooth transition: desktop pointer devices only. On iOS touch, repainting the
+   full-page bg + two fixed pseudo layers (mask+skew) frame-by-frame for 0.4s leaves
+   stale tiles from the previous theme -> a black bar at the bottom until navigation */
+@media (hover: hover) and (pointer: fine) {
+    body { transition: background-color 0.4s ease, --streak-color 0.4s ease, --corner-glow 0.4s ease; }
 }
 
 /* ======== 顶级卡片与交互 (白天晶莹剔透，黑夜暗黑深邃) ======== */
@@ -204,6 +211,9 @@ body::after {
 @media (max-width: 480px) {
     :root { --streak-shift: 30%; --streak-scale: 1.45; }
 }
+
+/* iOS fix: after every theme toggle, force one repaint of the two big background layers (clears the stale black bar) */
+body.theme-kick::before, body.theme-kick::after { opacity: 0.998; }
 
 /* 渐进增强: 仅在支持 mask 的浏览器启用条纹遮罩 (不支持则退化为柔和顶部渐变) */
 @supports ((mask-image: linear-gradient(#000, #000)) or (-webkit-mask-image: linear-gradient(#000, #000))) {

@@ -27,7 +27,7 @@ if (typeof currentSkin !== 'string') currentSkin = 'default';
 document.body.setAttribute('data-skin', currentSkin);
 
 function changeSkin(skin) {
-    currentSkin = skin; document.body.setAttribute('data-skin', skin); storageSet('ireSudokuSkin', skin);
+    currentSkin = skin; document.body.setAttribute('data-skin', skin); storageSet('ireSudokuSkin', skin); kickThemeRepaint();
 }
 
 function showAppMessage(title, body, color, iconSvg) {
@@ -76,15 +76,25 @@ function applyThemeUI() {
     if (themeText) themeText.innerText = dark ? '开灯' : '关灯';
 }
 
+// iOS fix: theme toggle repaints huge background layers; Safari may keep stale tiles
+// (a black bar at the bottom until navigation). Force one repaint of those layers.
+function kickThemeRepaint() {
+    document.body.classList.add("theme-kick");
+    requestAnimationFrame(() => {
+        window.scrollBy(0, 1);
+        requestAnimationFrame(() => window.scrollBy(0, -1));
+        requestAnimationFrame(() => document.body.classList.remove("theme-kick"));
+    });
+}
 function toggleTheme() {
     const body = document.body;
     if (body.getAttribute('data-theme') === 'dark') {
         body.removeAttribute('data-theme');
-        storageSet('ireTheme', 'light');
+        storageSet('ireTheme', 'light'); kickThemeRepaint();
         applyThemeUI();
     } else {
         body.setAttribute('data-theme', 'dark');
-        storageSet('ireTheme', 'dark');
+        storageSet('ireTheme', 'dark'); kickThemeRepaint();
         applyThemeUI();
         showAppMessage('护眼模式', '是不是很晚了还在玩呀，早点休息噢宝宝，别玩太晚～', '#6366f1');
     }
