@@ -25,6 +25,7 @@
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.06); 
     --stat-best-color: #059669;
     --streak-shift: 14%; /* 斜切光瀑整体右移量 (手机可视区右侧偏暗, 右移补齐) */
+    --streak-scale: 1; /* 斜切光瀑加粗倍数 (手机窄屏下每道光按视口百分比变细, 需放大补回宽度) */
 }
 
 /* 护眼模式核心 (黑夜模式 Dark) */
@@ -195,12 +196,13 @@ body::before {
 body::after {
     content: '';
     position: fixed; inset: 0; z-index: -2; pointer-events: none;
-    transform: translateX(var(--streak-shift)) skewX(45deg);
+    /* 先 skew 后 scale: 仅横向加粗光带, 45 度倾角严格保持不变 */
+    transform: translateX(var(--streak-shift)) skewX(45deg) scaleX(var(--streak-scale));
     background: linear-gradient(180deg, var(--streak-color) 0%, rgba(0, 0, 0, 0) 100%);
 }
-/* 手机窄屏: 光瀑再往右让一点, 避免可视区右侧发黑 */
+/* 手机窄屏: 视口窄导致每道光按百分比被挤细, 这里整体右移更多 + 加粗光带 */
 @media (max-width: 480px) {
-    :root { --streak-shift: 22%; }
+    :root { --streak-shift: 30%; --streak-scale: 1.45; }
 }
 
 /* 渐进增强: 仅在支持 mask 的浏览器启用条纹遮罩 (不支持则退化为柔和顶部渐变) */
