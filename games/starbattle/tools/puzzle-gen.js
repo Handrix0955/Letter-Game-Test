@@ -161,7 +161,17 @@ function genPuzzle(N, maxAttempts = 150000) {
     throw new Error(`生成失败: ${N}x${N} 超过最大尝试次数`);
 }
 
-// ======== verify 模式: 从 star.js 提取题库反向验证 ========
+// ======== verify 模式: 从 bank.js 提取 PUZZLE_BANK + EVENT_BANK 反向验证 (含跨池去重) ========
+function extractBlock(src, decl) {
+    const start = src.indexOf('const ' + decl + ' = {');
+    if (start < 0) return null;
+    let depth = 0, end = -1;
+    for (let i = src.indexOf('{', start); i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}') { depth--; if (depth === 0) { end = i + 1; break; } }
+    }
+    return JSON.parse(src.slice(src.indexOf('{', start), end));
+}
 function verify() {
     let src;
     const bankPath = path.join(__dirname, '..', 'bank.js');
@@ -170,18 +180,27 @@ function verify() {
     } else {
         src = fs.readFileSync(path.join(__dirname, '..', 'star.js'), 'utf8');
     }
-    const start = src.indexOf('const PUZZLE_BANK = {');
-    if (start < 0) throw new Error('star.js 中未找到 PUZZLE_BANK');
-    let depth = 0, end = -1;
-    for (let i = src.indexOf('{', start); i < src.length; i++) {
-        if (src[i] === '{') depth++;
-        else if (src[i] === '}') { depth--; if (depth === 0) { end = i + 1; break; } }
+    // 汇总所有池 (EVENT_BANK 的 event_moon 键为 9x9)
+    const pools = [];
+    for (const decl of ['PUZZLE_BANK', 'EVENT_BANK']) {
+        const bank = extractBlock(src, decl);
+        if (!bank) { if (decl === 'PUZZLE_BANK') throw new Error('未找到 PUZZLE_BANK'); continue; }
+        for (const sizeKey of Object.keys(bank)) {
+            const N = sizeKey === 'event_moon' ? 9 : +sizeKey;
+            pools.push({ sizeKey, N, arr: bank[sizeKey] });
+        }
     }
-    const bank = eval('(' + src.slice(src.indexOf('{', start), end) + ')');
     let allOk = true;
-    for (const sizeKey of Object.keys(bank)) {
-        const N = +sizeKey;
-        bank[sizeKey].forEach((pz, idx) => {
+    // 跨池去重检查: 任何两道题 (含跨池) 布局相同即 FAIL
+    const seenHash = new Map();
+    for (const p of pools) for (const pz of p.arr) {
+        const h = pz.regions.join('|');
+        if (seenHash.has(h)) { allOk = false; console.log('跨池/池内重复布局: ' + h + ' (先出现于 ' + seenHash.get(h) + ')'); }
+        else seenHash.set(h, p.sizeKey);
+    }
+    for (const p of pools) {
+        const N = p.N;
+        p.arr.forEach((pz, idx) => {
             const grid = pz.regions.map(s => [...s].map(Number));
             const sol = pz.solution.map(s => s.split(',').map(Number));
             const ids = new Set(grid.flat());

@@ -237,3 +237,20 @@ body.theme-kick::before, body.theme-kick::after { opacity: 0.998; }
         mask-composite: add;
     }
 }
+
+/* ======== 中秋活动「玉兔寻觅」专属光照 ======== */
+/* 中秋活动月光 (双类选择器 + !important 提权, 压过皮肤变量的双类特异性; 光瀑/光晕/辉光/点阵全金) */
+body.theme-moon {
+    --ray-color: rgba(253, 224, 71, 0.16) !important;
+    --glow-color: rgba(253, 224, 71, 0.3) !important;
+    --streak-color: rgba(253, 224, 71, 0.16) !important;
+    --corner-glow: rgba(180, 140, 20, 0.08) !important;
+    --dot-color: rgba(253, 224, 71, 0.07) !important;
+}
+body[data-theme="dark"].theme-moon {
+    --ray-color: rgba(253, 224, 71, 0.15) !important;
+    --glow-color: rgba(253, 224, 71, 0.3) !important;
+    --streak-color: rgba(253, 224, 71, 0.28) !important;
+    --corner-glow: rgba(120, 90, 20, 0.35) !important;
+    --dot-color: rgba(253, 224, 71, 0.12) !important;
+}

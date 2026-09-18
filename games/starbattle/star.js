@@ -10,6 +10,10 @@ let currentTarget = 'irene';
 let foundCount = 0;
 let isGameOver = false;
 
+// ======== 中秋限时活动「玉兔寻觅」 (隔离开发, 不影响普通模式) ========
+const MOON_EVENT_END = '2026-10-08T23:59:59+08:00';
+let isMoonEvent = false;
+
 let currentPuzzle = null;
 let timerInterval = null;
 let startTime = 0;
@@ -19,10 +23,15 @@ let elapsedSeconds = 0;
 let defaultStarStats = {
     '7': { best: null, avg: 0, count: 0, name: '7x7 简单' },
     '8': { best: null, avg: 0, count: 0, name: '8x8 中等' },
-    '9': { best: null, avg: 0, count: 0, name: '9x9 困难' }
+    '9': { best: null, avg: 0, count: 0, name: '9x9 困难' },
+    'event_total': { best: null, avg: 0, count: 0, name: '活动模式总榜' },
+    'event_moon': { best: null, avg: 0, count: 0, name: '玉兔爽局' }
 };
 let starStats = storageGet('ireStarStats', defaultStarStats) || defaultStarStats;
 if (typeof starStats !== 'object' || starStats === null) starStats = defaultStarStats;
+// 旧存档兼容: 补挂活动档与总榜 (不碰已有普通档数据)
+if (!starStats['event_moon']) starStats['event_moon'] = { best: null, avg: 0, count: 0, name: '玉兔爽局' };
+if (!starStats['event_total']) starStats['event_total'] = { best: null, avg: 0, count: 0, name: '活动模式总榜' };
 
 function formatTime(sec) {
     if (sec === null || sec === Infinity) return '--:--';
@@ -31,26 +40,49 @@ function formatTime(sec) {
     return `${m}:${s}`;
 }
 
+// 活动模式战绩记在 event_moon 键, 与普通档完全隔离
+function statsKey() { return isMoonEvent ? 'event_moon' : String(size); }
+
 function saveStarStats() {
-    let s = starStats[String(size)];
+    let s = starStats[statsKey()];
     if (!s) return;
     s.count++;
     s.avg = ((s.avg * (s.count - 1)) + elapsedSeconds) / s.count;
     if (s.best === null || elapsedSeconds < s.best) s.best = elapsedSeconds;
+    // 活动模式通关同时累积"活动总榜" (口径与数独的 event_total 一致)
+    if (isMoonEvent && starStats['event_total']) {
+        let t = starStats['event_total'];
+        t.count++;
+        t.avg = ((t.avg * (t.count - 1)) + elapsedSeconds) / t.count;
+        if (t.best === null || elapsedSeconds < t.best) t.best = elapsedSeconds;
+    }
     storageSet('ireStarStats', starStats);
 }
 
 function openStats() {
     let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>通关局数</th><th>题库进度</th></tr>`;
-    ['7', '8', '9'].forEach(k => {
+    ['7', '8', '9', 'event_total', 'event_moon'].forEach(k => {
         let s = starStats[k];
         if (!s) return;
+        // 过期且从未玩过的活动分榜不再展示 (总榜始终保留); 口径与数独一致
+        if (k === 'event_moon' && !document.getElementById('event-moon-option') && s.count === 0) return;
+        // 进度按当前池过滤统计 (活动池切换后, 旧共用池的已玩 hash 自动排除; 普通池无影响)
+        const isEvtRow = k === 'event_moon';
+        let progCell = '—';
+        if (k !== 'event_total') { // 总榜不绑题库, 其余行才计算进度
+            const pool = isEvtRow
+                ? ((typeof EVENT_BANK !== 'undefined' && EVENT_BANK.event_moon && EVENT_BANK.event_moon.length) ? EVENT_BANK.event_moon : PUZZLE_BANK['9'])
+                : PUZZLE_BANK[k];
+            const hashSet = new Set(pool.map(puzzleHash));
+            const progCnt = (starProgress.played[k] || []).filter(h => hashSet.has(h)).length;
+            progCell = `${progCnt}/${pool.length}`;
+        }
         html += `<tr>
             <td><b>${s.name}</b></td>
             <td style="color: var(--stat-best-color); font-weight:bold;">${formatTime(s.best)}</td>
             <td>${s.count === 0 ? '--:--' : formatTime(s.avg)}</td>
             <td>${s.count}</td>
-            <td>${starProgress.played[k].length}/${PUZZLE_BANK[k].length}</td>
+            <td>${progCell}</td>
         </tr>`;
     });
     document.getElementById('statsTable').innerHTML = html;
@@ -58,11 +90,11 @@ function openStats() {
 }
 
 // ======== 防重复抽题 (已玩集合; 注入新题后玩家自动无缝继续) ========
-let defaultStarProgress = { ver: 2, played: { '7': [], '8': [], '9': [] }, cycles: { '7': 0, '8': 0, '9': 0 } };
+let defaultStarProgress = { ver: 2, played: { '7': [], '8': [], '9': [], 'event_moon': [] }, cycles: { '7': 0, '8': 0, '9': 0, 'event_moon': 0 } };
 let starProgress = storageGet('ireStarProgress', defaultStarProgress) || defaultStarProgress;
 // ver 2: 进度语义修正为"通关才计入" (旧版本开局即计入, 已污染数据自动重置一次)
 if (typeof starProgress !== 'object' || !starProgress.played || starProgress.ver !== 2) starProgress = JSON.parse(JSON.stringify(defaultStarProgress));
-['7', '8', '9'].forEach(k => {
+['7', '8', '9', 'event_moon'].forEach(k => {
     if (!Array.isArray(starProgress.played[k])) starProgress.played[k] = [];
     if (typeof starProgress.cycles[k] !== 'number') starProgress.cycles[k] = 0;
 });
@@ -81,7 +113,8 @@ function drawPuzzle(sizeKey, bankArr) {
         starProgress.played[sizeKey] = [];
         storageSet('ireStarProgress', starProgress);
         setTimeout(() => {
-            showAppMessage('题库大满贯！', `你已通关 ${sizeKey}x${sizeKey} 的全部 ${bankArr.length} 道题！题库已重新随机，继续挑战更快纪录吧！`, '#8b5cf6', ICON_TROPHY);
+            const roundLabel = sizeKey === 'event_moon' ? '9x9 玉兔寻觅' : `${sizeKey}x${sizeKey}`;
+            showAppMessage('题库大满贯！', `你已通关 ${roundLabel} 的全部 ${bankArr.length} 道题！题库已重新随机，继续挑战更快纪录吧！`, '#8b5cf6', ICON_TROPHY);
         }, 400);
         unplayed = bankArr.map((_, idx) => idx);
     }
@@ -99,16 +132,35 @@ const ICON_TROPHY = '<svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5
 
 function startNewGame() {
     const diff = document.getElementById('diff-select').value;
-    size = parseInt(diff);
-    // 7x7给2命，8x8给3命，9x9给3命
-    maxHp = size === 7 ? 2 : 3;
+
+    // 活动过期管理: 过期即摘除选项; 若正玩着活动档, 切回普通 8x8 重开
+    if (new Date() > new Date(MOON_EVENT_END)) {
+        const opt = document.getElementById('event-moon-option');
+        if (opt) opt.remove();
+        if (diff === 'event_moon') {
+            document.getElementById('diff-select').value = '8';
+            return startNewGame();
+        }
+    }
+
+    // 活动分支: 9x9 / 3 命 / 独立进度与战绩; 普通模式逻辑零改动
+    isMoonEvent = diff === 'event_moon';
+    document.body.classList.toggle('theme-moon', isMoonEvent);
+
+    size = isMoonEvent ? 9 : parseInt(diff);
+    // 7x7给2命，8x8/9x9给3命
+    maxHp = isMoonEvent ? 3 : (size === 7 ? 2 : 3);
     currentHp = maxHp;
     foundCount = 0;
     isGameOver = false;
 
     // 从题库抽题 (已玩集合防重复, 不重复玩完一轮后自动开新一轮)
-    const bank = PUZZLE_BANK[size];
-    currentPuzzle = drawPuzzle(String(size), bank);
+    // 活动模式: 题目取自活动专属池 EVENT_BANK (与普通池零重叠), 进度记在独立的 event_moon 键
+    const progKey = isMoonEvent ? 'event_moon' : String(size);
+    // 兜底: 若 bank.js 旧版本尚无 EVENT_BANK, 活动档自动退回共用 9x9 池
+    const eventPool = (typeof EVENT_BANK !== 'undefined' && EVENT_BANK.event_moon && EVENT_BANK.event_moon.length)
+        ? EVENT_BANK.event_moon : PUZZLE_BANK['9'];
+    currentPuzzle = drawPuzzle(progKey, isMoonEvent ? eventPool : PUZZLE_BANK[String(size)]);
 
     renderHp();
     buildBoard();
@@ -162,7 +214,15 @@ function renderHp() {
     const hpContainer = document.getElementById('hp-container');
     hpContainer.innerHTML = '';
     for (let i = 0; i < maxHp; i++) {
-        const svg = `<svg class="heart-icon icon ${i >= currentHp ? 'lost' : ''}" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`;
+        let svg;
+        if (isMoonEvent) {
+            // 月相 HP: 满月 = 剩余血量, 残月 = 已失去
+            svg = i >= currentHp
+                ? `<svg class="heart-icon icon lost" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="transparent" stroke="#fde047" stroke-width="2" opacity="0.4"/></svg>`
+                : `<svg class="heart-icon icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fde047"/></svg>`;
+        } else {
+            svg = `<svg class="heart-icon icon ${i >= currentHp ? 'lost' : ''}" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`;
+        }
         hpContainer.insertAdjacentHTML('beforeend', svg);
     }
 }
@@ -266,7 +326,26 @@ function handleDoubleTap(cell) {
         img.src = `../../assets/${currentTarget}.png`;
         img.className = 'cell-avatar';
         cell.appendChild(img);
-        
+
+        // 中秋活动: 兔耳 + 自动排除 Buff (同行/同列/对角邻域自动打上月饼叉, 严格数字比对)
+        if (isMoonEvent) {
+            let ears = document.createElement('div'); ears.className = 'bunny-ears'; cell.appendChild(ears);
+            let targetR = parseInt(r, 10);
+            let targetC = parseInt(c, 10);
+            document.querySelectorAll('.cell').forEach(el => {
+                let curR = parseInt(el.dataset.r, 10);
+                let curC = parseInt(el.dataset.c, 10);
+                let isSameRow = (curR === targetR);
+                let isSameCol = (curC === targetC);
+                let isAdjacent = (Math.abs(curR - targetR) <= 1 && Math.abs(curC - targetC) <= 1);
+                if (isSameRow || isSameCol || isAdjacent) {
+                    if (!el.dataset.locked && !el.classList.contains('error-lock')) {
+                        el.classList.add('marked');
+                    }
+                }
+            });
+        }
+
         if (typeof playSound === 'function') playSound('bubble');
         
         foundCount++;
@@ -293,14 +372,18 @@ function checkWinCondition() {
     if (foundCount === size) {
         elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
         isGameOver = true;
-        clearInterval(timerInterval); // 赢了之后立刻停止计时
+        clearInterval(timerInterval); // 无论什么模式必须停表
         saveStarStats(); // 通关战绩落盘 (仅记录胜利)
-        if (currentPuzzleHash && !starProgress.played[String(size)].includes(currentPuzzleHash)) {
-            starProgress.played[String(size)].push(currentPuzzleHash); // 通关才计入题库进度
+        // 通关才计入题库进度 (活动档记入 event_moon 键, 与普通档隔离)
+        const progKey = statsKey();
+        if (currentPuzzleHash && !starProgress.played[progKey].includes(currentPuzzleHash)) {
+            starProgress.played[progKey].push(currentPuzzleHash);
             storageSet('ireStarProgress', starProgress);
             currentPuzzleHash = '';
         }
-        if (typeof triggerConfetti === 'function') triggerConfetti();
+        if (isMoonEvent) {
+            if (typeof triggerLanterns === 'function') triggerLanterns(); // 通关孔明灯
+        } else if (typeof triggerConfetti === 'function') triggerConfetti();
         setTimeout(() => {
             showAppMessage('完美寻觅！', `恭喜abb宝宝精准找出了所有的 ${currentTarget === 'irene' ? 'Irene' : 'Handrix'}！\n用时: ${String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:${String(elapsedSeconds % 60).padStart(2, '0')}`, '#10b981', ICON_TROPHY);
         }, 500);
@@ -310,3 +393,22 @@ function checkWinCondition() {
 function openRules() { document.getElementById('rulesModal').style.display = 'flex'; }
 
 window.addEventListener('DOMContentLoaded', startNewGame);
+
+// ======== 中秋活动: 通关孔明灯 (DOM 灯体 + CSS 动画, 自下而上摇曳飘升) ========
+function triggerLanterns() {
+    if (typeof playSound === 'function') playSound('win');
+    const n = 22;
+    for (let i = 0; i < n; i++) {
+        const l = document.createElement('div');
+        l.className = 'sky-lantern';
+        const size = 18 + Math.random() * 22; // 灯体大小
+        l.style.width = size + 'px';
+        l.style.height = size * 1.3 + 'px';
+        l.style.left = (5 + Math.random() * 90) + 'vw';
+        l.style.setProperty('--sway', (Math.random() * 30 - 15) + 'px');
+        l.style.setProperty('--delay', (Math.random() * 4) + 's');
+        l.style.setProperty('--dur', (8 + Math.random() * 6) + 's');
+        document.body.appendChild(l);
+        setTimeout(() => l.remove(), 14000);
+    }
+}
