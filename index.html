@@ -141,6 +141,10 @@
         .hall-bottom { display: flex; gap: 10px; align-self: center; }
         .hall-bottom .hall-theme { margin-top: 0; }
     </style>
+<link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/app-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body data-skin="default" data-theme="dark">
     <canvas id="canvas-fx"></canvas>
@@ -222,5 +226,14 @@
     </div>
 
     <script src="js/common.js"></script>
+<script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+            navigator.serviceWorker.register("sw.js").catch(function (err) {
+                console.warn("SW register failed:", err);
+            });
+        });
+    }
+    </script>
 </body>
 </html>

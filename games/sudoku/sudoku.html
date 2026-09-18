@@ -6,6 +6,10 @@
     <title>爱意九宫格：han luv ire</title>
     <link rel="stylesheet" href="../../css/common.css">
     <link rel="stylesheet" href="sudoku.css">
+    <link rel="manifest" href="../../manifest.json">
+    <link rel="apple-touch-icon" href="../../assets/app-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body data-skin="default" data-theme="dark">
 
@@ -132,7 +136,7 @@
         <div class="modal-content">
             <h2><svg class="icon" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> 个人战绩看板</h2>
             <table class="stats-table" id="statsTable"></table>
-            <p style="font-size: 11px; color: var(--text-note); text-align: center; margin-top: 15px;">* 数据安全储存在本手机芯片内，绝对隐私</p>
+            <p style="font-size: 11px; color: var(--text-note); text-align: center; margin-top: 15px;">* 宝宝好厉害～做得好快呀！</p>
             <button class="close-btn" onclick="closeModal('statsModal')">继续加油！</button>
         </div>
     </div>
@@ -147,5 +151,14 @@
 
     <script src="../../js/common.js"></script>
     <script src="sudoku.js"></script>
+<script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+            navigator.serviceWorker.register("../sw.js").catch(function (err) {
+                console.warn("SW register failed:", err);
+            });
+        });
+    }
+    </script>
 </body>
 </html>

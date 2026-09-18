@@ -1,0 +1,17 @@
+{
+  "name": "Irene's Puzzle Box",
+  "short_name": "Puzzle Box",
+  "display": "standalone",
+  "start_url": "./",
+  "scope": "./",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "assets/app-icon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
