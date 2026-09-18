@@ -89,8 +89,11 @@ body[data-theme="dark"][data-skin="purple"] {
 /* ======== 全局背景重塑 (点阵 + 射线统一架构) ======== */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 15px;
-    display: flex; flex-direction: column; align-items: center; touch-action: manipulation; padding-bottom: 40px; overflow-x: hidden;
+    background-color: var(--bg-color); color: var(--text-main); margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex; flex-direction: column; align-items: center; touch-action: manipulation; overflow-x: hidden;
+    padding: calc(15px + env(safe-area-inset-top)) 15px calc(40px + env(safe-area-inset-bottom)) 15px;
     /* theme transition moved to desktop-only media query below (iOS repaint fix) */
     
         /* 统一的背景结构 (顶部光晕 + 点阵)；斜切光瀑/辉光/颗粒由伪元素承载，颜色随模式自动切换 */

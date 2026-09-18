@@ -1,7 +1,7 @@
 /* Irene's Puzzle Box - service worker (offline + installable)
    IMPORTANT: bump CACHE (v3 -> v4 ...) whenever any cached file changes;
    the new content is picked up on the next visit. */
-const CACHE = 'ire-pbox-v3';
+const CACHE = 'ire-pbox-v4';
 const FILES = [
   './',
   'index.html',
