@@ -43,7 +43,7 @@ let isFixed = Array(9).fill().map(() => Array(9).fill(false));
 let selectedRow = -1; let selectedCol = -1; let noteMode = false;
 let historyStack = []; const MAX_HISTORY = 15;
 let timerInterval = null; let timeElapsed = 0; let gameActive = false;
-let eventHints = {}; let hintsLeft = 50; // 测试期 50 次提示 (上线前改回正式值)
+let eventHints = {}; let hintsLeft = 5;
 let luvCells = [];
 
 // ======== 中秋活动「玉兔捕月」(与星战活动对齐, 10-08 过期) ========
@@ -111,7 +111,7 @@ function startNewGame() {
     isMoonEvent = false; moonLanterns = []; moonFixed = []; // 中秋状态默认关闭
     const _boardEl = document.getElementById('board');
     if (_boardEl) { _boardEl.style.opacity = ''; _boardEl.style.transition = ''; } // 通关动画压暗必须复原
-    hintsLeft = 50; document.getElementById('hint-text').innerText = `提示(50)`; // 测试期 50 次
+    hintsLeft = 5; document.getElementById('hint-text').innerText = `提示(5)`;
 
     if (diffKey === 'event_qixi') {
         isMoonEvent = false; moonLanterns = []; moonFixed = []; // 中秋与七夕分支互斥
@@ -322,7 +322,7 @@ function checkMagpieAnimation() {
 
 function useHint() {
     if (!gameActive) return;
-    if (hintsLeft <= 0) { showMessage("提示", "50次提示机会已经用完啦宝宝～靠你自己咯！", "#f59e0b"); return; } // 测试期 50 次
+    if (hintsLeft <= 0) { showMessage("提示", "5次提示机会已经用完啦宝宝～靠你自己咯！", "#f59e0b"); return; }
     if (selectedRow === -1 || selectedCol === -1) { showMessage("提示", "请先点击选中一个你想要提示的空白格子哦！", "#3b82f6"); return; }
     if (isFixed[selectedRow][selectedCol]) { showMessage("提示", "这个已经是题目啦，不需要提示！", "#f59e0b"); return; }
     let correctChar = solution[selectedRow][selectedCol];

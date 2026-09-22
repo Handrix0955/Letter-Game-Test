@@ -108,7 +108,6 @@ body[data-theme="dark"].theme-moon .board { border-color: #eab308 !important; bo
 body.theme-moon .cell.mooncake-fixed {
     background-color: var(--cell-bg) !important;
     box-shadow: inset 0 0 20px rgba(234, 179, 8, 0.15);
-    border: none !important;
     border-radius: 0;
     color: #d97706 !important; font-weight: 800;
 }
@@ -129,8 +128,9 @@ body.theme-moon .cell.lantern-lit {
     background: radial-gradient(ellipse at 50% 80%, #fef08a 0%, #ea580c 100%) !important;
     color: #ffffff !important;
     text-shadow: 0 0 4px rgba(0,0,0,0.4);
-    box-shadow: 0 0 15px rgba(234, 88, 12, 0.8), inset 0 -4px 10px rgba(255,255,255,0.4);
-    border: none; border-radius: 6px 6px 12px 12px;
+    box-shadow: 0 0 6px rgba(234, 88, 12, 0.55), inset 0 -4px 10px rgba(255,255,255,0.4);
+    border-radius: 6px 6px 12px 12px;
+    background-clip: padding-box;
     transform: scale(0.9); z-index: 2;
 }
 /* 飞行字母 (通关聚拢动画) */
