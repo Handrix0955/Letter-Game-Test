@@ -6,13 +6,15 @@ let defaultStats = {
     '45': { best: null, avg: 0, count: 0, name: '中等模式' },
     '55': { best: null, avg: 0, count: 0, name: '困难模式' },
     'event_total': { best: null, avg: 0, count: 0, name: '活动模式总榜' },
-    'event_qixi': { best: null, avg: 0, count: 0, name: '七夕特别活动' }
+    'event_qixi': { best: null, avg: 0, count: 0, name: '七夕特别活动' },
+    'event_moon': { best: null, avg: 0, count: 0, name: '玉兔捕月' }
 };
 
 let localStats = storageGet('ireSudokuStats', defaultStats) || defaultStats;
 if (typeof localStats !== 'object' || localStats === null) localStats = defaultStats;
 if (!localStats['event_total']) localStats['event_total'] = defaultStats['event_total'];
 if (!localStats['event_qixi']) localStats['event_qixi'] = defaultStats['event_qixi'];
+if (!localStats['event_moon']) localStats['event_moon'] = defaultStats['event_moon'];
 
 // 无损继承端午数据
 if (localStats['event'] && localStats['event'].count > 0 && localStats['event_total'].count === 0) {
@@ -21,7 +23,7 @@ if (localStats['event'] && localStats['event'].count > 0 && localStats['event_to
     localStats['event_total'].best = localStats['event'].best;
 }
 
-['35', '45', '55', 'event_total', 'event_qixi'].forEach(k => {
+['35', '45', '55', 'event_total', 'event_qixi', 'event_moon'].forEach(k => {
     let s = localStats[k];
     if (s) {
         s.name = defaultStats[k].name;
@@ -41,8 +43,14 @@ let isFixed = Array(9).fill().map(() => Array(9).fill(false));
 let selectedRow = -1; let selectedCol = -1; let noteMode = false;
 let historyStack = []; const MAX_HISTORY = 15;
 let timerInterval = null; let timeElapsed = 0; let gameActive = false;
-let eventHints = {}; let hintsLeft = 3;
+let eventHints = {}; let hintsLeft = 50; // 测试期 50 次提示 (上线前改回正式值)
 let luvCells = [];
+
+// ======== 中秋活动「玉兔捕月」(与星战活动对齐, 10-08 过期) ========
+const MOON_EVENT_END = '2026-10-08T23:59:59+08:00';
+let isMoonEvent = false;
+let moonLanterns = []; // 9 盏孔明灯: 每字母 1 格, 开局全空待填
+let moonFixed = [];    // 6 个月饼格: han/ire 各字母 1 格, 固定提示
 
 // 七夕在8月底过期
 function checkEventExpiry() {
@@ -51,6 +59,12 @@ function checkEventExpiry() {
         let eventOpt = document.getElementById('event-option');
         if (eventOpt) eventOpt.remove();
         if (document.getElementById('diff-select').value === 'event_qixi') document.getElementById('diff-select').value = '45';
+    }
+    // 中秋到期管理 (与星战活动同口径, 选 45 中等回退)
+    if (now > new Date(MOON_EVENT_END)) {
+        let moonOpt = document.getElementById('event-moon-option');
+        if (moonOpt) moonOpt.remove();
+        if (document.getElementById('diff-select').value === 'event_moon') document.getElementById('diff-select').value = '45';
     }
 }
 
@@ -94,9 +108,14 @@ function startNewGame() {
     let blanks = diffKey.startsWith('event_') ? 55 : parseInt(diffKey);
     eventHints = {}; let forcedBlanks = [];
     luvCells = []; magpieTriggered = false;
-    hintsLeft = 3; document.getElementById('hint-text').innerText = `提示(3)`;
+    isMoonEvent = false; moonLanterns = []; moonFixed = []; // 中秋状态默认关闭
+    const _boardEl = document.getElementById('board');
+    if (_boardEl) { _boardEl.style.opacity = ''; _boardEl.style.transition = ''; } // 通关动画压暗必须复原
+    hintsLeft = 50; document.getElementById('hint-text').innerText = `提示(50)`; // 测试期 50 次
 
     if (diffKey === 'event_qixi') {
+        isMoonEvent = false; moonLanterns = []; moonFixed = []; // 中秋与七夕分支互斥
+        document.body.classList.remove('theme-moon');
         document.body.classList.add('theme-event');
         document.getElementById('main-title').innerText = "星河鹊桥局：han luv ire";
         startEventBg();
@@ -107,6 +126,22 @@ function startNewGame() {
             shapes.luv.forEach(p => { forcedBlanks.push(p); eventHints[`${p[0]}-${p[1]}`] = 'luv'; luvCells.push(p); });
             shapes.ire.forEach(p => { forcedBlanks.push(p); eventHints[`${p[0]}-${p[1]}`] = 'ire'; });
         } else generateSolution();
+    } else if (diffKey === 'event_moon') { // 中秋「玉兔捕月」: 55 困难基底 + 9 孔明灯强制挖空 + 6 月饼盖章
+        isMoonEvent = true;
+        document.body.classList.remove('theme-event');
+        document.body.classList.add('theme-moon');
+        document.getElementById('main-title').innerText = "玉兔捕月：han luv ire";
+        stopEventBg(); generateSolution();
+        // 9 盏孔明灯: 每个字母随机抽 1 个坐标, 强制挖空 (唯一性由 countSolutions 兜底)
+        for (let vi = 0; vi < 9; vi++) {
+            let spots = [];
+            for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
+                if (solution[r][c] === LETTERS[vi]) spots.push([r, c]);
+            }
+            let pick = spots[Math.floor(Math.random() * spots.length)];
+            moonLanterns.push({ r: pick[0], c: pick[1], val: LETTERS[vi] });
+            forcedBlanks.push(pick);
+        }
     } else {
         document.body.classList.remove('theme-event');
         document.getElementById('main-title').innerText = "爱意九宫格：han luv ire";
@@ -114,6 +149,25 @@ function startNewGame() {
     }
 
     createPuzzle(blanks, forcedBlanks);
+    if (isMoonEvent) {
+        // 6 个月饼格: h,a,n,i,r,e 各随机抽 1 个 (避开 9 灯位与已有关卡提示), 生成后盖章成固定提示
+        const moonVals = ['h', 'a', 'n', 'i', 'r', 'e'];
+        const taken = new Set(moonLanterns.map(m => `${m.r}-${m.c}`));
+        for (const letter of moonVals) {
+            let spots = [];
+            for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
+                if (solution[r][c] === letter && !taken.has(`${r}-${c}`) && isFixed[r][c]) spots.push([r, c]);
+            }
+            if (!spots.length) continue; // 极端情况该字母全被挖空则跳过, 不破坏唯一性
+            let pick = spots[Math.floor(Math.random() * spots.length)];
+            taken.add(`${pick[0]}-${pick[1]}`);
+            moonFixed.push({ r: pick[0], c: pick[1], val: letter });
+            board[pick[0]][pick[1]] = letter; // 塞回答案
+            isFixed[pick[0]][pick[1]] = true; // 锁死为提示
+            userGrid[pick[0]][pick[1]] = '';  // 提示格不占用户格
+            notesGrid[pick[0]][pick[1]] = []; // 清掉可能残留的笔记
+        }
+    }
     selectedRow = -1; selectedCol = -1; historyStack = [];
     renderBoard();
     gameActive = true; clearInterval(timerInterval); timeElapsed = 0; updateTimerDisplay();
@@ -205,6 +259,23 @@ function renderBoard() {
             let hintGroup = eventHints[`${r}-${c}`];
             if (hintGroup) cellDiv.classList.add(`hint-${hintGroup}`);
 
+            // 中秋: 孔明灯亮灭态 + 月饼提示格 (分支内判断, 普通模式零成本)
+            if (isMoonEvent) {
+                let moonM = null, moonF = null;
+                for (let mi = 0; mi < moonLanterns.length; mi++) {
+                    if (moonLanterns[mi].r === r && moonLanterns[mi].c === c) { moonM = moonLanterns[mi]; break; }
+                }
+                for (let fi = 0; fi < moonFixed.length; fi++) {
+                    if (moonFixed[fi].r === r && moonFixed[fi].c === c) { moonF = moonFixed[fi]; break; }
+                }
+                if (moonF) {
+                    cellDiv.classList.add('mooncake-fixed');
+                } else if (moonM) {
+                    let curVal = isFixed[r][c] ? board[r][c] : userGrid[r][c];
+                    cellDiv.classList.add(curVal === moonM.val ? 'lantern-lit' : 'lantern-empty');
+                }
+            }
+
             if (isFixed[r][c]) {
                 cellDiv.classList.add('fixed'); cellDiv.innerText = board[r][c];
             } else if (userGrid[r][c] !== '') {
@@ -251,7 +322,7 @@ function checkMagpieAnimation() {
 
 function useHint() {
     if (!gameActive) return;
-    if (hintsLeft <= 0) { showMessage("提示", "3次提示机会已经用完啦宝宝～靠你自己咯！", "#f59e0b"); return; }
+    if (hintsLeft <= 0) { showMessage("提示", "50次提示机会已经用完啦宝宝～靠你自己咯！", "#f59e0b"); return; } // 测试期 50 次
     if (selectedRow === -1 || selectedCol === -1) { showMessage("提示", "请先点击选中一个你想要提示的空白格子哦！", "#3b82f6"); return; }
     if (isFixed[selectedRow][selectedCol]) { showMessage("提示", "这个已经是题目啦，不需要提示！", "#f59e0b"); return; }
     let correctChar = solution[selectedRow][selectedCol];
@@ -333,6 +404,7 @@ function checkWin() {
     }
 
     storageSet('ireSudokuStats', localStats);
+    if (isMoonEvent) { playMoonWinAnimation(); return; } // 中秋剧本: 飞信聚拢 + 孔明灯 + 延迟情话弹窗
     triggerConfetti();
 
     let msg = `太棒了Abbbbbbbb！恭喜你完成了 Irene 专属数独！\n\n本局用时: ${formatTime(timeElapsed)}`;
@@ -345,12 +417,83 @@ function showMessage(title, body, color) {
     showAppMessage(title, body, color);
 }
 
+// ======== 中秋通关剧本: 9 飞信聚拢拼 hanluvire + 孔明灯 + 延迟情话弹窗 ========
+function playMoonWinAnimation() {
+    const order = ['h', 'a', 'n', 'l', 'u', 'v', 'i', 'r', 'e'];
+    const boardEl = document.getElementById('board');
+    const flyers = [];
+    for (const letter of order) {
+        const m = moonLanterns.find(x => x.val === letter);
+        if (!m) continue;
+        const cellEl = document.getElementById(`cell-${m.r}-${m.c}`);
+        if (!cellEl) continue;
+        const rect = cellEl.getBoundingClientRect();
+        const f = document.createElement('div');
+        f.className = 'fly-letter';
+        f.innerText = letter;
+        f.style.left = rect.left + 'px';
+        f.style.top = rect.top + 'px';
+        document.body.appendChild(f);
+        flyers.push(f);
+    }
+    // 棋盘压暗隐去 (新开局/弹窗时复原)
+    boardEl.style.transition = 'opacity 1s';
+    boardEl.style.opacity = '0.1';
+    // 100ms 后飞向屏幕正中央横向一排 (han luv ire 三组停顿; 窄屏自动收紧防出界)
+    setTimeout(() => {
+        const narrow = window.innerWidth < 420;
+        const cell = narrow ? 32 : 40, sep = narrow ? 12 : 20;
+        const totalWidth = 9 * cell + 2 * sep;
+        flyers.forEach((f, i) => {
+            let gap = 0;
+            if (i >= 3) gap += sep;
+            if (i >= 6) gap += sep;
+            f.style.width = cell + 'px';
+            f.style.height = cell + 'px';
+            f.style.fontSize = (narrow ? 18 : 24) + 'px';
+            f.style.left = ((window.innerWidth - totalWidth) / 2 + i * cell + gap) + 'px';
+            f.style.top = (window.innerHeight * 0.35) + 'px';
+        });
+    }, 100);
+    // 飞行到位后点亮孔明灯 (DOM 灯体, 与星战同款本地版)
+    setTimeout(() => { triggerLanterns(); }, 2100);
+    // 2.5s 后弹窗 (手动关闭, 棋盘在背后悄悄恢复)
+    setTimeout(() => {
+        for (const f of flyers) f.remove();
+        boardEl.style.opacity = '';
+        boardEl.style.transition = '';
+        showAppMessage('中秋圆满', '但愿人长久，千里想宝宝～ 🌕\n\n用时: ' + formatTime(timeElapsed), '#eab308');
+    }, 5000);
+}
+
+// 孔明灯 (DOM 灯体 + CSS 动画, 与星战 triggerLanterns 同款本地版)
+function triggerLanterns() {
+    const n = 22;
+    for (let i = 0; i < n; i++) {
+        const l = document.createElement('div');
+        l.className = 'sky-lantern';
+        const size = 18 + Math.random() * 22;
+        l.style.width = size + 'px';
+        l.style.height = size * 1.3 + 'px';
+        l.style.left = (5 + Math.random() * 90) + 'vw';
+        l.style.setProperty('--sway', (Math.random() * 30 - 15) + 'px');
+        l.style.setProperty('--delay', (Math.random() * 4) + 's');
+        l.style.setProperty('--dur', (8 + Math.random() * 6) + 's');
+        document.body.appendChild(l);
+        setTimeout(() => l.remove(), 14000);
+    }
+}
+
 function openStats() {
     let html = `<tr><th>难度</th><th>最佳记录</th><th>平均耗时</th><th>通关局数</th></tr>`;
-    ['35', '45', '55', 'event_total', 'event_qixi'].forEach(k => {
+    ['35', '45', '55', 'event_total', 'event_qixi', 'event_moon'].forEach(k => {
         let s = localStats[k];
         if (!s) return;
-        if (k.startsWith('event_') && k !== 'event_total' && !document.getElementById('event-option') && s.count === 0) return;
+        // 过期且从未玩过的活动分榜不再展示 (总榜始终保留); 与星战口径一致
+        if (k.startsWith('event_') && k !== 'event_total' && s.count === 0) {
+            const optId = k === 'event_moon' ? 'event-moon-option' : 'event-option';
+            if (!document.getElementById(optId)) return;
+        }
 
         html += `<tr>
             <td><b>${s.name}</b></td>
@@ -364,8 +507,12 @@ function openStats() {
 }
 
 function openRules() {
-    let isEvent = document.getElementById('diff-select').value === 'event_qixi';
-    document.getElementById('rule-event-title').style.display = isEvent ? 'block' : 'none';
-    document.getElementById('rule-event-body').style.display = isEvent ? 'block' : 'none';
+    let v = document.getElementById('diff-select').value;
+    let isQixi = v === 'event_qixi';
+    let isMoon = v === 'event_moon';
+    document.getElementById('rule-event-title').style.display = isQixi ? 'block' : 'none';
+    document.getElementById('rule-event-body').style.display = isQixi ? 'block' : 'none';
+    document.getElementById('rule-moon-title').style.display = isMoon ? 'block' : 'none';
+    document.getElementById('rule-moon-body').style.display = isMoon ? 'block' : 'none';
     document.getElementById('rulesModal').style.display = 'flex';
 }

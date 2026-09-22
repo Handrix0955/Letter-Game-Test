@@ -97,3 +97,71 @@ select#diff-select, #new-game-btn { flex: 1; max-width: 130px; text-align: cente
 .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; text-align: center; font-size: 14px; }
 .stats-table th { background: var(--th-bg); padding: 10px 8px; border-bottom: 1px solid var(--glass-border); border-radius: 8px 8px 0 0;}
 .stats-table td { border-bottom: 1px solid var(--glass-border); padding: 12px 8px; }
+
+/* ======== 中秋活动「玉兔捕月」专属样式 ======== */
+.theme-moon-text { color: #b45309; }
+body[data-theme="dark"] .theme-moon-text, [data-theme="dark"] .theme-moon-text { color: #fde047; }
+/* 棋盘月光边框 */
+body.theme-moon .board { border-color: #fde047 !important; box-shadow: 0 8px 32px rgba(253, 224, 71, 0.2); }
+body[data-theme="dark"].theme-moon .board { border-color: #eab308 !important; box-shadow: 0 8px 32px rgba(234, 179, 8, 0.4); }
+/* 月饼提示格: 恢复底板色防穿模 + 极淡金色内发光 (不抢灯的风头) */
+body.theme-moon .cell.mooncake-fixed {
+    background-color: var(--cell-bg) !important;
+    box-shadow: inset 0 0 20px rgba(234, 179, 8, 0.15);
+    border: none !important;
+    border-radius: 0;
+    color: #d97706 !important; font-weight: 800;
+}
+body[data-theme="dark"].theme-moon .cell.mooncake-fixed {
+    background-color: var(--cell-bg) !important;
+    color: #fcd34d !important;
+    box-shadow: inset 0 0 20px rgba(253, 224, 71, 0.15);
+}
+/* 空孔明灯: 虚线纸灯笼骨架 */
+body.theme-moon .cell.lantern-empty {
+    background-color: transparent !important;
+    box-shadow: inset 0 0 10px rgba(234, 179, 8, 0.15);
+    border: 1px dashed rgba(234, 179, 8, 0.6);
+    border-radius: 6px; transform: scale(0.9);
+}
+/* 已点亮孔明灯: 渐变发光纸灯笼质感 (上宽下窄) */
+body.theme-moon .cell.lantern-lit {
+    background: radial-gradient(ellipse at 50% 80%, #fef08a 0%, #ea580c 100%) !important;
+    color: #ffffff !important;
+    text-shadow: 0 0 4px rgba(0,0,0,0.4);
+    box-shadow: 0 0 15px rgba(234, 88, 12, 0.8), inset 0 -4px 10px rgba(255,255,255,0.4);
+    border: none; border-radius: 6px 6px 12px 12px;
+    transform: scale(0.9); z-index: 2;
+}
+/* 飞行字母 (通关聚拢动画) */
+.fly-letter { position: fixed; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; background: #fef08a; color: #b45309; border-radius: 8px; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.6); z-index: 10000; transition: all 2s cubic-bezier(0.25, 1, 0.5, 1); }
+/* 孔明灯: 暖光梯形灯身 + 内芯亮核 + 底口 + 光晕, 上升摇摆后淡出 (与星战同款, 数独本地版) */
+.sky-lantern {
+    position: fixed;
+    bottom: -8vh;
+    z-index: 9998;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 30%, #fffbe6 0%, #fde68a 30%, #f59e0b 68%, #b45309 100%);
+    border-radius: 46% 46% 40% 40% / 58% 58% 42% 42%;
+    box-shadow: 0 0 18px 6px rgba(253, 224, 71, 0.45), 0 0 46px 14px rgba(245, 158, 11, 0.18), inset 0 -4px 8px rgba(120, 53, 15, 0.55);
+    opacity: 0;
+    animation: lanternFloat var(--dur, 10s) ease-in var(--delay, 0s) forwards;
+}
+.sky-lantern::before {
+    content: ''; position: absolute; left: 32%; top: 18%; width: 36%; height: 40%;
+    background: radial-gradient(circle, #fffbeb 0%, rgba(254, 240, 138, 0.85) 55%, transparent 100%);
+    border-radius: 50%;
+}
+.sky-lantern::after {
+    content: ''; position: absolute; left: 30%; bottom: -2px; width: 40%; height: 12%;
+    background: linear-gradient(180deg, #78350f, #451a03);
+    border-radius: 0 0 30% 30%;
+}
+@keyframes lanternFloat {
+    0%   { transform: translate(0, 0) rotate(-3deg); opacity: 0; }
+    8%   { opacity: 1; }
+    25%  { transform: translate(calc(var(--sway, 0px) * 0.4), -22vh) rotate(3deg); }
+    50%  { transform: translate(calc(var(--sway, 0px) * -0.3), -46vh) rotate(-2deg); opacity: 1; }
+    75%  { transform: translate(calc(var(--sway, 0px) * 0.5), -72vh) rotate(2deg); opacity: 0.9; }
+    100% { transform: translate(0, -105vh) rotate(-2deg); opacity: 0; }
+}
