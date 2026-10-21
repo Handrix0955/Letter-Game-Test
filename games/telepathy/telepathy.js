@@ -4,6 +4,8 @@ const ICON_B = '<svg class="icon-b" viewBox="0 0 24 24"><path d="m12 3-1.912 5.8
 let peer = null;
 let conn = null;
 let isHost = false;
+let connDataBound = false;  // 防止 bindConnData 重复绑定 data 监听器
+let connGuardBound = false; // 防止 armConnGuard 重复绑定 close/error 监听器
 let gameMode = 'hard';
 let currentMode = 'hardcore';
 let gameState = 'LOBBY'; // LOBBY, SET_SECRET, SETTING_SECRET, WAIT_OPPONENT, COIN_TOSS, MY_TURN, OPP_TURN, PVE_TURN, PLAYING, GAMEOVER
@@ -59,11 +61,14 @@ function switchToGameUI() {
         gameCont.style.display = 'flex';
         track.style.display = 'none';
         prompt.style.display = 'block';
-        currentGuess = [];
-        syncInputAlias();
-        renderInput();
-        refreshKeyStates();
-        gameState = 'SETTING_SECRET';
+        // 只有首次从 LOBBY 进入时才重置状态，避免重复调用清空正在输入的数字
+        if (gameState === 'LOBBY') {
+            currentGuess = [];
+            syncInputAlias();
+            renderInput();
+            refreshKeyStates();
+            gameState = 'SETTING_SECRET';
+        }
         console.log('[telepathy] switchToGameUI done');
     } catch (err) {
         alert('UI切换失败，请检查控制台: ' + err.message);
@@ -72,6 +77,8 @@ function switchToGameUI() {
 }
 function armConnGuard() {
     if (!conn) return;
+    if (connGuardBound) return;
+    connGuardBound = true;
     conn.on('close', function() {
         alert('对方已断开连接，返回大厅。');
         exitGame();
@@ -134,6 +141,8 @@ function createRoom() {
     peer.on('connection', function(connection) {
         conn = connection;
         isHost = true;
+        connDataBound = false;
+        connGuardBound = false;
         console.log('[telepathy] host data connection established');
         armConnGuard();
         bindConnData();
@@ -151,6 +160,8 @@ function createRoom() {
 function cleanupJoin() {
     try { if (conn) { conn.close(); conn = null; } } catch (e) {}
     try { if (peer) { peer.destroy(); peer = null; } } catch (e) {}
+    connDataBound = false;
+    connGuardBound = false;
     gameState = 'LOBBY';
     updateTopStatus('请建立连接');
 }
@@ -164,6 +175,8 @@ function joinRoom() {
     peer = new Peer(peerOptions);
     peer.on('open', function() {
         conn = peer.connect('irene-pbox-' + code, { reliable: true });
+        connDataBound = false;
+        connGuardBound = false;
         isHost = false;
 
         // 在 open 之前先绑定错误与关闭处理器，捕获握手阶段断开
@@ -201,6 +214,8 @@ function joinRoom() {
 }
 function bindConnData() {
     if (!conn) return;
+    if (connDataBound) return;
+    connDataBound = true;
     conn.on('data', function(payload) {
         if (!payload || !payload.type) return;
         if (payload.type === 'MODE') {
@@ -243,7 +258,6 @@ function enterSecretSetting() {
     secretCode = [];
     myGuesses = [];
     oppGuesses = [];
-    switchToGameUI();
     const prompt = $('pvp-setup-prompt');
     if (prompt) prompt.innerText = '请在下方输入你的 4 位灵犀密码，然后点击确认';
     if ($('my-guesses')) $('my-guesses').innerHTML = '';
@@ -349,6 +363,8 @@ function exitGame(force) {
     }
     if (conn) { try { conn.close(); } catch (e) {} conn = null; }
     if (peer) { try { peer.destroy(); } catch (e) {} peer = null; }
+    connDataBound = false;
+    connGuardBound = false;
     gameState = 'LOBBY';
     isPVE = false;
     pendingReset = false;
