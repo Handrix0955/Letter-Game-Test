@@ -136,13 +136,16 @@ function createRoom() {
         isHost = true;
         console.log('[telepathy] host data connection established');
         armConnGuard();
-        switchToGameUI();
         bindConnData();
-        const sel = $('mode-select');
-        gameMode = sel ? sel.value : 'hard';
-        currentMode = (gameMode === 'easy') ? 'casual' : 'hardcore';
-        conn.send({ type: 'MODE', data: gameMode });
-        enterSecretSetting();
+        conn.on('open', function() {
+            console.log('[telepathy] host data channel open');
+            switchToGameUI();
+            const sel = $('mode-select');
+            gameMode = sel ? sel.value : 'hard';
+            currentMode = (gameMode === 'easy') ? 'casual' : 'hardcore';
+            conn.send({ type: 'MODE', data: gameMode });
+            enterSecretSetting();
+        });
     });
 }
 function cleanupJoin() {
