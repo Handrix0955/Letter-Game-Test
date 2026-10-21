@@ -6,6 +6,7 @@ let conn = null;
 let isHost = false;
 let connDataBound = false;  // 防止 bindConnData 重复绑定 data 监听器
 let connGuardBound = false; // 防止 armConnGuard 重复绑定 close/error 监听器
+let connTimeout = null;     // 加入房间 15 秒握手超时定时器
 let gameMode = 'hard';
 let currentMode = 'hardcore';
 let gameState = 'LOBBY'; // LOBBY, SET_SECRET, SETTING_SECRET, WAIT_OPPONENT, COIN_TOSS, MY_TURN, OPP_TURN, PVE_TURN, PLAYING, GAMEOVER
@@ -107,37 +108,30 @@ function generateRoomCode() {
     return code;
 }
 function createRoom() {
-    const display = $('my-room-code-display');
-    const codeSpan = $('my-room-code');
-    const waiting = $('connection-waiting');
-    const btn = $('create-room-btn');
-    if (display) display.style.display = 'block';
-    if (codeSpan) codeSpan.innerText = '连接服务器中...';
-    if (waiting) waiting.style.display = 'block';
-    if (btn) btn.disabled = true;
-    if (typeof Peer === 'undefined') {
-        if (codeSpan) codeSpan.innerText = '连接失败';
-        if (btn) btn.disabled = false;
-        showAppMessage('无法联机', '网络库未加载，请检查网络后重试。', '#ef4444');
-        return;
-    }
-    const shortCode = generateRoomCode();
+    document.getElementById('connection-menu').style.display = 'none';
+    document.getElementById('connection-waiting').style.display = 'block';
+    document.getElementById('my-room-code').innerText = '....';
+    updateTopStatus('连接服务器中...');
+
+    const code = generateRoomCode();
     try { if (peer) peer.destroy(); } catch (e) {}
-    peer = new Peer('irene-pbox-' + shortCode, peerOptions);
+    peer = new Peer('irene-pbox-' + code, peerOptions);
+
+    // 只有当信令服务器确认分配了该 ID，才显示房间码
     peer.on('open', function(id) {
-        const codeEl = document.getElementById('my-room-code');
-        if (codeEl) codeEl.innerText = id;
-        console.log('[telepathy] room ready, shortCode =', id);
-        updateTopStatus('房间已创建 | 房间码 ' + id + ' | 等待对方加入');
+        document.getElementById('my-room-code').innerText = code;
+        console.log('[telepathy] room ready, shortCode =', code);
+        updateTopStatus('等待对方加入');
     });
+
     peer.on('error', function(err) {
-        const codeEl = document.getElementById('my-room-code');
-        const type = err && err.type ? err.type : 'unknown';
-        alert('服务器连接异常: ' + type);
-        if (codeEl) codeEl.innerText = '连接失败';
-        if (btn) btn.disabled = false;
-        console.error('[telepathy] peer error:', err);
+        console.error('[telepathy] host peer error:', err);
+        if (gameState === 'LOBBY') {
+            showAppMessage('建房失败', '无法连接到信号服务器，请检查网络后重试。', '#ef4444');
+            quitMatch();
+        }
     });
+
     peer.on('connection', function(connection) {
         conn = connection;
         isHost = true;
@@ -190,7 +184,7 @@ function joinRoom() {
         });
 
         // 15秒握手超时（局域网打洞容许更慢）
-        setTimeout(function() {
+        connTimeout = setTimeout(function() {
             if (conn && conn.readyState !== 'open') {
                 console.log('[telepathy] join timeout');
                 showAppMessage('连接超时', '房间 ' + code + ' 连接超时，请稍后重试。', '#ef4444');
@@ -199,6 +193,11 @@ function joinRoom() {
         }, 15000);
 
         conn.on('open', function() {
+            // 拆弹：连接成功后清除定时超时
+            if (connTimeout) {
+                clearTimeout(connTimeout);
+                connTimeout = null;
+            }
             console.log('[telepathy] guest data connection open');
             armConnGuard();
             switchToGameUI();
