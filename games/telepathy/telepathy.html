@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <title>灵犀密码：破译你的心</title>
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="telepathy.css">
+    <script>
+    window.onerror = function(msg, url, line) { alert('致命错误\n信息: ' + msg + '\n行号: ' + line); };
+    </script>
+</head>
+<body data-theme="dark" data-skin="default">
+    <div class="header">
+        <a href="../../index.html" class="hall-back glass-panel" style="text-decoration: none;">
+            <svg class="icon" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> 返回大厅
+        </a>
+        <h1 id="main-title">灵犀密码</h1>
+    </div>
+    <div id="lobby-container">
+        <div class="top-controls">
+            <div class="room-info glass-panel">
+                <span class="status-dot"></span> <span class="status-text">请建立连接</span>
+            </div>
+            <button class="action-btn" id="quit-btn-lobby" style="width: 60px; color: #ef4444; margin-right: 6px;">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+            <button class="action-btn" id="rules-btn" style="width: 60px; margin-right: 6px;">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            </button>
+            <button class="action-btn" id="theme-btn" style="width: 60px;">
+                <svg class="icon" id="theme-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </button>
+        </div>
+        <div class="network-modal glass-panel" style="width:100%; max-width:400px; padding:20px; text-align:center;">
+            <h2 style="text-align: center; margin-bottom: 20px;">建立心电连接</h2>
+            <div id="connection-menu">
+                <select id="mode-select" style="width:100%; margin-bottom:15px; padding:12px; background:var(--glass-bg); color:var(--text-main); border:1px solid var(--glass-border); border-radius:10px; font-size:15px; outline:none; text-align:center;">
+                    <option value="hard">硬核推导 (1A2B)</option>
+                    <option value="easy">轻松破译 (只算位置正确)</option>
+                </select>
+                <div class="create-section" style="margin-bottom: 20px; text-align: center;">
+                    <button id="create-room-btn" class="action-btn btn-action" style="width:100%; padding:15px; background:var(--text-user); color:#fff; font-size:16px;">创建专属房间</button>
+                    <div id="my-room-code-display" style="display: none; margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.1); border-radius: 10px; min-height: 70px;">
+                        <p style="margin: 0 0 5px 0; font-size: 13px;">请将此房间码发送给宝宝：</p>
+                        <span id="my-room-code" style="display:inline-block; min-height:36px; font-size: 28px; font-weight: 800; letter-spacing: 4px; color: var(--text-user);">生成中...</span>
+                    </div>
+                </div>
+                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 20px 0;">
+                <div class="join-section" style="display: flex; gap: 10px; margin-bottom: 24px;">
+                    <input type="text" id="join-code-input" placeholder="输入4位房间码" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" style="flex: 1; min-width:0; padding: 12px; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--btn-bg); color: var(--text-main); text-transform: uppercase; font-size: 16px; font-weight:bold; letter-spacing:4px; text-align: center; outline: none;">
+                    <button id="join-room-btn" class="action-btn btn-action" style="flex: 1; color:#10b981; font-size:15px;">加入房间</button>
+                </div>
+                <button id="offline-btn" class="action-btn btn-action" style="width: 100%; padding:12px; background: transparent; border: 1px solid var(--glass-border); color: var(--text-note); font-weight:bold;">暂不联机，单机体验</button>
+            </div>
+            <div id="connection-waiting" style="display:none; padding: 10px 0 0 0;">
+                <p style="color:var(--text-note); font-size:13px;">已建立房间，等待对方加入后自动进入设密...</p>
+            </div>
+        </div>
+    </div>
+    <div id="game-container" style="display:none;">
+        <div class="top-controls">
+            <div class="room-info glass-panel" id="game-status">
+                <span class="status-dot"></span> <span class="status-text">对局中</span>
+            </div>
+            <button class="action-btn" id="quit-btn-game" style="width: 60px; color: #ef4444; margin-right: 6px;">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+            <button class="action-btn" id="rules-btn-game" style="width: 60px; margin-right: 6px;">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            </button>
+            <button class="action-btn" id="theme-btn-game" style="width: 60px;">
+                <svg class="icon" id="theme-icon-game" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </button>
+        </div>
+        <div id="pvp-setup-prompt" style="display:none; text-align:center; padding:15px; width:100%; max-width:400px; background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); border-radius:10px; margin-bottom:15px; font-weight:bold; color: var(--text-user);">请在下方输入你的 4 位灵犀密码，然后点击确认</div>
+        <div class="dual-track glass-panel" id="dual-track">
+            <div class="track my-track">
+                <div class="track-title">我的破译</div>
+                <div class="guess-list" id="my-guesses"></div>
+            </div>
+            <div class="track-divider"></div>
+            <div class="track her-track">
+                <div class="track-title">宝宝进度</div>
+                <div class="guess-list" id="her-guesses"></div>
+            </div>
+        </div>
+        <div class="modal-overlay" id="coin-modal" style="display:none; z-index: 10000; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px);">
+            <div style="text-align: center;">
+                <h2 style="color: var(--text-user); margin-bottom: 30px; font-size: 24px;">硬币争夺先手</h2>
+                <div class="coin-container">
+                    <div class="coin" id="flip-coin">
+                        <div class="coin-face coin-front">handrix</div>
+                        <div class="coin-face coin-back">abb</div>
+                    </div>
+                </div>
+                <p id="coin-result-text" style="color: #10b981; font-size: 20px; font-weight: bold; margin-top: 30px; opacity: 0; transition: 0.5s;"></p>
+            </div>
+        </div>
+        <div class="input-display glass-panel" id="input-display">
+            <div class="digit-slot"></div><div class="digit-slot"></div><div class="digit-slot"></div><div class="digit-slot"></div>
+        </div>
+        <div class="keyboard">
+            <div class="key-row"><div class="key" data-num="1">1</div><div class="key" data-num="2">2</div><div class="key" data-num="3">3</div></div>
+            <div class="key-row"><div class="key" data-num="4">4</div><div class="key" data-num="5">5</div><div class="key" data-num="6">6</div></div>
+            <div class="key-row"><div class="key" data-num="7">7</div><div class="key" data-num="8">8</div><div class="key" data-num="9">9</div></div>
+            <div class="key-row">
+                <div class="key action-key del-key" id="backspace-key"><svg class="icon" viewBox="0 0 24 24"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg></div>
+                <div class="key" data-num="0">0</div>
+                <div class="key action-key submit-key"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal-content">
+            <h2 style="text-align:center; margin-bottom:15px; display:flex; justify-content:center; align-items:center; gap:6px;">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> 灵犀密码规则
+            </h2>
+            <div style="font-size: 14px; color: var(--text-note); line-height: 1.6;">
+                <h3 style="color: var(--text-main); margin: 10px 0 5px 0;">核心目标：</h3>
+                <ul style="padding-left: 20px; margin: 0 0 15px 0;">
+                    <li>系统/对方会设定 <b>4位</b> 密码（硬核模式不重复）。</li>
+                    <li>单机默认 20 次机会，抢先获得 4A 获胜。</li>
+                </ul>
+                <h3 style="color: var(--text-main); margin: 10px 0 5px 0;">破译线索 (1A2B)：</h3>
+                <ul style="padding-left: 20px; margin: 0;">
+                    <li style="margin-bottom: 8px;"><svg class="icon-a" viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:#f59e0b;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <b>实心星 (A)</b>：数字对，且位置也对。</li>
+                    <li><svg class="icon-b" viewBox="0 0 24 24" style="width:14px;height:14px;color:#f59e0b;fill:none;stroke:currentColor;stroke-width:2;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> <b>空心星 (B)</b>：数字对，但位置错。</li>
+                </ul>
+
+                <!-- 实战举例高亮卡片 -->
+                <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 12px; border-radius: 10px; font-size: 13px; margin: 15px 0; text-align: left;">
+                    <div style="margin-bottom: 10px; color: var(--text-user); font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+                        <svg class="inline-icon" viewBox="0 0 24 24"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg> 实战举例：假设底牌是 4 5 6 7
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; color: var(--text-main);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>猜 <b>1 2 3 4</b></span>
+                            <span style="display: flex; align-items: center; gap: 2px;">
+                                <svg class="icon-b" viewBox="0 0 24 24" style="width:12px;height:12px;color:#f59e0b;fill:none;stroke:currentColor;stroke-width:2;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                <span style="font-size:11px;color:var(--text-note);margin-left:4px;">(仅4对但错位)</span>
+                            </span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>猜 <b>4 6 8 9</b></span>
+                            <span style="display: flex; align-items: center; gap: 2px;">
+                                <svg class="icon-a" viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px;color:#f59e0b;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <svg class="icon-b" viewBox="0 0 24 24" style="width:12px;height:12px;color:#f59e0b;fill:none;stroke:currentColor;stroke-width:2;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                <span style="font-size:11px;color:var(--text-note);margin-left:4px;">(4全对, 6错位)</span>
+                            </span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>猜 <b>4 5 7 6</b></span>
+                            <span style="display: flex; align-items: center; gap: 2px;">
+                                <svg class="icon-a" viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px;color:#f59e0b;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <svg class="icon-a" viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px;color:#f59e0b;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <svg class="icon-b" viewBox="0 0 24 24" style="width:12px;height:12px;color:#f59e0b;fill:none;stroke:currentColor;stroke-width:2;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                <svg class="icon-b" viewBox="0 0 24 24" style="width:12px;height:12px;color:#f59e0b;fill:none;stroke:currentColor;stroke-width:2;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                <span style="font-size:11px;color:var(--text-note);margin-left:4px;">(4,5对, 7,6错位)</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="close-btn btn-primary" id="rules-close-btn" style="margin-top: 20px; width: 100%;">开始破译！</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="network-modal" style="display:none;"></div>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="../../js/common.js"></script>
+    <script src="telepathy.js"></script>
+</body>
+</html>

@@ -1,12 +1,17 @@
 /* Irene's Puzzle Box - service worker (offline + installable)
    IMPORTANT: bump CACHE (v3 -> v4 ...) whenever any cached file changes;
    the new content is picked up on the next visit. */
-const CACHE = 'ire-pbox-v8';
+// 版本同步铁律：CACHE 整数为 N 时，index.html 大厅底部显示版本必须同步为 v1.0.N
+// 每次改动任何被缓存的文件（css/js/html），都要同时升这里的大厅显示版本
+const CACHE = 'ire-pbox-v9';
 const FILES = [
   './',
   'index.html',
   'css/common.css',
   'js/common.js',
+  'games/telepathy/telepathy.html',
+  'games/telepathy/telepathy.css',
+  'games/telepathy/telepathy.js',
   'games/starbattle/star.html',
   'games/starbattle/star.css',
   'games/starbattle/star.js',
