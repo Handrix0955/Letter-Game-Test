@@ -22,6 +22,18 @@ let myReady = false;
 let oppReady = false;
 const MAX_PVE_ATTEMPTS = 20;
 
+const peerOptions = {
+    debug: 2,
+    config: {
+        'iceServers': [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun.qq.com:3478' },
+            { urls: 'stun:stun.miwifi.com:3478' }
+        ]
+    }
+};
+
 function $(id) { return document.getElementById(id); }
 function updateTopStatus(text) {
     // 状态文本与状态点颜色联动 (绿=就绪/回合/开始，琥珀=等待/连接中)
@@ -104,7 +116,7 @@ function createRoom() {
     }
     const shortCode = generateRoomCode();
     try { if (peer) peer.destroy(); } catch (e) {}
-    peer = new Peer('irene-pbox-' + shortCode, { debug: 2 });
+    peer = new Peer('irene-pbox-' + shortCode, peerOptions);
     peer.on('open', function(id) {
         const codeEl = document.getElementById('my-room-code');
         if (codeEl) codeEl.innerText = id;
@@ -146,7 +158,7 @@ function joinRoom() {
     if (!code) return;
     if (typeof Peer === 'undefined') { showAppMessage('无法联机', '网络库未加载，请检查网络后重试。', '#ef4444'); return; }
     try { if (peer) peer.destroy(); } catch (e) {}
-    peer = new Peer({ debug: 2 });
+    peer = new Peer(peerOptions);
     peer.on('open', function() {
         conn = peer.connect('irene-pbox-' + code, { reliable: true });
         isHost = false;

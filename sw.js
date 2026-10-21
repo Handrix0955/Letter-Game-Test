@@ -3,7 +3,7 @@
    the new content is picked up on the next visit. */
 // 版本同步铁律：CACHE 整数为 N 时，index.html 大厅底部显示版本必须同步为 v1.0.N
 // 每次改动任何被缓存的文件（css/js/html），都要同时升这里的大厅显示版本
-const CACHE = 'ire-pbox-v9';
+const CACHE = 'ire-pbox-v10';
 const FILES = [
   './',
   'index.html',
