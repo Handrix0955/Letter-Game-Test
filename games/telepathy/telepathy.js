@@ -121,7 +121,7 @@ function createRoom() {
     peer.on('open', function(id) {
         document.getElementById('my-room-code').innerText = code;
         console.log('[telepathy] room ready, shortCode =', code);
-        updateTopStatus('等待对方加入');
+        updateTopStatus('等待宝宝加入');
     });
 
     peer.on('error', function(err) {
