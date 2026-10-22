@@ -62,14 +62,12 @@ function switchToGameUI() {
         gameCont.style.display = 'flex';
         track.style.display = 'none';
         prompt.style.display = 'block';
-        // 只有首次从 LOBBY 进入时才重置状态，避免重复调用清空正在输入的数字
-        if (gameState === 'LOBBY') {
-            currentGuess = [];
-            syncInputAlias();
-            renderInput();
-            refreshKeyStates();
-            gameState = 'SETTING_SECRET';
-        }
+        // 每次进入对局界面都重置输入状态，进入设密阶段
+        currentGuess = [];
+        syncInputAlias();
+        renderInput();
+        refreshKeyStates();
+        gameState = 'SETTING_SECRET';
         console.log('[telepathy] switchToGameUI done');
     } catch (err) {
         alert('UI切换失败，请检查控制台: ' + err.message);
@@ -121,7 +119,7 @@ function createRoom() {
     peer.on('open', function(id) {
         document.getElementById('my-room-code').innerText = code;
         console.log('[telepathy] room ready, shortCode =', code);
-        updateTopStatus('等待宝宝加入');
+        updateTopStatus('等待对方加入');
     });
 
     peer.on('error', function(err) {
@@ -141,12 +139,17 @@ function createRoom() {
         armConnGuard();
         bindConnData();
         conn.on('open', function() {
+            // 拆弹：连接成功后清除定时超时（房主侧保险）
+            if (connTimeout) {
+                clearTimeout(connTimeout);
+                connTimeout = null;
+            }
             console.log('[telepathy] host data channel open');
             switchToGameUI();
             const sel = $('mode-select');
             gameMode = sel ? sel.value : 'hard';
             currentMode = (gameMode === 'easy') ? 'casual' : 'hardcore';
-            conn.send({ type: 'MODE', data: gameMode });
+            if (conn) try { conn.send({ type: 'MODE', data: gameMode }); } catch (e) { /* 网络异常，继续处理 */ }
             enterSecretSetting();
         });
     });
@@ -276,7 +279,7 @@ function checkPvpStart() {
         updateTopStatus('抛硬币 | 争夺先手...');
         if (isHost) {
             const hostGoesFirst = Math.random() > 0.5;
-            if (conn) conn.send({ type: 'COIN', data: { isHostFirst: hostGoesFirst } });
+            if (conn) try { conn.send({ type: 'COIN', data: { isHostFirst: hostGoesFirst } }); } catch (e) { /* 网络异常，继续处理 */ }
             playCoinToss(hostGoesFirst);
         }
     }
@@ -286,7 +289,7 @@ function checkGameStart() {
         gameState = 'COIN_TOSS';
         if (isHost) {
             const hostGoesFirst = Math.random() > 0.5;
-            if (conn) conn.send({ type: 'COIN', data: { isHostFirst: hostGoesFirst } });
+            if (conn) try { conn.send({ type: 'COIN', data: { isHostFirst: hostGoesFirst } }); } catch (e) { /* 网络异常，继续处理 */ }
             playCoinToss(hostGoesFirst);
         }
     }
@@ -482,6 +485,7 @@ function renderOppGuesses() {
 function submitGuess() {
     if (currentGuess.length !== 4 || gameState === 'LOBBY' || gameState === 'GAMEOVER') return;
     if (typeof playSound === 'function') playSound('bubble');
+    // SETTING_SECRET 状态下允许提交底牌（房主设密）
     if (gameState === 'SETTING_SECRET') {
         mySecretCode = currentGuess.slice();
         mySecret = mySecretCode.slice();
@@ -492,7 +496,7 @@ function submitGuess() {
         const prompt = $('pvp-setup-prompt');
         if (prompt) prompt.innerText = '等待对方就绪...';
         updateTopStatus('底牌已锁定 | 等待对方就绪...');
-        if (conn) conn.send({ type: 'READY', secret: mySecretCode });
+        if (conn) try { conn.send({ type: 'READY', secret: mySecretCode }); } catch (e) { /* 网络异常，继续处理 */ }
         checkPvpStart();
         return;
     }
@@ -503,7 +507,7 @@ function submitGuess() {
         renderInput();
         gameState = 'WAIT_OPPONENT';
         updateTopStatus('底牌已锁定 | 等待对方设密...');
-        if (conn) conn.send({ type: 'SECRET', data: mySecret });
+        if (conn) try { conn.send({ type: 'SECRET', data: mySecret }); } catch (e) { /* 网络异常，继续处理 */ }
         checkGameStart();
         return;
     }
@@ -514,14 +518,14 @@ function submitGuess() {
     const guessData = { guess: currentGuess.slice(), a: res.a, b: res.b };
     myGuesses.push(guessData);
     renderMyGuesses();
-    if (conn && gameState === 'MY_TURN') conn.send({ type: 'GUESS', data: guessData });
+    if (conn && gameState === 'MY_TURN') try { conn.send({ type: 'GUESS', data: guessData }); } catch (e) { /* 网络异常，继续处理 */ }
     currentGuess.length = 0;
     syncInputAlias();
 
     // 胜利判定 (4A)
     if (res.a === 4) {
         gameState = 'GAMEOVER';
-        if (conn) conn.send({ type: 'WIN' });
+        if (conn) try { conn.send({ type: 'WIN' }); } catch (e) { /* 网络异常，继续处理 */ }
         if (typeof triggerConfetti === 'function') triggerConfetti();
         renderInput();
         if (isPVE) {
@@ -562,7 +566,7 @@ function submitGuess() {
         if (kb) kb.classList.add('locked');
         renderInput();
         updateTopStatus('对方回合，请等待');
-        if (conn) conn.send({ type: 'TURN_PASS' });
+        if (conn) try { conn.send({ type: 'TURN_PASS' }); } catch (e) { /* 网络异常，继续处理 */ }
         if (navigator.vibrate) navigator.vibrate(40);
     }
 }

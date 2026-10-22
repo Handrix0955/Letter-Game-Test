@@ -41,10 +41,6 @@
                 </select>
                 <div class="create-section" style="margin-bottom: 20px; text-align: center;">
                     <button id="create-room-btn" class="action-btn btn-action" style="width:100%; padding:15px; background:var(--text-user); color:#fff; font-size:16px;">创建专属房间</button>
-                    <div id="connection-waiting" style="display: none; margin-top: 15px; padding: 20px; background: rgba(0,0,0,0.1); border-radius: 10px; min-height: 140px;">
-                        <h1 id="my-room-code" style="font-size: 48px; letter-spacing: 12px; color: var(--text-user); margin: 20px 0; font-weight: 900;">....</h1>
-                        <p style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-note);">请将上方 4 位代码发送给对方</p>
-                    </div>
                 </div>
                 <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 20px 0;">
                 <div class="join-section" style="display: flex; gap: 10px; margin-bottom: 24px;">
@@ -53,9 +49,10 @@
                 </div>
                 <button id="offline-btn" class="action-btn btn-action" style="width: 100%; padding:12px; background: transparent; border: 1px solid var(--glass-border); color: var(--text-note); font-weight:bold;">暂不联机，单机体验</button>
             </div>
-            <div id="connection-waiting" style="display:none; padding: 10px 0 0 0;">
-                <p style="color:var(--text-note); font-size:13px;">已建立房间，等待对方加入后自动进入设密...</p>
-            </div>
+        </div>
+        <div id="connection-waiting" style="display:none; margin-top: 15px; padding: 20px; background: rgba(0,0,0,0.1); border-radius: 10px; min-height: 140px;">
+            <h1 id="my-room-code" style="font-size: 48px; letter-spacing: 12px; color: var(--text-user); margin: 20px 0; font-weight: 900;">....</h1>
+            <p style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-note);">请将上方 4 位代码发送给宝宝</p>
         </div>
     </div>
     <div id="game-container" style="display:none;">
@@ -90,7 +87,7 @@
                 <h2 style="color: var(--text-user); margin-bottom: 30px; font-size: 24px;">硬币争夺先手</h2>
                 <div class="coin-container">
                     <div class="coin" id="flip-coin">
-                        <div class="coin-face coin-front">handrix</div>
+                        <div class="coin-face coin-front">Handrix</div>
                         <div class="coin-face coin-back">abb</div>
                     </div>
                 </div>
@@ -110,6 +107,7 @@
                 <div class="key action-key submit-key"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
             </div>
         </div>
+        <p style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-note);">请将上方 4 位代码发送给宝宝</p>
     </div>
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">
