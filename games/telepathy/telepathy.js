@@ -79,7 +79,7 @@ function armConnGuard() {
     if (connGuardBound) return;
     connGuardBound = true;
     conn.on('close', function() {
-        alert('对方已断开连接，返回大厅。');
+        alert('宝宝跑去玩手机咯，返回大厅。');
         exitGame();
     });
     conn.on('error', function(err) {
@@ -238,7 +238,7 @@ function bindConnData() {
             renderOppGuesses();
         } else if (payload.type === 'WIN') {
             gameState = 'GAMEOVER';
-            showAppMessage('破译失败', '对方率先破译了你的底牌！', '#ef4444');
+            showAppMessage('破译失败', '可惜捏，宝宝率先破译了你的底牌，但是你也很棒啦！', '#ef4444');
         } else if (payload.type === 'COIN') {
             playCoinToss(payload.data.isHostFirst);
         } else if (payload.type === 'TURN_PASS') {
@@ -536,7 +536,7 @@ function submitGuess() {
                 bindPveEndReset();
             }, 500);
         } else {
-            setTimeout(function() { showAppMessage('破译成功！', '你太厉害了！正确底牌就是 ' + target.join('') + '。', '#10b981'); }, 500);
+            setTimeout(function() { showAppMessage('破译成功！', '宝宝太厉害了！正确底牌就是 ' + target.join('') + '。', '#10b981'); }, 500);
         }
         return;
     }
@@ -565,7 +565,7 @@ function submitGuess() {
         const kb = document.querySelector('.keyboard');
         if (kb) kb.classList.add('locked');
         renderInput();
-        updateTopStatus('对方回合，请等待');
+        updateTopStatus('宝宝回合，请等待');
         if (conn) try { conn.send({ type: 'TURN_PASS' }); } catch (e) { /* 网络异常，继续处理 */ }
         if (navigator.vibrate) navigator.vibrate(40);
     }
