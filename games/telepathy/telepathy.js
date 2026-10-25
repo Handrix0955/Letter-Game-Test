@@ -502,7 +502,7 @@ function renderOppGuesses() {
     });
 }
 function submitGuess() {
-    if (currentGuess.length !== 4 || gameState === 'LOBBY' || gameState === 'GAMEOVER') return;
+    if (currentInput.length !== 4 || gameState === 'LOBBY' || gameState === 'GAMEOVER' || gameState === 'WAIT_OPP_FINISH') return;
     if (typeof playSound === 'function') playSound('bubble');
     // SETTING_SECRET 状态下允许提交底牌（房主设密）
     if (gameState === 'SETTING_SECRET') {
@@ -584,13 +584,19 @@ function submitGuess() {
 
     // 回合移交 (仅联机 PVP：自己猜完 → 锁键盘 → 交棒对方)
     if (gameState === 'MY_TURN') {
+        if (oppWon) {
+            // 对方已赢，无需移交回合，自己可以无限继续猜
+            updateTopStatus('你的回合 (你的心思已被宝宝猜透)');
+            return; 
+        }
+        
+        // 正常交接回合
         gameState = 'OPP_TURN';
         const kb = document.querySelector('.submit-key');
         if (kb) kb.classList.add('locked');
         renderInput();
-        updateTopStatus('宝宝回合，请等待');
-        if (conn) try { conn.send({ type: 'TURN_PASS' }); } catch (e) { /* 网络异常，继续处理 */ }
-        if (navigator.vibrate) navigator.vibrate(40);
+        updateTopStatus('对方回合，请等待');
+        if (conn) try { conn.send({ type: 'TURN_PASS' }); } catch (e) { console.error('Turn pass error', e); }
     }
 }
 function bindPveEndReset() {
