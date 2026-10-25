@@ -249,15 +249,15 @@ function bindConnData() {
             if (iWon) {
                 gameState = 'GAMEOVER';
                 updateTopStatus('对局圆满结束');
-                showAppMessage('双向奔赴！', '对方也成功破译了你的底牌！对局结束。', '#10b981');
+                showAppMessage('双向奔赴！', '宝宝也成功破译了你的底牌！对局结束。', '#10b981');
             } else {
-                showAppMessage('对方已破译', '对方率先破译了你的底牌！\n不要气馁，你可以继续破译直到成功！', '#f59e0b');
+                showAppMessage('对方已破译', '宝宝率先破译了你的底牌！\n不要气馁，你可以继续破译直到成功！', '#f59e0b');
             }
         } else if (payload.type === 'COIN') {
             playCoinToss(payload.data.isHostFirst);
         } else if (payload.type === 'TURN_PASS') {
             gameState = 'MY_TURN';
-            const kb = document.querySelector('.keyboard');
+            const kb = document.querySelector('.submit-key');
             if (kb) kb.classList.remove('locked');
             updateTopStatus('你的回合');
             if (navigator.vibrate) navigator.vibrate(100);
@@ -339,7 +339,7 @@ function startOfflinePVE() {
     attemptsLeft = MAX_PVE_ATTEMPTS;
     pendingReset = false;
     gameState = 'PVE_TURN';
-    const kbPve = document.querySelector('.keyboard');
+    const kbPve = document.querySelector('.submit-key');
     if (kbPve) kbPve.classList.remove('locked');
     currentGuess.length = 0;
     syncInputAlias();
@@ -363,7 +363,7 @@ function resetRound() {
         secretCode = (currentMode === 'casual') ? genSecretCasual() : genSecretHardcore();
         oppSecret = secretCode.slice();
         gameState = 'PVE_TURN';
-        const kbReset = document.querySelector('.keyboard');
+        const kbReset = document.querySelector('.submit-key');
         if (kbReset) kbReset.classList.remove('locked');
         updateTopStatus('单机演练 | 模式: ' + (currentMode === 'casual' ? '轻松' : '硬核') + ' | 新一局已开始');
     } else {
@@ -406,7 +406,7 @@ function initGame() {
     currentGuess.length = 0;
     syncInputAlias();
     attemptsLeft = MAX_PVE_ATTEMPTS;
-    document.getElementById('my-track-title').innerText = '我的破译';
+    document.getElementById('her-track-title').innerText = '宝宝进度';
     const menu = $('connection-menu');
     const waiting = $('connection-waiting');
     if (menu) menu.style.display = 'block';
@@ -509,7 +509,7 @@ function submitGuess() {
         mySecretCode = currentGuess.slice();
         mySecret = mySecretCode.slice();
         myReady = true;
-        document.getElementById('my-track-title').innerText = '我的破译 (底牌: ' + mySecret.join('') + ')';
+        document.getElementById('her-track-title').innerText = '宝宝进度 (底牌: ' + mySecret.join('') + ')';
         currentGuess.length = 0;
         syncInputAlias();
         renderInput();
@@ -555,7 +555,7 @@ function submitGuess() {
                 setTimeout(() => showAppMessage('双向奔赴！', `正确底牌是 ${oppSecret.join('')}。\n双方均已成功破译！`, '#10b981'), 500);
             } else {
                 gameState = 'WAIT_OPP_FINISH';
-                document.querySelector('.keyboard').classList.add('locked');
+                document.querySelector('.submit-key').classList.add('locked');
                 updateTopStatus('已破译 | 等待对方');
                 setTimeout(() => showAppMessage('破译成功！', `宝宝太厉害啦！正确底牌是 ${oppSecret.join('')}。\n请等待对方完成破译...`, '#10b981'), 500);
                 renderInput();
@@ -585,7 +585,7 @@ function submitGuess() {
     // 回合移交 (仅联机 PVP：自己猜完 → 锁键盘 → 交棒对方)
     if (gameState === 'MY_TURN') {
         gameState = 'OPP_TURN';
-        const kb = document.querySelector('.keyboard');
+        const kb = document.querySelector('.submit-key');
         if (kb) kb.classList.add('locked');
         renderInput();
         updateTopStatus('宝宝回合，请等待');
@@ -696,7 +696,7 @@ function playCoinToss(isHostFirst) {
             setTimeout(function() {
                 modal.style.display = 'none';
                 gameState = myTurnFirst ? 'MY_TURN' : 'OPP_TURN';
-                const kb = document.querySelector('.keyboard');
+                const kb = document.querySelector('.submit-key');
                 if (kb) kb.classList.toggle('locked', !myTurnFirst);
                 updateTopStatus(myTurnFirst ? '你的回合' : '对方回合，请等待');
             }, 2000);
@@ -732,7 +732,7 @@ function quitMatch() {
     // 重置 UI
     if ($('my-guesses')) $('my-guesses').innerHTML = '';
     if ($('her-guesses')) $('her-guesses').innerHTML = '';
-    const kb = document.querySelector('.keyboard');
+    const kb = document.querySelector('.submit-key');
     if (kb) kb.classList.remove('locked');
     renderAttempts();
     renderInput();
