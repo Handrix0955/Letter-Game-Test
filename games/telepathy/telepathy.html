@@ -73,7 +73,7 @@
         <div id="pvp-setup-prompt" style="display:none; text-align:center; padding:15px; width:100%; max-width:400px; background: rgba(0,0,0,0.15); border: 1px solid var(--glass-border); border-radius:10px; margin-bottom:15px; font-weight:bold; color: var(--text-user);">请在下方输入你的 4 位灵犀密码，然后点击确认</div>
         <div class="dual-track glass-panel" id="dual-track">
             <div class="track my-track">
-                <div class="track-title">我的破译</div>
+                <div class="track-title" id="my-track-title">我的破译</div>
                 <div class="guess-list" id="my-guesses"></div>
             </div>
             <div class="track-divider"></div>
@@ -108,6 +108,11 @@
             </div>
         </div>
         <p style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-note);">请将上方 4 位代码发送给宝宝</p>
+
+        <div class="my-secret-bar glass-panel" id="my-secret-bar" style="display:none; margin-top: 12px;">
+            <span class="secret-label">我的底牌：</span>
+            <span class="secret-code" id="my-secret-code">----</span>
+        </div>
     </div>
     <div class="modal-overlay" id="rulesModal">
         <div class="modal-content">

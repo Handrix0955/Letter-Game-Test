@@ -54,3 +54,8 @@
 .coin-front { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
 .coin-back { background: linear-gradient(135deg, #38bdf8, #0284c7); color: #fff; transform: rotateY(180deg); }
 .keyboard.locked { opacity: 0.4; pointer-events: none; }
+
+/* 我的底牌显示条 */
+.my-secret-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 400px; padding: 10px 0; margin-bottom: 10px; }
+.secret-label { color: var(--text-note); font-size: 13px; }
+.secret-code { font-size: 24px; font-weight: bold; letter-spacing: 4px; color: #0ea5e9; font-variant-numeric: tabular-nums; }

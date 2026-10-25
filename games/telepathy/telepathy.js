@@ -24,6 +24,8 @@ let mySecretCode = [];
 let myReady = false;
 let oppReady = false;
 const MAX_PVE_ATTEMPTS = 20;
+let iWon = false;   // 玩家自己是否破译成功
+let oppWon = false; // 对方是否破译成功
 
 const peerOptions = {
     debug: 2,
@@ -68,6 +70,12 @@ function switchToGameUI() {
         renderInput();
         refreshKeyStates();
         gameState = 'SETTING_SECRET';
+        iWon = false;
+        oppWon = false;
+        const mySecretBar = document.getElementById('my-secret-bar');
+        if (mySecretBar) mySecretBar.style.display = 'none';
+        const mySecretCodeEl = document.getElementById('my-secret-code');
+        if (mySecretCodeEl) mySecretCodeEl.innerText = '----';
         console.log('[telepathy] switchToGameUI done');
     } catch (err) {
         alert('UI切换失败，请检查控制台: ' + err.message);
@@ -237,8 +245,14 @@ function bindConnData() {
             oppGuesses.push(payload.data);
             renderOppGuesses();
         } else if (payload.type === 'WIN') {
-            gameState = 'GAMEOVER';
-            showAppMessage('破译失败', '可惜捏，宝宝率先破译了你的底牌，但是你也很棒啦！', '#ef4444');
+            oppWon = true;
+            if (iWon) {
+                gameState = 'GAMEOVER';
+                updateTopStatus('对局圆满结束');
+                showAppMessage('双向奔赴！', '对方也成功破译了你的底牌！对局结束。', '#10b981');
+            } else {
+                showAppMessage('对方已破译', '对方率先破译了你的底牌！\n不要气馁，你可以继续破译直到成功！', '#f59e0b');
+            }
         } else if (payload.type === 'COIN') {
             playCoinToss(payload.data.isHostFirst);
         } else if (payload.type === 'TURN_PASS') {
@@ -258,6 +272,8 @@ function enterSecretSetting() {
     mySecret = [];
     oppSecret = [];
     secretCode = [];
+    iWon = false;
+    oppWon = false;
     myGuesses = [];
     oppGuesses = [];
     const prompt = $('pvp-setup-prompt');
@@ -384,10 +400,13 @@ function initGame() {
     gameState = 'LOBBY';
     isPVE = false;
     pendingReset = false;
+    iWon = false;
+    oppWon = false;
     mySecret = []; oppSecret = []; secretCode = []; myGuesses = []; oppGuesses = [];
     currentGuess.length = 0;
     syncInputAlias();
     attemptsLeft = MAX_PVE_ATTEMPTS;
+    document.getElementById('my-track-title').innerText = '我的破译';
     const menu = $('connection-menu');
     const waiting = $('connection-waiting');
     if (menu) menu.style.display = 'block';
@@ -490,6 +509,7 @@ function submitGuess() {
         mySecretCode = currentGuess.slice();
         mySecret = mySecretCode.slice();
         myReady = true;
+        document.getElementById('my-track-title').innerText = '我的破译 (底牌: ' + mySecret.join('') + ')';
         currentGuess.length = 0;
         syncInputAlias();
         renderInput();
@@ -524,19 +544,22 @@ function submitGuess() {
 
     // 胜利判定 (4A)
     if (res.a === 4) {
-        gameState = 'GAMEOVER';
-        if (conn) try { conn.send({ type: 'WIN' }); } catch (e) { /* 网络异常，继续处理 */ }
-        if (typeof triggerConfetti === 'function') triggerConfetti();
-        renderInput();
-        if (isPVE) {
-            pendingReset = true;
-            const used = MAX_PVE_ATTEMPTS - attemptsLeft;
-            setTimeout(function() {
-                showAppMessage('破译成功', '正确底牌就是 ' + target.join('') + '，共用 ' + used + ' 次。点击关闭开始下一局。', '#10b981');
-                bindPveEndReset();
-            }, 500);
-        } else {
-            setTimeout(function() { showAppMessage('破译成功！', '宝宝太厉害了！正确底牌就是 ' + target.join('') + '。', '#10b981'); }, 500);
+        if (isPVE) { gameState = 'GAMEOVER'; } else {
+            iWon = true;
+            if (conn) try { conn.send({ type: 'WIN' }); } catch (e) { /* 网络异常，继续处理 */ }
+            if (typeof triggerConfetti === 'function') triggerConfetti();
+            
+            if (oppWon) {
+                gameState = 'GAMEOVER';
+                updateTopStatus('对局圆满结束');
+                setTimeout(() => showAppMessage('双向奔赴！', `正确底牌是 ${oppSecret.join('')}。\n双方均已成功破译！`, '#10b981'), 500);
+            } else {
+                gameState = 'WAIT_OPP_FINISH';
+                document.querySelector('.keyboard').classList.add('locked');
+                updateTopStatus('已破译 | 等待对方');
+                setTimeout(() => showAppMessage('破译成功！', `宝宝太厉害啦！正确底牌是 ${oppSecret.join('')}。\n请等待对方完成破译...`, '#10b981'), 500);
+                renderInput();
+            }
         }
         return;
     }
@@ -586,7 +609,7 @@ let longPressTimer;
 keys.forEach(function(key) {
     key.addEventListener('contextmenu', function(e) { e.preventDefault(); });
     key.addEventListener('pointerdown', function(e) {
-        if (gameState === 'LOBBY' || gameState === 'GAMEOVER') return;
+        if (gameState === 'LOBBY' || gameState === 'GAMEOVER' || gameState === 'WAIT_OPP_FINISH') return;
         try { key.setPointerCapture(e.pointerId); } catch (err) {}
         let isLongPress = false;
         longPressTimer = setTimeout(function() {
