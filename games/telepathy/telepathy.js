@@ -251,6 +251,9 @@ function bindConnData() {
                 updateTopStatus('对局圆满结束');
                 showAppMessage('双向奔赴！', '宝宝也成功破译了你的底牌！对局结束。', '#10b981');
             } else {
+                gameState = 'MY_TURN';
+                document.querySelector('.submit-key').classList.remove('locked');
+                updateTopStatus('你的回合 (对方已破译)');
                 showAppMessage('对方已破译', '宝宝率先破译了你的底牌！\n不要气馁，你可以继续破译直到成功！', '#f59e0b');
             }
         } else if (payload.type === 'COIN') {
@@ -502,7 +505,7 @@ function renderOppGuesses() {
     });
 }
 function submitGuess() {
-    if (currentInput.length !== 4 || gameState === 'LOBBY' || gameState === 'GAMEOVER' || gameState === 'WAIT_OPP_FINISH') return;
+    if (currentInput.length !== 4 || gameState === 'LOBBY' || gameState === 'GAMEOVER') return;
     if (typeof playSound === 'function') playSound('bubble');
     // SETTING_SECRET 状态下允许提交底牌（房主设密）
     if (gameState === 'SETTING_SECRET') {
@@ -554,10 +557,10 @@ function submitGuess() {
                 updateTopStatus('对局圆满结束');
                 setTimeout(() => showAppMessage('双向奔赴！', `正确底牌是 ${oppSecret.join('')}。\n双方均已成功破译！`, '#10b981'), 500);
             } else {
-                gameState = 'WAIT_OPP_FINISH';
-                document.querySelector('.submit-key').classList.add('locked');
-                updateTopStatus('已破译 | 等待对方');
-                setTimeout(() => showAppMessage('破译成功！', `宝宝太厉害啦！正确底牌是 ${oppSecret.join('')}。\n请等待对方完成破译...`, '#10b981'), 500);
+                gameState = 'MY_TURN';
+                document.querySelector('.submit-key').classList.remove('locked');
+                updateTopStatus('你的回合 (对方已破译)');
+                setTimeout(() => showAppMessage('破译成功！', `宝宝太厉害啦！正确底牌是 ${oppSecret.join('')}。\n请继续破译对方的密码...`, '#10b981'), 500);
                 renderInput();
             }
         }
@@ -615,7 +618,7 @@ let longPressTimer;
 keys.forEach(function(key) {
     key.addEventListener('contextmenu', function(e) { e.preventDefault(); });
     key.addEventListener('pointerdown', function(e) {
-        if (gameState === 'LOBBY' || gameState === 'GAMEOVER' || gameState === 'WAIT_OPP_FINISH') return;
+        if (gameState === 'LOBBY' || gameState === 'GAMEOVER') return;
         try { key.setPointerCapture(e.pointerId); } catch (err) {}
         let isLongPress = false;
         longPressTimer = setTimeout(function() {
